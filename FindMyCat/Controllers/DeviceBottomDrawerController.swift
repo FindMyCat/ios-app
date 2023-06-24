@@ -9,16 +9,26 @@ import Foundation
 import UIKit
 import FittedSheets
 
-class DeviceBottomDrawerController : UIViewController {
+class DeviceBottomDrawerController :
+        UIViewController,
+        UITableViewDelegate,
+        UITableViewDataSource
+{
+    public let controller: UIViewController
     
+    private var devices: [Device] = [Device(name: "Pump Myan")]
+    
+    // Parent View + Controller
     private var parentVc: UIViewController
     private var parentView: UIView
     
-    public let controller: UIViewController
-    
+    // Views
     private var stackView = UIStackView()
     private var drawerLabel = UILabel()
+    private var tableView = UITableView()
     
+
+    // Constructor
     init(parentView: UIView, parentVc: UIViewController) {
         self.parentVc = parentVc
         self.parentView = parentView
@@ -36,11 +46,13 @@ class DeviceBottomDrawerController : UIViewController {
     override func viewDidLoad() {
         view.isUserInteractionEnabled = false
 
-        let options = SheetOptions(
+        let sheeetOptions = SheetOptions(
             useInlineMode: true
         )
+        
+        let allowedSheetSizes = [SheetSize.percent(0.3), SheetSize.percent(0.6), SheetSize.percent(0.1)]
 
-        let sheetController = SheetViewController(controller: self.controller, sizes: [.percent(0.3), .percent(0.6)], options: options)
+        let sheetController = SheetViewController(controller: self.controller, sizes: allowedSheetSizes, options: sheeetOptions)
         sheetController.allowGestureThroughOverlay = true
         
 
@@ -80,8 +92,26 @@ class DeviceBottomDrawerController : UIViewController {
         // animate in
         sheetController.animateIn(to: self.parentView, in: self.parentVc)
 
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        
         configureStackView()
         configureDrawerLabel()
+        configureTableView()
+        
+    }
+    
+    func configureTableView() {
+        
+        tableView.delegate = self
+        tableView.dataSource = self
+        stackView.addSubview(tableView)
+        
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.topAnchor.constraint(equalTo: drawerLabel.bottomAnchor, constant: 10).isActive            = true
+        tableView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive    = true
+        tableView.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
+        tableView.bottomAnchor.constraint(equalTo: stackView.bottomAnchor, constant: 20).isActive      = true
+        
     }
     
     func configureStackView() {
@@ -102,8 +132,30 @@ class DeviceBottomDrawerController : UIViewController {
         
         drawerLabel.text = "Devices"
         drawerLabel.font =  UIFont.boldSystemFont(ofSize: 20)
+        drawerLabel.topAnchor.constraint(equalTo: stackView.topAnchor).isActive            = true
         
         // constraints
         drawerLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        
+        var config = UIListContentConfiguration.cell()
+        config.text = devices[indexPath.row].getName()
+        
+        cell.contentConfiguration = config
+        
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        print("LALALAL")
+        return devices.count
+    }
+    
+    override func viewDidLayoutSubviews() {
+        tableView.frame = controller.view.bounds
     }
 }
