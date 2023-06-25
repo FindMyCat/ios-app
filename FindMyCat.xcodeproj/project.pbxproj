@@ -24,6 +24,8 @@
 		365E537E2A48AFDF00AD6AE8 /* CookieHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E537D2A48AFDF00AD6AE8 /* CookieHandler.swift */; };
 		365E53822A48B54A00AD6AE8 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E53812A48B54A00AD6AE8 /* LoginViewController.swift */; };
 		365E53842A48B73300AD6AE8 /* HomeScreenController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E53832A48B73300AD6AE8 /* HomeScreenController.swift */; };
+		365E53862A48EC9900AD6AE8 /* SharedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E53852A48EC9900AD6AE8 /* SharedData.swift */; };
+		365E53892A48EF0200AD6AE8 /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = 365E53882A48EF0200AD6AE8 /* Starscream */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,6 +45,7 @@
 		365E537D2A48AFDF00AD6AE8 /* CookieHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieHandler.swift; sourceTree = "<group>"; };
 		365E53812A48B54A00AD6AE8 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		365E53832A48B73300AD6AE8 /* HomeScreenController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreenController.swift; sourceTree = "<group>"; };
+		365E53852A48EC9900AD6AE8 /* SharedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,6 +56,7 @@
 				365E537B2A48AFC700AD6AE8 /* Alamofire in Frameworks */,
 				365E53712A4770A000AD6AE8 /* FittedSheets in Frameworks */,
 				365E53662A476A0C00AD6AE8 /* MapboxMaps in Frameworks */,
+				365E53892A48EF0200AD6AE8 /* Starscream in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -97,6 +101,7 @@
 			isa = PBXGroup;
 			children = (
 				365E53732A478F6F00AD6AE8 /* Devices.swift */,
+				365E53852A48EC9900AD6AE8 /* SharedData.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -157,6 +162,7 @@
 				365E53652A476A0C00AD6AE8 /* MapboxMaps */,
 				365E53702A4770A000AD6AE8 /* FittedSheets */,
 				365E537A2A48AFC700AD6AE8 /* Alamofire */,
+				365E53882A48EF0200AD6AE8 /* Starscream */,
 			);
 			productName = FindMyCat;
 			productReference = 365E534C2A47648700AD6AE8 /* FindMyCat.app */;
@@ -190,6 +196,7 @@
 				365E53642A476A0C00AD6AE8 /* XCRemoteSwiftPackageReference "mapbox-maps-ios" */,
 				365E536F2A4770A000AD6AE8 /* XCRemoteSwiftPackageReference "FittedSheets" */,
 				365E53792A48AFC700AD6AE8 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				365E53872A48EF0200AD6AE8 /* XCRemoteSwiftPackageReference "Starscream" */,
 			);
 			productRefGroup = 365E534D2A47648700AD6AE8 /* Products */;
 			projectDirPath = "";
@@ -218,6 +225,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				365E53862A48EC9900AD6AE8 /* SharedData.swift in Sources */,
 				365E537E2A48AFDF00AD6AE8 /* CookieHandler.swift in Sources */,
 				365E53542A47648700AD6AE8 /* ViewController.swift in Sources */,
 				365E53692A476AE800AD6AE8 /* MapboxView.swift in Sources */,
@@ -478,6 +486,14 @@
 				kind = branch;
 			};
 		};
+		365E53872A48EF0200AD6AE8 /* XCRemoteSwiftPackageReference "Starscream" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/daltoniam/Starscream.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -495,6 +511,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 365E53792A48AFC700AD6AE8 /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
+		};
+		365E53882A48EF0200AD6AE8 /* Starscream */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 365E53872A48EF0200AD6AE8 /* XCRemoteSwiftPackageReference "Starscream" */;
+			productName = Starscream;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
