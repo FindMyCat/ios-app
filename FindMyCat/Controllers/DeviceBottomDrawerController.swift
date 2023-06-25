@@ -44,7 +44,7 @@ class DeviceBottomDrawerController :
     
     
     override func viewDidLoad() {
-        view.isUserInteractionEnabled              = false
+        view.isUserInteractionEnabled = false
 
         let sheeetOptions = SheetOptions(
             useInlineMode: true
