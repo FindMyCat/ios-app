@@ -7,15 +7,36 @@
 
 import Foundation
 import UIKit
+import Combine
 
 class HomeScreenController: UIViewController {
+    
+    // Load devices here from API
+    private var devices: [Device] = []
+    
     private var mapboxView: MapboxView!
     
     private var deviceBottomDrawerViewController: DeviceBottomDrawerController!
+
     
     override func viewDidLoad() {
-        showMainScreen()
+          super.viewDidLoad()
+          fetchDevices()
+          showMainScreen()
+      }
+
+    private func fetchDevices() {
+        TraccarAPIManager.shared.fetchDevices { [weak self] response in
+            switch response {
+            case .success(let devices):
+                self?.devices = devices
+            case .failure(let error):
+                print("Could not fetch devices", error)
+            }
+        }
     }
+    
+
     
     private func showMainScreen() {
           // Add map to the background
