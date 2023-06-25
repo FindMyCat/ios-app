@@ -50,7 +50,7 @@ class DeviceBottomDrawerController :
             useInlineMode: true
         )
         
-        let allowedSheetSizes = [SheetSize.percent(0.3), SheetSize.percent(0.6), SheetSize.percent(0.1)]
+        let allowedSheetSizes = [SheetSize.percent(0.4), SheetSize.percent(0.7), SheetSize.percent(0.1)]
 
         let sheetController = SheetViewController(controller: self.controller, sizes: allowedSheetSizes, options: sheeetOptions)
         sheetController.allowGestureThroughOverlay = true
@@ -62,6 +62,7 @@ class DeviceBottomDrawerController :
         }
         // The size of the grip in the pull bar
         sheetController.gripSize = CGSize(width: 50, height: 6)
+        sheetController.gripColor = UIColor(red: 60/255, green: 60/255, blue: 67/255, alpha: 0.3)
         sheetController.overlayColor = UIColor.clear
 
 
@@ -87,7 +88,16 @@ class DeviceBottomDrawerController :
 
         /// Automatically grow/move the sheet to accomidate the keyboard. Defaults to true.
         sheetController.autoAdjustToKeyboard = true
+        
+        sheetController.contentBackgroundColor = .clear
 
+        let blurEffect = UIBlurEffect(style: UIBlurEffect.Style.light)
+        let blurEffectView = UIVisualEffectView(effect: blurEffect)
+        blurEffectView.backgroundColor = UIColor.init(red: 243/255, green: 243/255, blue: 243/255, alpha: 0.7)
+
+        blurEffectView.frame = view.bounds
+        blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        controller.view.addSubview(blurEffectView)
     
         // animate in
         sheetController.animateIn(to: self.parentView, in: self.parentVc)
@@ -96,21 +106,8 @@ class DeviceBottomDrawerController :
         
         configureStackView()
         configureDrawerLabel()
+        configureHairline()
         configureTableView()
-        
-    }
-    
-    func configureTableView() {
-        
-        tableView.delegate = self
-        tableView.dataSource = self
-        stackView.addSubview(tableView)
-        
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.topAnchor.constraint(equalTo: drawerLabel.bottomAnchor, constant: 10).isActive            = true
-        tableView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive    = true
-        tableView.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
-        tableView.bottomAnchor.constraint(equalTo: stackView.bottomAnchor, constant: 20).isActive      = true
         
     }
     
@@ -119,23 +116,51 @@ class DeviceBottomDrawerController :
         controller.view.addSubview(stackView)
         
         stackView.axis = .horizontal
+        stackView.backgroundColor = .clear
         // constraints
         stackView.translatesAutoresizingMaskIntoConstraints                                                  = false
-        stackView.topAnchor.constraint(equalTo: controller.view.topAnchor, constant: 20).isActive            = true
-        stackView.leadingAnchor.constraint(equalTo: controller.view.leadingAnchor, constant: 20).isActive    = true
-        stackView.trailingAnchor.constraint(equalTo: controller.view.trailingAnchor, constant: -20).isActive = true
-        stackView.bottomAnchor.constraint(equalTo: controller.view.bottomAnchor, constant: 20).isActive      = true
+        stackView.topAnchor.constraint(equalTo: controller.view.topAnchor, constant: 15).isActive            = true
+        stackView.leadingAnchor.constraint(equalTo: controller.view.leadingAnchor, constant: 15).isActive    = true
+        stackView.trailingAnchor.constraint(equalTo: controller.view.trailingAnchor, constant: -15).isActive = true
+        stackView.bottomAnchor.constraint(equalTo: controller.view.bottomAnchor, constant: 15).isActive      = true
     }
     
     func configureDrawerLabel() {
         stackView.addSubview(drawerLabel)
         
         drawerLabel.text = "Devices"
-        drawerLabel.font =  UIFont.boldSystemFont(ofSize: 20)
+        drawerLabel.font =  UIFont.boldSystemFont(ofSize: 18)
         drawerLabel.topAnchor.constraint(equalTo: stackView.topAnchor).isActive            = true
         
         // constraints
         drawerLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+    }
+    
+    func configureHairline() {
+        let hairline = UIView()
+        stackView.addSubview(hairline)
+        hairline.translatesAutoresizingMaskIntoConstraints = false
+        hairline.widthAnchor.constraint(equalToConstant: controller.view.frame.width).isActive = true
+        hairline.heightAnchor.constraint(equalToConstant: 0.3).isActive = true
+        hairline.leftAnchor.constraint(equalTo: controller.view.leftAnchor).isActive = true
+        hairline.topAnchor.constraint(equalTo: drawerLabel.bottomAnchor,constant: 15).isActive = true
+        hairline.backgroundColor = UIColor(red: 60/255, green: 60/255, blue: 67/255, alpha: 0.3)
+    }
+    
+    func configureTableView() {
+        
+        tableView.delegate = self
+        tableView.dataSource = self
+        stackView.addSubview(tableView)
+        
+        tableView.backgroundColor = .clear
+        
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.topAnchor.constraint(equalTo: drawerLabel.bottomAnchor, constant: 15).isActive            = true
+        tableView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive    = true
+        tableView.trailingAnchor.constraint(equalTo: controller.view.trailingAnchor).isActive = true
+        tableView.bottomAnchor.constraint(equalTo: stackView.bottomAnchor, constant: 20).isActive      = true
         
     }
     
@@ -147,6 +172,7 @@ class DeviceBottomDrawerController :
         
         cell.contentConfiguration = config
         
+        cell.backgroundColor = .clear
         return cell
     }
     
