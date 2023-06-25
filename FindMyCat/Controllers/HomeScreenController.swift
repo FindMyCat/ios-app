@@ -11,10 +11,10 @@ import Combine
 
 class HomeScreenController: UIViewController {
     
-    // Load devices here from API
-    private var devices: [Device] = []
     
     private var mapboxView: MapboxView!
+    
+    private var devices: [Device] = []
     
     private var deviceBottomDrawerViewController: DeviceBottomDrawerController!
 
@@ -31,6 +31,7 @@ class HomeScreenController: UIViewController {
             case .success(let devices):
                 self?.devices = devices
             case .failure(let error):
+                self?.devices = []
                 print("Could not fetch devices", error)
             }
         }
