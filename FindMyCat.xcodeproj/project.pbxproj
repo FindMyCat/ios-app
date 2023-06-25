@@ -19,6 +19,11 @@
 		365E536E2A476D3C00AD6AE8 /* DeviceBottomDrawerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E536D2A476D3C00AD6AE8 /* DeviceBottomDrawerController.swift */; };
 		365E53712A4770A000AD6AE8 /* FittedSheets in Frameworks */ = {isa = PBXBuildFile; productRef = 365E53702A4770A000AD6AE8 /* FittedSheets */; };
 		365E53742A478F6F00AD6AE8 /* Devices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E53732A478F6F00AD6AE8 /* Devices.swift */; };
+		365E53782A48AF6300AD6AE8 /* TraccarAPIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E53772A48AF6300AD6AE8 /* TraccarAPIManager.swift */; };
+		365E537B2A48AFC700AD6AE8 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 365E537A2A48AFC700AD6AE8 /* Alamofire */; };
+		365E537E2A48AFDF00AD6AE8 /* CookieHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E537D2A48AFDF00AD6AE8 /* CookieHandler.swift */; };
+		365E53822A48B54A00AD6AE8 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E53812A48B54A00AD6AE8 /* LoginViewController.swift */; };
+		365E53842A48B73300AD6AE8 /* HomeScreenController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E53832A48B73300AD6AE8 /* HomeScreenController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +39,10 @@
 		365E536A2A476CAC00AD6AE8 /* DeviceBottomDrawer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceBottomDrawer.swift; sourceTree = "<group>"; };
 		365E536D2A476D3C00AD6AE8 /* DeviceBottomDrawerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceBottomDrawerController.swift; sourceTree = "<group>"; };
 		365E53732A478F6F00AD6AE8 /* Devices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Devices.swift; sourceTree = "<group>"; };
+		365E53772A48AF6300AD6AE8 /* TraccarAPIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraccarAPIManager.swift; sourceTree = "<group>"; };
+		365E537D2A48AFDF00AD6AE8 /* CookieHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieHandler.swift; sourceTree = "<group>"; };
+		365E53812A48B54A00AD6AE8 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		365E53832A48B73300AD6AE8 /* HomeScreenController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreenController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,6 +50,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				365E537B2A48AFC700AD6AE8 /* Alamofire in Frameworks */,
 				365E53712A4770A000AD6AE8 /* FittedSheets in Frameworks */,
 				365E53662A476A0C00AD6AE8 /* MapboxMaps in Frameworks */,
 			);
@@ -68,6 +78,7 @@
 		365E534E2A47648700AD6AE8 /* FindMyCat */ = {
 			isa = PBXGroup;
 			children = (
+				365E53752A48AF4600AD6AE8 /* network */,
 				365E536C2A476D2100AD6AE8 /* Controllers */,
 				365E53672A476ACE00AD6AE8 /* Views */,
 				365E53632A4769BC00AD6AE8 /* Models */,
@@ -103,8 +114,27 @@
 			isa = PBXGroup;
 			children = (
 				365E536D2A476D3C00AD6AE8 /* DeviceBottomDrawerController.swift */,
+				365E53812A48B54A00AD6AE8 /* LoginViewController.swift */,
+				365E53832A48B73300AD6AE8 /* HomeScreenController.swift */,
 			);
 			path = Controllers;
+			sourceTree = "<group>";
+		};
+		365E53752A48AF4600AD6AE8 /* network */ = {
+			isa = PBXGroup;
+			children = (
+				365E537C2A48AFD300AD6AE8 /* util */,
+				365E53772A48AF6300AD6AE8 /* TraccarAPIManager.swift */,
+			);
+			path = network;
+			sourceTree = "<group>";
+		};
+		365E537C2A48AFD300AD6AE8 /* util */ = {
+			isa = PBXGroup;
+			children = (
+				365E537D2A48AFDF00AD6AE8 /* CookieHandler.swift */,
+			);
+			path = util;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -126,6 +156,7 @@
 			packageProductDependencies = (
 				365E53652A476A0C00AD6AE8 /* MapboxMaps */,
 				365E53702A4770A000AD6AE8 /* FittedSheets */,
+				365E537A2A48AFC700AD6AE8 /* Alamofire */,
 			);
 			productName = FindMyCat;
 			productReference = 365E534C2A47648700AD6AE8 /* FindMyCat.app */;
@@ -158,6 +189,7 @@
 			packageReferences = (
 				365E53642A476A0C00AD6AE8 /* XCRemoteSwiftPackageReference "mapbox-maps-ios" */,
 				365E536F2A4770A000AD6AE8 /* XCRemoteSwiftPackageReference "FittedSheets" */,
+				365E53792A48AFC700AD6AE8 /* XCRemoteSwiftPackageReference "Alamofire" */,
 			);
 			productRefGroup = 365E534D2A47648700AD6AE8 /* Products */;
 			projectDirPath = "";
@@ -186,6 +218,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				365E537E2A48AFDF00AD6AE8 /* CookieHandler.swift in Sources */,
 				365E53542A47648700AD6AE8 /* ViewController.swift in Sources */,
 				365E53692A476AE800AD6AE8 /* MapboxView.swift in Sources */,
 				365E536B2A476CAC00AD6AE8 /* DeviceBottomDrawer.swift in Sources */,
@@ -193,6 +226,9 @@
 				365E53742A478F6F00AD6AE8 /* Devices.swift in Sources */,
 				365E53522A47648700AD6AE8 /* SceneDelegate.swift in Sources */,
 				365E536E2A476D3C00AD6AE8 /* DeviceBottomDrawerController.swift in Sources */,
+				365E53822A48B54A00AD6AE8 /* LoginViewController.swift in Sources */,
+				365E53842A48B73300AD6AE8 /* HomeScreenController.swift in Sources */,
+				365E53782A48AF6300AD6AE8 /* TraccarAPIManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -434,6 +470,14 @@
 				kind = branch;
 			};
 		};
+		365E53792A48AFC700AD6AE8 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -446,6 +490,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 365E536F2A4770A000AD6AE8 /* XCRemoteSwiftPackageReference "FittedSheets" */;
 			productName = FittedSheets;
+		};
+		365E537A2A48AFC700AD6AE8 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 365E53792A48AFC700AD6AE8 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

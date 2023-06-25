@@ -23,5 +23,20 @@
 	</dict>
 	<key>MBXAccessToken</key>
 	<string>pk.eyJ1IjoiY2hpdGxhbmdlc2FoYXMiLCJhIjoiY2o0c2g3cmdwMnVvejMzcXNoOTU4aGUzNSJ9.GLe1_VP5YZjqSkoN5pbOLA</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>ec2-18-191-185-127.us-east-2.compute.amazonaws.com</key>
+			<dict>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSTemporaryExceptionMinimumTLSVersion</key>
+				<string>TLSv1.1</string>
+			</dict>
+		</dict>
+	</dict>
 </dict>
 </plist>

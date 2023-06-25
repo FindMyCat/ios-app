@@ -16,7 +16,7 @@ class DeviceBottomDrawerController :
 {
     public let controller: UIViewController
     
-    private var devices: [Device] = [Device(name: "Pump Myan")]
+    private var devices: [Device] = [Device(name: "Pumpkin Cat"), Device(name: "Butter"), Device(name: "Reggie")]
     
     // Parent View + Controller
     private var parentVc: UIViewController
@@ -141,7 +141,7 @@ class DeviceBottomDrawerController :
         let hairline = UIView()
         stackView.addSubview(hairline)
         hairline.translatesAutoresizingMaskIntoConstraints = false
-        hairline.widthAnchor.constraint(equalToConstant: controller.view.frame.width).isActive = true
+        hairline.trailingAnchor.constraint(equalTo: controller.view.trailingAnchor).isActive = true
         hairline.heightAnchor.constraint(equalToConstant: 0.3).isActive = true
         hairline.leftAnchor.constraint(equalTo: controller.view.leftAnchor).isActive = true
         hairline.topAnchor.constraint(equalTo: drawerLabel.bottomAnchor,constant: 15).isActive = true
@@ -158,7 +158,7 @@ class DeviceBottomDrawerController :
         
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.topAnchor.constraint(equalTo: drawerLabel.bottomAnchor, constant: 15).isActive            = true
-        tableView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive    = true
+        tableView.leadingAnchor.constraint(equalTo: controller.view.leadingAnchor).isActive    = true
         tableView.trailingAnchor.constraint(equalTo: controller.view.trailingAnchor).isActive = true
         tableView.bottomAnchor.constraint(equalTo: stackView.bottomAnchor, constant: 20).isActive      = true
         
@@ -173,12 +173,18 @@ class DeviceBottomDrawerController :
         cell.contentConfiguration = config
         
         cell.backgroundColor = .clear
+        let bgColorView = UIView()
+        bgColorView.backgroundColor = UIColor(red: 60/255, green: 60/255, blue: 67/255, alpha: 0.3)
+        cell.selectedBackgroundView = bgColorView
         return cell
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        print("LALALAL")
         return devices.count
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
     }
     
     override func viewDidLayoutSubviews() {
