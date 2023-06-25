@@ -10,9 +10,13 @@ import MapboxMaps
 
 
 class ViewController: UIViewController {
-    
-
+            
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
         
+        self.showLoginScreen()
+    }
+    
     private func showLoginScreen() {
       let loginViewController = LoginViewController()
       
@@ -20,10 +24,5 @@ class ViewController: UIViewController {
       present(loginViewController, animated: true, completion: nil)
     }
 
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        self.showLoginScreen()
-    }
 }
 

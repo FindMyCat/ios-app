@@ -44,7 +44,7 @@ class DeviceBottomDrawerController :
     
     
     override func viewDidLoad() {
-        view.isUserInteractionEnabled = false
+        view.isUserInteractionEnabled              = false
 
         let sheeetOptions = SheetOptions(
             useInlineMode: true
@@ -67,29 +67,29 @@ class DeviceBottomDrawerController :
 
 
         // The corner curve of the sheet (iOS 13 or later)
-        sheetController.cornerCurve = .continuous
+        sheetController.cornerCurve                 = .continuous
 
 
         // minimum distance above the pull bar, prevents bar from coming right up to the edge of the screen
-        sheetController.minimumSpaceAbovePullBar = 0
+        sheetController.minimumSpaceAbovePullBar    = 0
 
 
         // Determine if the rounding should happen on the pullbar or the presented controller only (should only be true when the pull bar's background color is .clear)
-        sheetController.treatPullBarAsClear = false
+        sheetController.treatPullBarAsClear         = false
 
         // Disable the dismiss on background tap functionality
-        sheetController.dismissOnOverlayTap = false
+        sheetController.dismissOnOverlayTap         = false
 
         // Disable the ability to pull down to dismiss the modal
-        sheetController.dismissOnPull = false
+        sheetController.dismissOnPull               = false
 
         /// Allow pulling past the maximum height and bounce back. Defaults to true.
-        sheetController.allowPullingPastMaxHeight = false
+        sheetController.allowPullingPastMaxHeight   = false
 
         /// Automatically grow/move the sheet to accomidate the keyboard. Defaults to true.
-        sheetController.autoAdjustToKeyboard = true
+        sheetController.autoAdjustToKeyboard        = true
         
-        sheetController.contentBackgroundColor = .clear
+        sheetController.contentBackgroundColor      = .clear
 
         let blurEffect = UIBlurEffect(style: UIBlurEffect.Style.light)
         let blurEffectView = UIVisualEffectView(effect: blurEffect)
@@ -130,7 +130,7 @@ class DeviceBottomDrawerController :
         
         drawerLabel.text = "Devices"
         drawerLabel.font =  UIFont.boldSystemFont(ofSize: 18)
-        drawerLabel.topAnchor.constraint(equalTo: stackView.topAnchor).isActive            = true
+        drawerLabel.topAnchor.constraint(equalTo: stackView.topAnchor).isActive = true
         
         // constraints
         drawerLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -140,11 +140,11 @@ class DeviceBottomDrawerController :
     func configureHairline() {
         let hairline = UIView()
         stackView.addSubview(hairline)
-        hairline.translatesAutoresizingMaskIntoConstraints = false
-        hairline.trailingAnchor.constraint(equalTo: controller.view.trailingAnchor).isActive = true
-        hairline.heightAnchor.constraint(equalToConstant: 0.3).isActive = true
-        hairline.leftAnchor.constraint(equalTo: controller.view.leftAnchor).isActive = true
-        hairline.topAnchor.constraint(equalTo: drawerLabel.bottomAnchor,constant: 15).isActive = true
+        hairline.translatesAutoresizingMaskIntoConstraints                                              = false
+        hairline.trailingAnchor.constraint(equalTo: controller.view.trailingAnchor).isActive            = true
+        hairline.heightAnchor.constraint(equalToConstant: 0.3).isActive                                 = true
+        hairline.leftAnchor.constraint(equalTo: controller.view.leftAnchor).isActive                    = true
+        hairline.topAnchor.constraint(equalTo: drawerLabel.bottomAnchor,constant: 15).isActive          = true
         hairline.backgroundColor = UIColor(red: 60/255, green: 60/255, blue: 67/255, alpha: 0.3)
     }
     
@@ -156,11 +156,11 @@ class DeviceBottomDrawerController :
         
         tableView.backgroundColor = .clear
         
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.topAnchor.constraint(equalTo: drawerLabel.bottomAnchor, constant: 15).isActive            = true
-        tableView.leadingAnchor.constraint(equalTo: controller.view.leadingAnchor).isActive    = true
-        tableView.trailingAnchor.constraint(equalTo: controller.view.trailingAnchor).isActive = true
-        tableView.bottomAnchor.constraint(equalTo: stackView.bottomAnchor, constant: 20).isActive      = true
+        tableView.translatesAutoresizingMaskIntoConstraints                                             = false
+        tableView.topAnchor.constraint(equalTo: drawerLabel.bottomAnchor, constant: 15).isActive        = true
+        tableView.leadingAnchor.constraint(equalTo: controller.view.leadingAnchor).isActive             = true
+        tableView.trailingAnchor.constraint(equalTo: controller.view.trailingAnchor).isActive           = true
+        tableView.bottomAnchor.constraint(equalTo: stackView.bottomAnchor, constant: 20).isActive       = true
         
     }
     
