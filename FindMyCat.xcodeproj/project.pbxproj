@@ -26,6 +26,9 @@
 		365E53842A48B73300AD6AE8 /* HomeScreenController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E53832A48B73300AD6AE8 /* HomeScreenController.swift */; };
 		365E53862A48EC9900AD6AE8 /* SharedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E53852A48EC9900AD6AE8 /* SharedData.swift */; };
 		365E53892A48EF0200AD6AE8 /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = 365E53882A48EF0200AD6AE8 /* Starscream */; };
+		365E538B2A48EF5600AD6AE8 /* WebSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E538A2A48EF5600AD6AE8 /* WebSocketManager.swift */; };
+		365E538D2A48FD3200AD6AE8 /* Positions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E538C2A48FD3200AD6AE8 /* Positions.swift */; };
+		365E538F2A49005800AD6AE8 /* WebsocketPayloadWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E538E2A49005800AD6AE8 /* WebsocketPayloadWrapper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +49,9 @@
 		365E53812A48B54A00AD6AE8 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		365E53832A48B73300AD6AE8 /* HomeScreenController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreenController.swift; sourceTree = "<group>"; };
 		365E53852A48EC9900AD6AE8 /* SharedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedData.swift; sourceTree = "<group>"; };
+		365E538A2A48EF5600AD6AE8 /* WebSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebSocketManager.swift; sourceTree = "<group>"; };
+		365E538C2A48FD3200AD6AE8 /* Positions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Positions.swift; sourceTree = "<group>"; };
+		365E538E2A49005800AD6AE8 /* WebsocketPayloadWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsocketPayloadWrapper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,6 +108,8 @@
 			children = (
 				365E53732A478F6F00AD6AE8 /* Devices.swift */,
 				365E53852A48EC9900AD6AE8 /* SharedData.swift */,
+				365E538C2A48FD3200AD6AE8 /* Positions.swift */,
+				365E538E2A49005800AD6AE8 /* WebsocketPayloadWrapper.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -130,6 +138,7 @@
 			children = (
 				365E537C2A48AFD300AD6AE8 /* util */,
 				365E53772A48AF6300AD6AE8 /* TraccarAPIManager.swift */,
+				365E538A2A48EF5600AD6AE8 /* WebSocketManager.swift */,
 			);
 			path = network;
 			sourceTree = "<group>";
@@ -233,7 +242,10 @@
 				365E53502A47648700AD6AE8 /* AppDelegate.swift in Sources */,
 				365E53742A478F6F00AD6AE8 /* Devices.swift in Sources */,
 				365E53522A47648700AD6AE8 /* SceneDelegate.swift in Sources */,
+				365E538D2A48FD3200AD6AE8 /* Positions.swift in Sources */,
 				365E536E2A476D3C00AD6AE8 /* DeviceBottomDrawerController.swift in Sources */,
+				365E538F2A49005800AD6AE8 /* WebsocketPayloadWrapper.swift in Sources */,
+				365E538B2A48EF5600AD6AE8 /* WebSocketManager.swift in Sources */,
 				365E53822A48B54A00AD6AE8 /* LoginViewController.swift in Sources */,
 				365E53842A48B73300AD6AE8 /* HomeScreenController.swift in Sources */,
 				365E53782A48AF6300AD6AE8 /* TraccarAPIManager.swift in Sources */,

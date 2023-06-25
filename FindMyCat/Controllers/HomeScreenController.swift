@@ -19,26 +19,53 @@ class HomeScreenController: UIViewController {
     private var deviceBottomDrawerViewController: DeviceBottomDrawerController!
 
     
+    // Websockets
+    private let webSocketManager = WebSocketManager()
+    private var cancellables = Set<AnyCancellable>()
+    
     override func viewDidLoad() {
           super.viewDidLoad()
-          fetchDevices()
           showMainScreen()
+          configureWebsocket()
       }
-
-    private func fetchDevices() {
-        TraccarAPIManager.shared.fetchDevices { [weak self] response in
-            switch response {
-            case .success(let devices):
-                self?.devices = devices
-            case .failure(let error):
-                self?.devices = []
-                print("Could not fetch devices", error)
+    
+    private func configureWebsocket() {
+        webSocketManager.connect()
+        webSocketManager.dataPublisher
+            .sink { [weak self] newData in
+                self?.handleWebSocketData(newData)
             }
-        }
+            .store(in: &cancellables)
     }
     
+    private func handleWebSocketData(_ jsonString: String) {
+        // Handle updated data in the first view controller
+        print("HomeScreenController websocket recv data: \(jsonString)")
+        
+        let jsonData = jsonString.data(using: .utf8)!
+        print(jsonData)
+        
+        do {
+            let decoder = JSONDecoder()
+            let payloadWrapper = try decoder.decode(PayloadWrapper.self, from: jsonData)
+            
+            if let devices = payloadWrapper.devices {
+                for device in devices {
+                    print(device.name)
+                }
+                // Handle devices
+            } else if let positions = payloadWrapper.positions {
+                // Handle positions
+                for position in positions {
+                    print(position.longitude)
+                }
+            }
+        } catch {
+            print("Error decoding JSON: \(error)")
+        }
+        
+    }
 
-    
     private func showMainScreen() {
           // Add map to the background
           mapboxView = MapboxView(frame: view.bounds)
