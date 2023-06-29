@@ -40,7 +40,6 @@ class TraccarAPIManager {
             .request(url, method: method)
             .validate(statusCode: 200..<300)
             .response { response in
-                debugPrint(response)
                 switch response.result {
                 case .success(let value):
                     completion(.success(value))
