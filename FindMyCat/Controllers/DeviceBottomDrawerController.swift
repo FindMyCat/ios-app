@@ -16,8 +16,6 @@ class DeviceBottomDrawerController :
 {
     public let controller: UIViewController
     
-    private var devices: [Device] = [Device(name: "Pumpkin Cat"), Device(name: "Butter"), Device(name: "Reggie")]
-    
     // Parent View + Controller
     private var parentVc: UIViewController
     private var parentView: UIView
@@ -42,9 +40,9 @@ class DeviceBottomDrawerController :
         fatalError("init(coder:) has not been implemented")
     }
     
-    
     override func viewDidLoad() {
         view.isUserInteractionEnabled = false
+        NotificationCenter.default.addObserver(self, selector: #selector(devicesUpdated(_:)), name: Notification.Name(Constants.DevicesUpdatedNotificationName), object: nil)
 
         let sheeetOptions = SheetOptions(
             useInlineMode: true
@@ -111,6 +109,10 @@ class DeviceBottomDrawerController :
         
     }
     
+    @objc private func devicesUpdated(_ notification: Notification) {
+        tableView.reloadData()
+    }
+    
     func configureStackView() {
         
         controller.view.addSubview(stackView)
@@ -168,6 +170,7 @@ class DeviceBottomDrawerController :
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         
         var config = UIListContentConfiguration.cell()
+        let devices = SharedData.getDevices()
         config.text = devices[indexPath.row].getName()
         
         cell.contentConfiguration = config
@@ -180,7 +183,7 @@ class DeviceBottomDrawerController :
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return devices.count
+        return SharedData.getDevices().count
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

@@ -47,7 +47,6 @@ class LoginViewController: UIViewController {
             result in
             switch result {
             case .success(let session):
-                debugPrint(session)
                 self.navigateToMainScreen()
             case .failure(_):
                 self.displayErrorMessage()

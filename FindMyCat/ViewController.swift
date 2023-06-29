@@ -11,6 +11,8 @@ import MapboxMaps
 
 class ViewController: UIViewController {
     
+    private var sharedData = SharedData.shared // initialize shared data instance
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         showMainOrLoginScreen()
@@ -22,7 +24,6 @@ class ViewController: UIViewController {
             
             switch response {
             case .success(let session):
-                print("Session found : ", session)
                 self.showMainScreen()
             case .failure(_):
                 print("No session found, redirecting to login screen")
@@ -35,14 +36,14 @@ class ViewController: UIViewController {
       let loginViewController = LoginViewController()
       
       loginViewController.modalPresentationStyle = .fullScreen
-      present(loginViewController, animated: true, completion: nil)
+      present(loginViewController, animated: false, completion: nil)
     }
     
     private func showMainScreen() {
       let homeScreenController = HomeScreenController()
       
       homeScreenController.modalPresentationStyle = .fullScreen
-      present(homeScreenController, animated: true, completion: nil)
+      present(homeScreenController, animated: false, completion: nil)
     }
 
 }

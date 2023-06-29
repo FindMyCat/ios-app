@@ -11,59 +11,19 @@ import Combine
 
 class HomeScreenController: UIViewController {
     
-    
     private var mapboxView: MapboxView!
     
-    private var devices: [Device] = []
-    
     private var deviceBottomDrawerViewController: DeviceBottomDrawerController!
-
-    
-    // Websockets
-    private let webSocketManager = WebSocketManager()
-    private var cancellables = Set<AnyCancellable>()
     
     override func viewDidLoad() {
           super.viewDidLoad()
           showMainScreen()
-          configureWebsocket()
-      }
-    
-    private func configureWebsocket() {
-        webSocketManager.connect()
-        webSocketManager.dataPublisher
-            .sink { [weak self] newData in
-                self?.handleWebSocketData(newData)
-            }
-            .store(in: &cancellables)
+        NotificationCenter.default.addObserver(self, selector: #selector(devicesUpdated(_:)), name: Notification.Name(Constants.DevicesUpdatedNotificationName), object: nil)
     }
-    
-    private func handleWebSocketData(_ jsonString: String) {
-        // Handle updated data in the first view controller
-        print("HomeScreenController websocket recv data: \(jsonString)")
-        
-        let jsonData = jsonString.data(using: .utf8)!
-        print(jsonData)
-        
-        do {
-            let decoder = JSONDecoder()
-            let payloadWrapper = try decoder.decode(PayloadWrapper.self, from: jsonData)
-            
-            if let devices = payloadWrapper.devices {
-                for device in devices {
-                    print(device.name)
-                }
-                // Handle devices
-            } else if let positions = payloadWrapper.positions {
-                // Handle positions
-                for position in positions {
-                    print(position.longitude)
-                }
-            }
-        } catch {
-            print("Error decoding JSON: \(error)")
-        }
-        
+
+    @objc private func devicesUpdated(_ notification: Notification) {
+
+        // Update UI using the updated devices array
     }
 
     private func showMainScreen() {
