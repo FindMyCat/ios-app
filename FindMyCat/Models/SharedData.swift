@@ -124,7 +124,7 @@ class SharedData {
             } else if let positions = payloadWrapper.positions {
                 print("websocket positions", positions)
                 for newPosition in positions {
-                    if let index = SharedData.positions.firstIndex(where: { $0.id == newPosition.id }) {
+                    if let index = SharedData.positions.firstIndex(where: { $0.deviceId == newPosition.deviceId }) {
                         // Device with the same ID exists, update it
                         SharedData.positions[index] = newPosition
                     } else {
