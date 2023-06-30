@@ -15,7 +15,6 @@
 		365E535C2A47648900AD6AE8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 365E535A2A47648900AD6AE8 /* LaunchScreen.storyboard */; };
 		365E53662A476A0C00AD6AE8 /* MapboxMaps in Frameworks */ = {isa = PBXBuildFile; productRef = 365E53652A476A0C00AD6AE8 /* MapboxMaps */; };
 		365E53692A476AE800AD6AE8 /* MapboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E53682A476AE800AD6AE8 /* MapboxView.swift */; };
-		365E536B2A476CAC00AD6AE8 /* DeviceBottomDrawer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E536A2A476CAC00AD6AE8 /* DeviceBottomDrawer.swift */; };
 		365E536E2A476D3C00AD6AE8 /* DeviceBottomDrawerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E536D2A476D3C00AD6AE8 /* DeviceBottomDrawerController.swift */; };
 		365E53712A4770A000AD6AE8 /* FittedSheets in Frameworks */ = {isa = PBXBuildFile; productRef = 365E53702A4770A000AD6AE8 /* FittedSheets */; };
 		365E53742A478F6F00AD6AE8 /* Devices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E53732A478F6F00AD6AE8 /* Devices.swift */; };
@@ -31,6 +30,7 @@
 		365E538F2A49005800AD6AE8 /* WebsocketPayloadWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E538E2A49005800AD6AE8 /* WebsocketPayloadWrapper.swift */; };
 		367763892A4E173F0096FF1F /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367763882A4E173F0096FF1F /* Constants.swift */; };
 		3677638B2A4E1EDA0096FF1F /* MapMarkerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3677638A2A4E1EDA0096FF1F /* MapMarkerView.swift */; };
+		36CC30882A4E95A400E8FCCA /* DeviceCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36CC30872A4E95A400E8FCCA /* DeviceCellView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,7 +43,6 @@
 		365E535B2A47648900AD6AE8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		365E535D2A47648900AD6AE8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		365E53682A476AE800AD6AE8 /* MapboxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapboxView.swift; sourceTree = "<group>"; };
-		365E536A2A476CAC00AD6AE8 /* DeviceBottomDrawer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceBottomDrawer.swift; sourceTree = "<group>"; };
 		365E536D2A476D3C00AD6AE8 /* DeviceBottomDrawerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceBottomDrawerController.swift; sourceTree = "<group>"; };
 		365E53732A478F6F00AD6AE8 /* Devices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Devices.swift; sourceTree = "<group>"; };
 		365E53772A48AF6300AD6AE8 /* TraccarAPIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraccarAPIManager.swift; sourceTree = "<group>"; };
@@ -56,6 +55,7 @@
 		365E538E2A49005800AD6AE8 /* WebsocketPayloadWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsocketPayloadWrapper.swift; sourceTree = "<group>"; };
 		367763882A4E173F0096FF1F /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		3677638A2A4E1EDA0096FF1F /* MapMarkerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapMarkerView.swift; sourceTree = "<group>"; };
+		36CC30872A4E95A400E8FCCA /* DeviceCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCellView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -123,8 +123,8 @@
 			isa = PBXGroup;
 			children = (
 				365E53682A476AE800AD6AE8 /* MapboxView.swift */,
-				365E536A2A476CAC00AD6AE8 /* DeviceBottomDrawer.swift */,
 				3677638A2A4E1EDA0096FF1F /* MapMarkerView.swift */,
+				36CC30872A4E95A400E8FCCA /* DeviceCellView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -240,11 +240,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36CC30882A4E95A400E8FCCA /* DeviceCellView.swift in Sources */,
 				365E53862A48EC9900AD6AE8 /* SharedData.swift in Sources */,
 				365E537E2A48AFDF00AD6AE8 /* CookieHandler.swift in Sources */,
 				365E53542A47648700AD6AE8 /* ViewController.swift in Sources */,
 				365E53692A476AE800AD6AE8 /* MapboxView.swift in Sources */,
-				365E536B2A476CAC00AD6AE8 /* DeviceBottomDrawer.swift in Sources */,
 				365E53502A47648700AD6AE8 /* AppDelegate.swift in Sources */,
 				365E53742A478F6F00AD6AE8 /* Devices.swift in Sources */,
 				367763892A4E173F0096FF1F /* Constants.swift in Sources */,
