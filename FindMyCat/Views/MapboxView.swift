@@ -75,13 +75,13 @@ class MapboxView: UIView, CLLocationManagerDelegate {
             return CLLocationCoordinate2D(latitude: position.latitude, longitude: position.longitude)
         }
         
-        if (positions.count > 1) {
+        if (coordinates.count > 1) {
             let polygon = Geometry.polygon(Polygon([coordinates]))
             let newCamera = mapView.mapboxMap.camera(for: polygon, padding: .init(top: 100, left: 100, bottom: 300, right: 100), bearing: 0, pitch: 0)
             mapView.camera.ease(to: newCamera, duration: 0.5)
         } else {
             let newCoordinate = CLLocationCoordinate2D(latitude: positions[0].latitude, longitude: positions[0].longitude)
-            mapView.camera.ease(to: CameraOptions(center: newCoordinate, zoom: 15), duration: 1.3)
+            mapView.camera.ease(to: CameraOptions(center: newCoordinate, zoom: 14), duration: 0.7)
         }
     }
     
@@ -108,6 +108,7 @@ class MapboxView: UIView, CLLocationManagerDelegate {
 
         print("positionUpdated: ", SharedData.getPositions())
         mapView.viewAnnotations.removeAll()
+        print(mapView.viewAnnotations.annotations)
         // Update UI using the updated positions array
         updatePositions(positions: SharedData.getPositions())
     }
