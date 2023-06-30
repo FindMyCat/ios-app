@@ -67,15 +67,19 @@ class MapboxView: UIView, CLLocationManagerDelegate {
         for position in positions {
             let latitude = position.latitude
             let longitude = position.longitude
-
             
             // Create a new `CLLocationCoordinate2D` with the updated latitude and longitude
             let newCoordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-            mapView.camera.ease(to: CameraOptions(center: newCoordinate, zoom: 15), duration: 1.3)
             
             self.addViewAnnotation(at: newCoordinate)
         }
         
+        let coordinates = positions.map { position in
+            return CLLocationCoordinate2D(latitude: position.latitude, longitude: position.longitude)
+        }
+        let polygon = Geometry.polygon(Polygon([coordinates]))
+        let newCamera = mapView.mapboxMap.camera(for: polygon, padding: .init(top: 100, left: 100, bottom: 300, right: 100), bearing: 0, pitch: 0)
+        mapView.camera.ease(to: newCamera, duration: 0.5)
     }
     
     // Handle location authorization status changes
@@ -115,6 +119,7 @@ class MapboxView: UIView, CLLocationManagerDelegate {
         )
         let sampleView = CustomAnnotationView(frame: CGRect(x: 0, y: 0, width: 60, height: 60))
         sampleView.setIcon(systemName: "pawprint", color: .black)
+        
                 
         try? mapView.viewAnnotations.add(sampleView, options: options)
     }
