@@ -75,6 +75,7 @@ class MapboxView: UIView, CLLocationManagerDelegate {
             
             self.addViewAnnotation(at: newCoordinate)
         }
+        
     }
     
     // Handle location authorization status changes
@@ -98,6 +99,7 @@ class MapboxView: UIView, CLLocationManagerDelegate {
     
     @objc private func positionsUpdated(_ notification: Notification) {
 
+        print("positionUpdated: ", SharedData.getPositions())
         mapView.viewAnnotations.removeAll()
         // Update UI using the updated positions array
         updatePositions(positions: SharedData.getPositions())
