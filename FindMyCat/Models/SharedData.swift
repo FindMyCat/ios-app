@@ -83,9 +83,26 @@ class SharedData {
             let payloadWrapper = try decoder.decode(PayloadWrapper.self, from: jsonData)
             
             if let devices = payloadWrapper.devices {
-                SharedData.devices = devices
+//              // Update existing devices and append new devices
+                for newDevice in devices {
+                    if let index = SharedData.devices.firstIndex(where: { $0.id == newDevice.id }) {
+                        // Device with the same ID exists, update it
+                        SharedData.devices[index] = newDevice
+                    } else {
+                        // Device does not exist, append it
+                        SharedData.devices.append(newDevice)
+                    }
+                }
             } else if let positions = payloadWrapper.positions {
-                SharedData.positions = positions
+                for newPosition in positions {
+                    if let index = SharedData.positions.firstIndex(where: { $0.id == newPosition.id }) {
+                        // Device with the same ID exists, update it
+                        SharedData.positions[index] = newPosition
+                    } else {
+                        // Device does not exist, append it
+                        SharedData.positions.append(newPosition)
+                    }
+                }
             }
         } catch {
             print("Error decoding JSON: \(error)")
