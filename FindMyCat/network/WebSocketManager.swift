@@ -59,6 +59,7 @@ class WebSocketManager: WebSocketDelegate {
       case .reconnectSuggested:
         print("reconnectSuggested")
       case .cancelled:
+          socket?.connect()
         print("cancelled")
       }
     }
