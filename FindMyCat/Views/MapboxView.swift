@@ -8,6 +8,7 @@
 import UIKit
 import MapboxMaps
 import CoreLocation
+import MapKit
 
 class MapboxView: UIView, CLLocationManagerDelegate {
     internal var mapView: MapView!
@@ -36,6 +37,9 @@ class MapboxView: UIView, CLLocationManagerDelegate {
         locationManager = CLLocationManager()
         locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
+        NotificationCenter.default.addObserver(self, selector: #selector(devicesUpdated(_:)), name: Notification.Name(Constants.DevicesUpdatedNotificationName), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(positionsUpdated(_:)), name: Notification.Name(Constants.PositionsUpdatedNotificationName), object: nil)
+        
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -59,32 +63,58 @@ class MapboxView: UIView, CLLocationManagerDelegate {
         addSubview(mapView)
     }
     
-    public func updatePosition(position: Position) {
-        let latitude = position.latitude
-        let longitude = position.longitude
+    public func updatePositions(positions: [Position]) {
+        for position in positions {
+            let latitude = position.latitude
+            let longitude = position.longitude
 
-        
-        // Create a new `CLLocationCoordinate2D` with the updated latitude and longitude
-        let newCoordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-
-
-        mapView.camera.ease(to: CameraOptions(center: newCoordinate, zoom: 15), duration: 1.3)
+            
+            // Create a new `CLLocationCoordinate2D` with the updated latitude and longitude
+            let newCoordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            mapView.camera.ease(to: CameraOptions(center: newCoordinate, zoom: 15), duration: 1.3)
+            
+            self.addViewAnnotation(at: newCoordinate)
+        }
     }
     
     // Handle location authorization status changes
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == .authorizedWhenInUse {
             setupMapView()
-//            centerToUserLocation()
         }
     }
     
     func centerToUserLocation() {
         let userLocation = locationManager.location?.coordinate
-        print("userLocation", userLocation!)
         
         mapView.camera.ease(to: CameraOptions(center: userLocation! as CLLocationCoordinate2D, zoom: 15), duration: 1.3)
         
+    }
+
+    @objc private func devicesUpdated(_ notification: Notification) {
+
+        // Update UI using the updated devices array
+    }
+    
+    @objc private func positionsUpdated(_ notification: Notification) {
+
+        mapView.viewAnnotations.removeAll()
+        // Update UI using the updated positions array
+        updatePositions(positions: SharedData.getPositions())
+    }
+    
+    private func addViewAnnotation(at coordinate: CLLocationCoordinate2D) {
+        let options = ViewAnnotationOptions(
+            geometry: Point(coordinate),
+            width: 60,
+            height: 60,
+            allowOverlap: false,
+            anchor: ViewAnnotationAnchor.bottom
+        )
+        let sampleView = CustomAnnotationView(frame: CGRect(x: 0, y: 0, width: 60, height: 60))
+        sampleView.setIcon(systemName: "pawprint", color: .black)
+                
+        try? mapView.viewAnnotations.add(sampleView, options: options)
     }
 }
 

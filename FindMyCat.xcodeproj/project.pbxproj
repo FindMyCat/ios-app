@@ -30,6 +30,7 @@
 		365E538D2A48FD3200AD6AE8 /* Positions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E538C2A48FD3200AD6AE8 /* Positions.swift */; };
 		365E538F2A49005800AD6AE8 /* WebsocketPayloadWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E538E2A49005800AD6AE8 /* WebsocketPayloadWrapper.swift */; };
 		367763892A4E173F0096FF1F /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367763882A4E173F0096FF1F /* Constants.swift */; };
+		3677638B2A4E1EDA0096FF1F /* MapMarkerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3677638A2A4E1EDA0096FF1F /* MapMarkerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -54,6 +55,7 @@
 		365E538C2A48FD3200AD6AE8 /* Positions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Positions.swift; sourceTree = "<group>"; };
 		365E538E2A49005800AD6AE8 /* WebsocketPayloadWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsocketPayloadWrapper.swift; sourceTree = "<group>"; };
 		367763882A4E173F0096FF1F /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		3677638A2A4E1EDA0096FF1F /* MapMarkerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapMarkerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,6 +124,7 @@
 			children = (
 				365E53682A476AE800AD6AE8 /* MapboxView.swift */,
 				365E536A2A476CAC00AD6AE8 /* DeviceBottomDrawer.swift */,
+				3677638A2A4E1EDA0096FF1F /* MapMarkerView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -247,6 +250,7 @@
 				367763892A4E173F0096FF1F /* Constants.swift in Sources */,
 				365E53522A47648700AD6AE8 /* SceneDelegate.swift in Sources */,
 				365E538D2A48FD3200AD6AE8 /* Positions.swift in Sources */,
+				3677638B2A4E1EDA0096FF1F /* MapMarkerView.swift in Sources */,
 				365E536E2A476D3C00AD6AE8 /* DeviceBottomDrawerController.swift in Sources */,
 				365E538F2A49005800AD6AE8 /* WebsocketPayloadWrapper.swift in Sources */,
 				365E538B2A48EF5600AD6AE8 /* WebSocketManager.swift in Sources */,
