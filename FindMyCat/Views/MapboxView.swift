@@ -37,9 +37,6 @@ class MapboxView: UIView, CLLocationManagerDelegate {
         locationManager = CLLocationManager()
         locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
-        NotificationCenter.default.addObserver(self, selector: #selector(devicesUpdated(_:)), name: Notification.Name(Constants.DevicesUpdatedNotificationName), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(positionsUpdated(_:)), name: Notification.Name(Constants.PositionsUpdatedNotificationName), object: nil)
-        
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -77,9 +74,15 @@ class MapboxView: UIView, CLLocationManagerDelegate {
         let coordinates = positions.map { position in
             return CLLocationCoordinate2D(latitude: position.latitude, longitude: position.longitude)
         }
-        let polygon = Geometry.polygon(Polygon([coordinates]))
-        let newCamera = mapView.mapboxMap.camera(for: polygon, padding: .init(top: 100, left: 100, bottom: 300, right: 100), bearing: 0, pitch: 0)
-        mapView.camera.ease(to: newCamera, duration: 0.5)
+        
+        if (positions.count > 1) {
+            let polygon = Geometry.polygon(Polygon([coordinates]))
+            let newCamera = mapView.mapboxMap.camera(for: polygon, padding: .init(top: 100, left: 100, bottom: 300, right: 100), bearing: 0, pitch: 0)
+            mapView.camera.ease(to: newCamera, duration: 0.5)
+        } else {
+            let newCoordinate = CLLocationCoordinate2D(latitude: positions[0].latitude, longitude: positions[0].longitude)
+            mapView.camera.ease(to: CameraOptions(center: newCoordinate, zoom: 15), duration: 1.3)
+        }
     }
     
     // Handle location authorization status changes
@@ -122,6 +125,11 @@ class MapboxView: UIView, CLLocationManagerDelegate {
         
                 
         try? mapView.viewAnnotations.add(sampleView, options: options)
+    }
+    
+    override func didMoveToWindow() {
+        NotificationCenter.default.addObserver(self, selector: #selector(devicesUpdated(_:)), name: Notification.Name(Constants.DevicesUpdatedNotificationName), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(positionsUpdated(_:)), name: Notification.Name(Constants.PositionsUpdatedNotificationName), object: nil)
     }
 }
 
