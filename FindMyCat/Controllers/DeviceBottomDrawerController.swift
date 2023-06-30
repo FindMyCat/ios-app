@@ -43,6 +43,7 @@ class DeviceBottomDrawerController :
     override func viewDidLoad() {
         view.isUserInteractionEnabled = false
         NotificationCenter.default.addObserver(self, selector: #selector(devicesUpdated(_:)), name: Notification.Name(Constants.DevicesUpdatedNotificationName), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(positionsUpdated(_:)), name: Notification.Name(Constants.PositionsUpdatedNotificationName), object: nil)
 
         let sheeetOptions = SheetOptions(
             useInlineMode: true
@@ -100,7 +101,7 @@ class DeviceBottomDrawerController :
         // animate in
         sheetController.animateIn(to: self.parentView, in: self.parentVc)
 
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        tableView.register(DeviceCellView.self, forCellReuseIdentifier: "DeviceCell")
         
         configureStackView()
         configureDrawerLabel()
@@ -110,6 +111,10 @@ class DeviceBottomDrawerController :
     }
     
     @objc private func devicesUpdated(_ notification: Notification) {
+        tableView.reloadData()
+    }
+    
+    @objc private func positionsUpdated(_ notification: Notification) {
         tableView.reloadData()
     }
     
@@ -167,15 +172,17 @@ class DeviceBottomDrawerController :
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        
-        var config = UIListContentConfiguration.cell()
+        let cell = tableView.dequeueReusableCell(withIdentifier: "DeviceCell", for: indexPath) as! DeviceCellView
         let devices = SharedData.getDevices()
-        config.text = devices[indexPath.row].getName()
-        
-        cell.contentConfiguration = config
+        let positions = SharedData.getPositions()
         
         cell.backgroundColor = .clear
+        
+        cell.nameLabel.text = devices[indexPath.row].name
+        if(!positions.isEmpty) {
+            cell.setBatteryPercentage(percentage: positions[indexPath.row].attributes.batteryLevel)
+        }
+        
         let bgColorView = UIView()
         bgColorView.backgroundColor = UIColor(red: 60/255, green: 60/255, blue: 67/255, alpha: 0.3)
         cell.selectedBackgroundView = bgColorView
