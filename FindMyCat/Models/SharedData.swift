@@ -35,8 +35,17 @@ class SharedData {
         // Initialize WebSocket connection and handle incoming data updates
         // Update the devices array accordingly
         print("SharedData init()")
-        configureWebsocket()
-        fetchDevicesFromRestAPI()
+        
+        // Sequentially exeute API calls and finally register websockets.
+        fetchDevicesFromRestAPI {
+            self.fetchPositionsFromRestAPI {
+                self.configureWebsocket {
+                    // All tasks completed
+                    print("All tasks completed")
+                }
+            }
+        }
+
      }
     
     // MARK: Getters for Devices and Position static variables
@@ -49,7 +58,7 @@ class SharedData {
     }
     
     // MARK: Network handlers
-    private func fetchDevicesFromRestAPI() {
+    private func fetchDevicesFromRestAPI(completion: @escaping () -> Void) {
         print("fetching devices from REST API")
         TraccarAPIManager.shared.fetchDevices {
             result in
@@ -61,16 +70,35 @@ class SharedData {
             case .failure(let error):
                 print("Could not fetch Devices from REST endpoint ", error)
             }
+            completion()
         }
     }
     
-    private func configureWebsocket() {
+    private func fetchPositionsFromRestAPI(completion: @escaping () -> Void) {
+        print("fetching devices from REST API")
+        TraccarAPIManager.shared.fetchPositions {
+            result in
+            
+            switch result {
+            case .success(let positions):
+                // Set devices in shared data so it's acceccible to all consuming classes.
+                SharedData.positions = positions
+                print(positions)
+            case .failure(let error):
+                print("Could not fetch Devices from REST endpoint ", error)
+            }
+            completion()
+        }
+    }
+    
+    private func configureWebsocket(completion: @escaping () -> Void) {
         webSocketManager.connect()
         webSocketManager.dataPublisher
             .sink { [weak self] newData in
                 self?.handleWebSocketData(newData)
             }
             .store(in: &cancellables)
+        completion()
     }
     
     private func handleWebSocketData(_ jsonString: String) {
@@ -94,6 +122,7 @@ class SharedData {
                     }
                 }
             } else if let positions = payloadWrapper.positions {
+                print("websocket positions", positions)
                 for newPosition in positions {
                     if let index = SharedData.positions.firstIndex(where: { $0.id == newPosition.id }) {
                         // Device with the same ID exists, update it

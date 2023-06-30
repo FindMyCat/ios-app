@@ -27,6 +27,18 @@ class TraccarAPIManager {
         }
     }
     
+    func fetchPositions(completion: @escaping (Result<[Position], Error>) -> Void) {
+        let apiUrl = "http://\(host)/api/positions"
+        session.request(apiUrl).responseDecodable(of: [Position].self) { response in
+            switch response.result {
+            case .success(let positions):
+                completion(.success(positions))
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+    
     enum GetSessionError: Error {
         case SessionNotFound
         case UnknownError
