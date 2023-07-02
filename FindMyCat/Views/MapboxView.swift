@@ -7,7 +7,6 @@
 
 import UIKit
 import MapboxMaps
-import CoreLocation
 import MapKit
 
 class MapboxView: UIView, CLLocationManagerDelegate {
@@ -84,7 +83,7 @@ class MapboxView: UIView, CLLocationManagerDelegate {
     }
 
     // MARK: - Actions
-    
+
     @objc private func devicesUpdated(_ notification: Notification) {
 
         // Update UI using the updated devices array
@@ -101,12 +100,15 @@ class MapboxView: UIView, CLLocationManagerDelegate {
     // MARK: - Public Functions
 
     public func updatePositions(positions: [Position]) {
-        if let newCamera = calculateCamera(positions: positions) {
+        // If more than one positions, we calculate camera for the polygon
+        if let newCamera = calculateCameraForPositions(positions: positions) {
             mapView.camera.ease(to: newCamera, duration: 0.5) { [weak self] _ in
                 self?.addAnnotations(positions: positions)
             }
         } else if let position = positions.first {
+            // One position, camera is on the coordinate as center
             let newCoordinate = CLLocationCoordinate2D(latitude: position.latitude, longitude: position.longitude)
+
             mapView.camera.ease(to: CameraOptions(center: newCoordinate, zoom: 14), duration: 0.7) { [weak self] _ in
                 self?.addAnnotations(positions: positions)
             }
@@ -120,7 +122,7 @@ class MapboxView: UIView, CLLocationManagerDelegate {
     }
 
     // MARK: - Private Functions
-    private func calculateCamera(positions: [Position]) -> CameraOptions? {
+    private func calculateCameraForPositions(positions: [Position]) -> CameraOptions? {
         guard positions.count > 1 else {
             return nil
         }
