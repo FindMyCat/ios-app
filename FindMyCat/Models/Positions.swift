@@ -8,7 +8,7 @@
 import Foundation
 
 class Position: Decodable {
-    
+
     struct Attributes: Decodable {
             var sat: Double
             var batteryLevel: Double
@@ -16,7 +16,7 @@ class Position: Decodable {
             var totalDistance: Double
             var motion: Bool
         }
-    
+
     var id: Int
     var attributes: Attributes
     var deviceId: Int

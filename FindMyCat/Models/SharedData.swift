@@ -10,7 +10,7 @@ import Combine
 
 class SharedData {
     static let shared = SharedData()
-    
+
     private static var devices: [Device] = [] {
         didSet {
             print("devices set")
@@ -25,7 +25,7 @@ class SharedData {
             NotificationCenter.default.post(name: Notification.Name(Constants.PositionsUpdatedNotificationName), object: nil, userInfo: userInfo)
         }
     }
-    
+
     // Websockets
     private let webSocketManager = WebSocketManager()
     private var cancellables = Set<AnyCancellable>()
@@ -35,7 +35,7 @@ class SharedData {
         // Initialize WebSocket connection and handle incoming data updates
         // Update the devices array accordingly
         print("SharedData init()")
-        
+
         // Sequentially exeute API calls and finally register websockets.
         fetchDevicesFromRestAPI {
             self.fetchPositionsFromRestAPI {
@@ -47,22 +47,22 @@ class SharedData {
         }
 
      }
-    
+
     // MARK: Getters for Devices and Position static variables
     public static func getDevices() -> [Device] {
         return self.devices
     }
-    
+
     public static func getPositions() -> [Position] {
         return self.positions
     }
-    
+
     // MARK: Network handlers
     private func fetchDevicesFromRestAPI(completion: @escaping () -> Void) {
         print("fetching devices from REST API")
         TraccarAPIManager.shared.fetchDevices {
             result in
-            
+
             switch result {
             case .success(let devices):
                 // Set devices in shared data so it's acceccible to all consuming classes.
@@ -73,12 +73,12 @@ class SharedData {
             completion()
         }
     }
-    
+
     private func fetchPositionsFromRestAPI(completion: @escaping () -> Void) {
         print("fetching devices from REST API")
         TraccarAPIManager.shared.fetchPositions {
             result in
-            
+
             switch result {
             case .success(let positions):
                 // Set devices in shared data so it's acceccible to all consuming classes.
@@ -90,7 +90,7 @@ class SharedData {
             completion()
         }
     }
-    
+
     private func configureWebsocket(completion: @escaping () -> Void) {
         webSocketManager.connect()
         webSocketManager.dataPublisher
@@ -100,16 +100,16 @@ class SharedData {
             .store(in: &cancellables)
         completion()
     }
-    
+
     private func handleWebSocketData(_ jsonString: String) {
         // Handle updated data in the first view controller
-        
+
         let jsonData = jsonString.data(using: .utf8)!
-        
+
         do {
             let decoder = JSONDecoder()
             let payloadWrapper = try decoder.decode(PayloadWrapper.self, from: jsonData)
-            
+
             if let devices = payloadWrapper.devices {
 //              // Update existing devices and append new devices
                 for newDevice in devices {
@@ -136,6 +136,6 @@ class SharedData {
         } catch {
             print("Error decoding JSON: \(error)")
         }
-        
+
     }
 }
