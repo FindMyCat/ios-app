@@ -12,7 +12,7 @@ import MapKit
 
 class MapboxView: UIView, CLLocationManagerDelegate {
     internal var mapView: MapView!
-    var locationManager: CLLocationManager!
+    private var locationManager: CLLocationManager!
 
     // fetch mapbox api key from info.plist
     private var apiKey: String {
@@ -30,6 +30,8 @@ class MapboxView: UIView, CLLocationManagerDelegate {
       }
     }
 
+    // MARK: - View Lifecycle
+
     override init(frame: CGRect) {
         super.init(frame: frame)
 
@@ -43,6 +45,14 @@ class MapboxView: UIView, CLLocationManagerDelegate {
         super.init(coder: aDecoder)
         setupMapView()
     }
+
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+
+        addObserverForNotifications()
+    }
+
+    // MARK: - Setup
 
     private func setupMapView() {
         let myResourceOptions = ResourceOptions(accessToken: apiKey)
@@ -60,6 +70,36 @@ class MapboxView: UIView, CLLocationManagerDelegate {
         addSubview(mapView)
     }
 
+    private func addObserverForNotifications() {
+        NotificationCenter.default.addObserver(self, selector: #selector(devicesUpdated(_:)), name: Notification.Name(Constants.DevicesUpdatedNotificationName), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(positionsUpdated(_:)), name: Notification.Name(Constants.PositionsUpdatedNotificationName), object: nil)
+    }
+
+    // MARK: - Location Manager Delegate
+
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        if status == .authorizedWhenInUse {
+            setupMapView()
+        }
+    }
+
+    // MARK: - Actions
+    
+    @objc private func devicesUpdated(_ notification: Notification) {
+
+        // Update UI using the updated devices array
+    }
+
+    @objc private func positionsUpdated(_ notification: Notification) {
+
+        print("positionUpdated: ", SharedData.getPositions())
+        mapView.viewAnnotations.removeAll()
+        // Update UI using the updated positions array
+        updatePositions(positions: SharedData.getPositions())
+    }
+
+    // MARK: - Public Functions
+
     public func updatePositions(positions: [Position]) {
         if let newCamera = calculateCamera(positions: positions) {
             mapView.camera.ease(to: newCamera, duration: 0.5) { [weak self] _ in
@@ -73,6 +113,13 @@ class MapboxView: UIView, CLLocationManagerDelegate {
         }
     }
 
+    public func centerToUserLocation() {
+        let userLocation = locationManager.location?.coordinate
+
+        mapView.camera.ease(to: CameraOptions(center: userLocation! as CLLocationCoordinate2D, zoom: 15), duration: 1.3)
+    }
+
+    // MARK: - Private Functions
     private func calculateCamera(positions: [Position]) -> CameraOptions? {
         guard positions.count > 1 else {
             return nil
@@ -102,34 +149,4 @@ class MapboxView: UIView, CLLocationManagerDelegate {
         }
     }
 
-    // Handle location authorization status changes
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        if status == .authorizedWhenInUse {
-            setupMapView()
-        }
-    }
-
-    func centerToUserLocation() {
-        let userLocation = locationManager.location?.coordinate
-
-        mapView.camera.ease(to: CameraOptions(center: userLocation! as CLLocationCoordinate2D, zoom: 15), duration: 1.3)
-    }
-
-    @objc private func devicesUpdated(_ notification: Notification) {
-
-        // Update UI using the updated devices array
-    }
-
-    @objc private func positionsUpdated(_ notification: Notification) {
-
-        print("positionUpdated: ", SharedData.getPositions())
-        mapView.viewAnnotations.removeAll()
-        // Update UI using the updated positions array
-        updatePositions(positions: SharedData.getPositions())
-    }
-
-    override func didMoveToWindow() {
-        NotificationCenter.default.addObserver(self, selector: #selector(devicesUpdated(_:)), name: Notification.Name(Constants.DevicesUpdatedNotificationName), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(positionsUpdated(_:)), name: Notification.Name(Constants.PositionsUpdatedNotificationName), object: nil)
-    }
 }
