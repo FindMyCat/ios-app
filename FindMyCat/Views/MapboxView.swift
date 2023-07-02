@@ -61,27 +61,44 @@ class MapboxView: UIView, CLLocationManagerDelegate {
     }
 
     public func updatePositions(positions: [Position]) {
+        if let newCamera = calculateCamera(positions: positions) {
+            mapView.camera.ease(to: newCamera, duration: 0.5) { [weak self] _ in
+                self?.addAnnotations(positions: positions)
+            }
+        } else if let position = positions.first {
+            let newCoordinate = CLLocationCoordinate2D(latitude: position.latitude, longitude: position.longitude)
+            mapView.camera.ease(to: CameraOptions(center: newCoordinate, zoom: 14), duration: 0.7) { [weak self] _ in
+                self?.addAnnotations(positions: positions)
+            }
+        }
+    }
+
+    private func calculateCamera(positions: [Position]) -> CameraOptions? {
+        guard positions.count > 1 else {
+            return nil
+        }
+
+        let coordinates = positions.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
+        let polygon = Geometry.polygon(Polygon([coordinates]))
+        return mapView.mapboxMap.camera(for: polygon, padding: .init(top: 100, left: 100, bottom: 300, right: 100), bearing: 0, pitch: 0)
+    }
+
+    private func addAnnotations(positions: [Position]) {
         for position in positions {
-            let latitude = position.latitude
-            let longitude = position.longitude
+            let newCoordinate = CLLocationCoordinate2D(latitude: position.latitude, longitude: position.longitude)
+            let options = ViewAnnotationOptions(
+                geometry: Point(newCoordinate),
+                width: 60,
+                height: 60,
+                allowOverlap: false,
+                anchor: ViewAnnotationAnchor.bottom
+            )
 
-            // Create a new `CLLocationCoordinate2D` with the updated latitude and longitude
-            let newCoordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            let frame = CGRect(x: 0, y: 0, width: 60, height: 60)
+            let pin = CustomAnnotationView(frame: frame)
+            pin.setIcon(systemName: "pawprint", color: .black)
 
-            self.addViewAnnotation(at: newCoordinate)
-        }
-
-        let coordinates = positions.map { position in
-            return CLLocationCoordinate2D(latitude: position.latitude, longitude: position.longitude)
-        }
-
-        if coordinates.count > 1 {
-            let polygon = Geometry.polygon(Polygon([coordinates]))
-            let newCamera = mapView.mapboxMap.camera(for: polygon, padding: .init(top: 100, left: 100, bottom: 300, right: 100), bearing: 0, pitch: 0)
-            mapView.camera.ease(to: newCamera, duration: 0.5)
-        } else {
-            let newCoordinate = CLLocationCoordinate2D(latitude: positions[0].latitude, longitude: positions[0].longitude)
-            mapView.camera.ease(to: CameraOptions(center: newCoordinate, zoom: 14), duration: 0.7)
+            try? mapView.viewAnnotations.add(pin, options: options)
         }
     }
 
@@ -96,7 +113,6 @@ class MapboxView: UIView, CLLocationManagerDelegate {
         let userLocation = locationManager.location?.coordinate
 
         mapView.camera.ease(to: CameraOptions(center: userLocation! as CLLocationCoordinate2D, zoom: 15), duration: 1.3)
-
     }
 
     @objc private func devicesUpdated(_ notification: Notification) {
@@ -108,23 +124,8 @@ class MapboxView: UIView, CLLocationManagerDelegate {
 
         print("positionUpdated: ", SharedData.getPositions())
         mapView.viewAnnotations.removeAll()
-        print(mapView.viewAnnotations.annotations)
         // Update UI using the updated positions array
         updatePositions(positions: SharedData.getPositions())
-    }
-
-    private func addViewAnnotation(at coordinate: CLLocationCoordinate2D) {
-        let options = ViewAnnotationOptions(
-            geometry: Point(coordinate),
-            width: 60,
-            height: 60,
-            allowOverlap: false,
-            anchor: ViewAnnotationAnchor.bottom
-        )
-        let sampleView = CustomAnnotationView(frame: CGRect(x: 0, y: 0, width: 60, height: 60))
-        sampleView.setIcon(systemName: "pawprint", color: .black)
-
-        try? mapView.viewAnnotations.add(sampleView, options: options)
     }
 
     override func didMoveToWindow() {
