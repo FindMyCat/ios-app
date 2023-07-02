@@ -7,13 +7,12 @@
 
 import UIKit
 
-import UIKit
-
-
 class DeviceCellView: UITableViewCell {
     let nameLabel = UILabel()
-    let batteryLabel = UILabel()
     let batteryIcon = UIImageView()
+    
+    // Expanded state views
+    let expandedStateBatteryLabel = UILabel()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -26,53 +25,49 @@ class DeviceCellView: UITableViewCell {
     }
     
     func setBatteryPercentage(percentage: Double) {
-        batteryLabel.text = "\(Int(percentage))"
-        let batteryIconImageConfig = UIImage.SymbolConfiguration(pointSize: 25)
+        expandedStateBatteryLabel.text = "\(Int(percentage))"
+        let batteryIconImageConfig = UIImage.SymbolConfiguration(pointSize: 20)
         let battPercentageRounded = roundBatteryPercentage(Int(percentage))
         batteryIcon.image = UIImage(systemName: "battery.\(battPercentageRounded)", withConfiguration: batteryIconImageConfig)
-    
     }
     private func configureSubviews() {
-        // Configure the labels
+        // Configure the normal views (always visible regardless of expansion state)
         nameLabel.textAlignment = .left
-        batteryLabel.textAlignment = .right
-        batteryLabel.font = UIFont.boldSystemFont(ofSize: 8)
-        batteryLabel.textColor = .black
-        
-        // Set the battery icon and percentage
-
-        let batteryIconImageConfig = UIImage.SymbolConfiguration(pointSize: 25)
-        if let batteryLabelText = batteryLabel.text, let percentage = Int(batteryLabelText) {
-            let battPercentageRounded = roundBatteryPercentage(percentage)
-            batteryIcon.image = UIImage(systemName: "battery.\(battPercentageRounded)", withConfiguration: batteryIconImageConfig)
-        } else {
-            batteryIcon.image = UIImage(systemName: "battery.100", withConfiguration: batteryIconImageConfig)
-        }
-       
-        
         batteryIcon.tintColor = .black
         
         // Add labels to the cell's contentView
         contentView.addSubview(nameLabel)
         contentView.addSubview(batteryIcon)
-//        contentView.addSubview(batteryLabel)
-        
+
         
         // Add constraints for the labels
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
-        batteryLabel.translatesAutoresizingMaskIntoConstraints = false
+        expandedStateBatteryLabel.translatesAutoresizingMaskIntoConstraints = false
         batteryIcon.translatesAutoresizingMaskIntoConstraints =  false
+        
+        // Expanded state views
+        expandedStateBatteryLabel.textAlignment = .right
+        expandedStateBatteryLabel.font = UIFont.boldSystemFont(ofSize: 8)
+        expandedStateBatteryLabel.textColor = .black
         
         NSLayoutConstraint.activate([
             nameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            nameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
             
             batteryIcon.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            batteryIcon.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
-//
-//            batteryLabel.centerYAnchor.constraint(equalTo: batteryIcon.centerYAnchor),
-//            batteryLabel.centerXAnchor.constraint(equalTo: batteryIcon.centerXAnchor, constant: -2)
+            batteryIcon.centerYAnchor.constraint(equalTo: nameLabel.centerYAnchor)
         ])
+        
+    }
+    
+    func enableExpandedState() {
+            contentView.addSubview(expandedStateBatteryLabel)
+            
+            NSLayoutConstraint.activate([
+                // Expanded state constraints
+                expandedStateBatteryLabel.centerYAnchor.constraint(equalTo: batteryIcon.centerYAnchor),
+                expandedStateBatteryLabel.centerXAnchor.constraint(equalTo: batteryIcon.centerXAnchor, constant: -2)
+            ])
     }
 
    private func roundBatteryPercentage(_ percentage: Int) -> Int {
