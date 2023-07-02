@@ -94,7 +94,7 @@ class CustomAnnotationView: UIView {
      }
 
     // MARK: - Public methods
-    
+
     public func setIcon(systemName: String, color: UIColor = .black) {
         let configuration = UIImage.SymbolConfiguration(pointSize: 20)
         let iconImage = UIImage(systemName: systemName, withConfiguration: configuration)?

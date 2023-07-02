@@ -14,6 +14,8 @@ class DeviceCellView: UITableViewCell {
     // Expanded state views
     let expandedStateBatteryLabel = UILabel()
 
+    // MARK: - Initializers
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
 
@@ -24,12 +26,8 @@ class DeviceCellView: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func setBatteryPercentage(percentage: Double) {
-        expandedStateBatteryLabel.text = "\(Int(percentage))"
-        let batteryIconImageConfig = UIImage.SymbolConfiguration(pointSize: 20)
-        let battPercentageRounded = roundBatteryPercentage(Int(percentage))
-        batteryIcon.image = UIImage(systemName: "battery.\(battPercentageRounded)", withConfiguration: batteryIconImageConfig)
-    }
+    // MARK: - Configurations of Subviews
+
     private func configureSubviews() {
         // Configure the normal views (always visible regardless of expansion state)
         nameLabel.textAlignment = .left
@@ -59,6 +57,15 @@ class DeviceCellView: UITableViewCell {
 
     }
 
+    // MARK: - Public Methods
+
+    func setBatteryPercentage(percentage: Double) {
+        expandedStateBatteryLabel.text = "\(Int(percentage))"
+        let batteryIconImageConfig = UIImage.SymbolConfiguration(pointSize: 20)
+        let battPercentageRounded = roundBatteryPercentage(Int(percentage))
+        batteryIcon.image = UIImage(systemName: "battery.\(battPercentageRounded)", withConfiguration: batteryIconImageConfig)
+    }
+
     func enableExpandedState() {
             contentView.addSubview(expandedStateBatteryLabel)
 
@@ -68,6 +75,8 @@ class DeviceCellView: UITableViewCell {
             expandedStateBatteryLabel.centerXAnchor.constraint(equalTo: batteryIcon.centerXAnchor, constant: -2)
         ])
     }
+
+    // MARK: - Private Methods
 
    private func roundBatteryPercentage(_ percentage: Int) -> Int {
         let roundedValue: Int
