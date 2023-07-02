@@ -25,6 +25,8 @@ class DeviceBottomDrawerController :
     private var drawerLabel = UILabel()
     private var tableView = UITableView()
     
+    private var selectedDeviceIndex: Int? = nil
+    
 
     // Constructor
     init(parentView: UIView, parentVc: UIViewController) {
@@ -172,6 +174,7 @@ class DeviceBottomDrawerController :
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        // swiftlint:disable force_cast
         let cell = tableView.dequeueReusableCell(withIdentifier: "DeviceCell", for: indexPath) as! DeviceCellView
         let devices = SharedData.getDevices()
         let positions = SharedData.getPositions()
@@ -179,7 +182,7 @@ class DeviceBottomDrawerController :
         cell.backgroundColor = .clear
         
         cell.nameLabel.text = devices[indexPath.row].name
-        if(!positions.isEmpty) {
+        if !positions.isEmpty && indexPath.row < positions.count {
             cell.setBatteryPercentage(percentage: positions[indexPath.row].attributes.batteryLevel)
         }
         
@@ -188,14 +191,35 @@ class DeviceBottomDrawerController :
         cell.selectedBackgroundView = bgColorView
         return cell
     }
-    
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return SharedData.getDevices().count
     }
-    
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+
+        // If already selected, de-select.
+        if(selectedDeviceIndex == indexPath.row) {
+            selectedDeviceIndex = nil
+        } else {
+            selectedDeviceIndex = indexPath.row
+        }
+
         tableView.deselectRow(at: indexPath, animated: true)
+        
+        tableView.beginUpdates()
+        tableView.endUpdates()
     }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if (indexPath.row == selectedDeviceIndex) {
+                // Return the expanded height of the cell
+                return 200 // Adjust the value based on your requirements
+            } else {
+                // Return the default/collapsed height of the cell
+                return 60
+            }
+        }
     
     override func viewDidLayoutSubviews() {
         tableView.frame = controller.view.bounds
