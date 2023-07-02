@@ -15,12 +15,12 @@ enum PayloadType: String, Decodable {
 struct PayloadWrapper: Decodable {
     let devices: [Device]?
     let positions: [Position]?
-    
+
     private enum CodingKeys: String, CodingKey {
         case devices
         case positions
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         devices = try container.decodeIfPresent([Device].self, forKey: .devices)

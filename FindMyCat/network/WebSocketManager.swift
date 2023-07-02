@@ -10,13 +10,13 @@ import Combine
 import Foundation
 
 class WebSocketManager: WebSocketDelegate {
-    
+
     let urlString = "ws://ec2-18-191-185-127.us-east-2.compute.amazonaws.com:8082/api/socket"
-    
+
     private var socket: WebSocket?
     private var cancellables = Set<AnyCancellable>()
 
-    private var isConnected: Bool = false;
+    private var isConnected: Bool = false
     private let subject = PassthroughSubject<String, Never>()
 
     var dataPublisher: AnyPublisher<String, Never> {

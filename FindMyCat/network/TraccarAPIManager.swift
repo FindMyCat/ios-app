@@ -5,7 +5,7 @@ class TraccarAPIManager {
     static let shared = TraccarAPIManager()
 
     let session: Session
-    
+
     // TODO: move to Info.plist
     let host = "ec2-18-191-185-127.us-east-2.compute.amazonaws.com:8082"
 
@@ -13,7 +13,6 @@ class TraccarAPIManager {
         CookieHandler.shared.restoreCookies()
         self.session = Session()
     }
-    
 
     func fetchDevices(completion: @escaping (Result<[Device], Error>) -> Void) {
         let apiUrl = "http://\(host)/api/devices"
@@ -26,7 +25,7 @@ class TraccarAPIManager {
             }
         }
     }
-    
+
     func fetchPositions(completion: @escaping (Result<[Position], Error>) -> Void) {
         let apiUrl = "http://\(host)/api/positions"
         session.request(apiUrl).responseDecodable(of: [Position].self) { response in
@@ -38,16 +37,16 @@ class TraccarAPIManager {
             }
         }
     }
-    
+
     enum GetSessionError: Error {
         case SessionNotFound
         case UnknownError
     }
-    
+
     func getSession(completion: @escaping (Result<Data?, Error>) -> Void) {
         let url = "http://\(host)/api/session"
         let method = HTTPMethod.get
-        
+
         session
             .request(url, method: method)
             .validate(statusCode: 200..<300)
@@ -55,19 +54,19 @@ class TraccarAPIManager {
                 switch response.result {
                 case .success(let value):
                     completion(.success(value))
-                case .failure(_):
+                case .failure:
                     completion(.failure(GetSessionError.SessionNotFound))
                 }
         }
     }
-    
+
     func createSession(username: String, password: String, completion: @escaping (Result<Data?, Error>) -> Void) {
         // TODO: Use HTTPS when in production.
         let url = "http://\(host)/api/session"
 
         let headers: HTTPHeaders = [
             .accept("application/json"),
-            .contentType("application/x-www-form-urlencoded"),
+            .contentType("application/x-www-form-urlencoded")
         ]
 
         struct Login: Encodable {
@@ -75,7 +74,7 @@ class TraccarAPIManager {
             let password: String
         }
 
-        let login = Login(email: username , password: password)
+        let login = Login(email: username, password: password)
 
         // create a session
         session
@@ -96,6 +95,6 @@ class TraccarAPIManager {
                     completion(.failure(error))
                 }
         }
- 
+
     }
 }

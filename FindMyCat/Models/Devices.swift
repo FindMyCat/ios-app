@@ -23,13 +23,12 @@ class Device: Decodable {
     var category: String?
     var disabled: Bool?
     var expirationTime: Date?
-    
+
     init(name: String) {
         self.name = name
     }
-    
+
     func getName() -> String {
         return self.name
     }
 }
-
