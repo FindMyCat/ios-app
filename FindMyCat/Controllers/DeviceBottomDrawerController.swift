@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 import FittedSheets
+import CoreLocation
 
 class DeviceBottomDrawerController:
         UIViewController,
@@ -26,6 +27,7 @@ class DeviceBottomDrawerController:
 
     private var selectedDeviceIndex: Int?
 
+    // MARK: - Initializers
     // Constructor
     init(parentView: UIView, parentVc: UIViewController) {
         self.parentVc = parentVc
@@ -40,11 +42,41 @@ class DeviceBottomDrawerController:
         fatalError("init(coder:) has not been implemented")
     }
 
+    // MARK: - View Lifecycle
+
     override func viewDidLoad() {
         view.isUserInteractionEnabled = false
         NotificationCenter.default.addObserver(self, selector: #selector(devicesUpdated(_:)), name: Notification.Name(Constants.DevicesUpdatedNotificationName), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(positionsUpdated(_:)), name: Notification.Name(Constants.PositionsUpdatedNotificationName), object: nil)
 
+        configureSheetController()
+
+        tableView.register(DeviceCellView.self, forCellReuseIdentifier: "DeviceCell")
+
+        configureStackView()
+        configureDrawerLabel()
+        configureHairline()
+        configureTableView()
+
+    }
+
+    override func viewDidLayoutSubviews() {
+        tableView.frame = controller.view.bounds
+    }
+
+    // MARK: - Notification Observers
+
+    @objc private func devicesUpdated(_ notification: Notification) {
+        tableView.reloadData()
+    }
+
+    @objc private func positionsUpdated(_ notification: Notification) {
+        tableView.reloadData()
+    }
+
+    // MARK: - Configuration of all subviews
+
+    private func configureSheetController() {
         let sheeetOptions = SheetOptions(
             useInlineMode: true
         )
@@ -96,22 +128,6 @@ class DeviceBottomDrawerController:
 
         // animate in
         sheetController.animateIn(to: self.parentView, in: self.parentVc)
-
-        tableView.register(DeviceCellView.self, forCellReuseIdentifier: "DeviceCell")
-
-        configureStackView()
-        configureDrawerLabel()
-        configureHairline()
-        configureTableView()
-
-    }
-
-    @objc private func devicesUpdated(_ notification: Notification) {
-        tableView.reloadData()
-    }
-
-    @objc private func positionsUpdated(_ notification: Notification) {
-        tableView.reloadData()
     }
 
     func configureStackView() {
@@ -167,6 +183,8 @@ class DeviceBottomDrawerController:
 
     }
 
+    // MARK: - UITableView Delegate & DataSource
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "DeviceCell", for: indexPath) as! DeviceCellView
         let devices = SharedData.getDevices()
@@ -214,7 +232,27 @@ class DeviceBottomDrawerController:
             }
         }
 
-    override func viewDidLayoutSubviews() {
-        tableView.frame = controller.view.bounds
+    // MARK: - Private Methods
+
+    private func getAddressFromPosition(position: Position, completion: @escaping (String?) -> Void) {
+        let longitude = position.longitude
+        let latitude = position.latitude
+        let location = CLLocation(latitude: latitude, longitude: longitude)
+        let geocoder = CLGeocoder()
+
+        geocoder.reverseGeocodeLocation(location) { placemarks, error in
+            if let error = error {
+                print("Reverse geocoding error: \(error.localizedDescription)")
+                completion(nil)
+            }
+
+            if let placemark = placemarks?.first {
+                // Retrieve the address information from the placemark
+                let address = "\(placemark.subThoroughfare ?? "") \(placemark.thoroughfare ?? ""), \(placemark.locality ?? "") \(placemark.postalCode ?? ""), \(placemark.country ?? "")"
+                completion(address)
+            } else {
+                completion(nil)
+            }
+        }
     }
 }
