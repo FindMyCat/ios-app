@@ -17,6 +17,8 @@ class CustomAnnotationView: UIView {
             return imageView
         }()
 
+    // MARK: - View Lifecycles
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .clear
@@ -29,34 +31,6 @@ class CustomAnnotationView: UIView {
         backgroundColor = .clear
         setupShadow()
         setupSubviews()
-    }
-
-    private func setupShadow() {
-        layer.shadowColor = UIColor.black.cgColor
-        layer.shadowOpacity = 0.5
-        layer.shadowOffset = CGSize(width: 0, height: 2)
-        layer.shadowRadius = 4
-        layer.masksToBounds = false
-    }
-
-    private func setupSubviews() {
-        addSubview(iconImageView)
-
-        NSLayoutConstraint.activate([
-              iconImageView.centerXAnchor.constraint(equalTo: centerXAnchor),
-              iconImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
-              iconImageView.widthAnchor.constraint(lessThanOrEqualTo: widthAnchor),
-              iconImageView.heightAnchor.constraint(lessThanOrEqualTo: heightAnchor),
-              iconImageView.widthAnchor.constraint(equalTo: iconImageView.heightAnchor, multiplier: 1.0)
-          ])
-     }
-
-    func setIcon(systemName: String, color: UIColor = .black) {
-        let configuration = UIImage.SymbolConfiguration(pointSize: 20)
-        let iconImage = UIImage(systemName: systemName, withConfiguration: configuration)?
-            .withRenderingMode(.alwaysTemplate)
-        iconImageView.image = iconImage
-        iconImageView.tintColor = color
     }
 
     override func draw(_ rect: CGRect) {
@@ -96,4 +70,37 @@ class CustomAnnotationView: UIView {
 
         context.restoreGState()
     }
+
+    // MARK: - Configuration of all subviews
+
+    private func setupShadow() {
+        layer.shadowColor = UIColor.black.cgColor
+        layer.shadowOpacity = 0.5
+        layer.shadowOffset = CGSize(width: 0, height: 2)
+        layer.shadowRadius = 4
+        layer.masksToBounds = false
+    }
+
+    private func setupSubviews() {
+        addSubview(iconImageView)
+
+        NSLayoutConstraint.activate([
+              iconImageView.centerXAnchor.constraint(equalTo: centerXAnchor),
+              iconImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
+              iconImageView.widthAnchor.constraint(lessThanOrEqualTo: widthAnchor),
+              iconImageView.heightAnchor.constraint(lessThanOrEqualTo: heightAnchor),
+              iconImageView.widthAnchor.constraint(equalTo: iconImageView.heightAnchor, multiplier: 1.0)
+          ])
+     }
+
+    // MARK: - Public methods
+    
+    public func setIcon(systemName: String, color: UIColor = .black) {
+        let configuration = UIImage.SymbolConfiguration(pointSize: 20)
+        let iconImage = UIImage(systemName: systemName, withConfiguration: configuration)?
+            .withRenderingMode(.alwaysTemplate)
+        iconImageView.image = iconImage
+        iconImageView.tintColor = color
+    }
+
 }
