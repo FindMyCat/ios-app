@@ -192,7 +192,7 @@ class DeviceBottomDrawerController:
 
         cell.backgroundColor = .clear
 
-        cell.nameLabel.text = devices[indexPath.row].name
+        cell.deviceNameLabel.text = devices[indexPath.row].name
         if !positions.isEmpty && indexPath.row < positions.count {
             cell.setBatteryPercentage(percentage: positions[indexPath.row].attributes.batteryLevel)
         }
@@ -200,6 +200,7 @@ class DeviceBottomDrawerController:
         let bgColorView = UIView()
         bgColorView.backgroundColor = UIColor(red: 60/255, green: 60/255, blue: 67/255, alpha: 0.3)
         cell.selectedBackgroundView = bgColorView
+
         return cell
     }
 
@@ -219,7 +220,9 @@ class DeviceBottomDrawerController:
         tableView.deselectRow(at: indexPath, animated: true)
 
         tableView.beginUpdates()
+
         tableView.endUpdates()
+
     }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
