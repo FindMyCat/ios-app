@@ -16,7 +16,6 @@
 		365E53662A476A0C00AD6AE8 /* MapboxMaps in Frameworks */ = {isa = PBXBuildFile; productRef = 365E53652A476A0C00AD6AE8 /* MapboxMaps */; };
 		365E53692A476AE800AD6AE8 /* MapboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E53682A476AE800AD6AE8 /* MapboxView.swift */; };
 		365E536E2A476D3C00AD6AE8 /* DeviceBottomDrawerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E536D2A476D3C00AD6AE8 /* DeviceBottomDrawerController.swift */; };
-		365E53712A4770A000AD6AE8 /* FittedSheets in Frameworks */ = {isa = PBXBuildFile; productRef = 365E53702A4770A000AD6AE8 /* FittedSheets */; };
 		365E53742A478F6F00AD6AE8 /* Devices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E53732A478F6F00AD6AE8 /* Devices.swift */; };
 		365E53782A48AF6300AD6AE8 /* TraccarAPIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E53772A48AF6300AD6AE8 /* TraccarAPIManager.swift */; };
 		365E537B2A48AFC700AD6AE8 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 365E537A2A48AFC700AD6AE8 /* Alamofire */; };
@@ -30,6 +29,7 @@
 		365E538F2A49005800AD6AE8 /* WebsocketPayloadWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E538E2A49005800AD6AE8 /* WebsocketPayloadWrapper.swift */; };
 		367763892A4E173F0096FF1F /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367763882A4E173F0096FF1F /* Constants.swift */; };
 		3677638B2A4E1EDA0096FF1F /* MapMarkerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3677638A2A4E1EDA0096FF1F /* MapMarkerView.swift */; };
+		3681E8862A54C1EE003392F9 /* FittedSheets in Frameworks */ = {isa = PBXBuildFile; productRef = 3681E8852A54C1EE003392F9 /* FittedSheets */; };
 		36CC30882A4E95A400E8FCCA /* DeviceCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36CC30872A4E95A400E8FCCA /* DeviceCellView.swift */; };
 /* End PBXBuildFile section */
 
@@ -63,8 +63,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3681E8862A54C1EE003392F9 /* FittedSheets in Frameworks */,
 				365E537B2A48AFC700AD6AE8 /* Alamofire in Frameworks */,
-				365E53712A4770A000AD6AE8 /* FittedSheets in Frameworks */,
 				365E53662A476A0C00AD6AE8 /* MapboxMaps in Frameworks */,
 				365E53892A48EF0200AD6AE8 /* Starscream in Frameworks */,
 			);
@@ -78,6 +78,7 @@
 			children = (
 				365E534E2A47648700AD6AE8 /* FindMyCat */,
 				365E534D2A47648700AD6AE8 /* Products */,
+				3681E8812A54C110003392F9 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -157,6 +158,13 @@
 			path = util;
 			sourceTree = "<group>";
 		};
+		3681E8812A54C110003392F9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -176,9 +184,9 @@
 			name = FindMyCat;
 			packageProductDependencies = (
 				365E53652A476A0C00AD6AE8 /* MapboxMaps */,
-				365E53702A4770A000AD6AE8 /* FittedSheets */,
 				365E537A2A48AFC700AD6AE8 /* Alamofire */,
 				365E53882A48EF0200AD6AE8 /* Starscream */,
+				3681E8852A54C1EE003392F9 /* FittedSheets */,
 			);
 			productName = FindMyCat;
 			productReference = 365E534C2A47648700AD6AE8 /* FindMyCat.app */;
@@ -210,9 +218,9 @@
 			mainGroup = 365E53432A47648700AD6AE8;
 			packageReferences = (
 				365E53642A476A0C00AD6AE8 /* XCRemoteSwiftPackageReference "mapbox-maps-ios" */,
-				365E536F2A4770A000AD6AE8 /* XCRemoteSwiftPackageReference "FittedSheets" */,
 				365E53792A48AFC700AD6AE8 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				365E53872A48EF0200AD6AE8 /* XCRemoteSwiftPackageReference "Starscream" */,
+				3681E8842A54C1EE003392F9 /* XCRemoteSwiftPackageReference "FittedSheets" */,
 			);
 			productRefGroup = 365E534D2A47648700AD6AE8 /* Products */;
 			projectDirPath = "";
@@ -511,14 +519,6 @@
 				kind = branch;
 			};
 		};
-		365E536F2A4770A000AD6AE8 /* XCRemoteSwiftPackageReference "FittedSheets" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/gordontucker/FittedSheets";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
 		365E53792A48AFC700AD6AE8 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
@@ -535,6 +535,14 @@
 				kind = branch;
 			};
 		};
+		3681E8842A54C1EE003392F9 /* XCRemoteSwiftPackageReference "FittedSheets" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ChitlangeSahas/FittedSheets";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -542,11 +550,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 365E53642A476A0C00AD6AE8 /* XCRemoteSwiftPackageReference "mapbox-maps-ios" */;
 			productName = MapboxMaps;
-		};
-		365E53702A4770A000AD6AE8 /* FittedSheets */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 365E536F2A4770A000AD6AE8 /* XCRemoteSwiftPackageReference "FittedSheets" */;
-			productName = FittedSheets;
 		};
 		365E537A2A48AFC700AD6AE8 /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -557,6 +560,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 365E53872A48EF0200AD6AE8 /* XCRemoteSwiftPackageReference "Starscream" */;
 			productName = Starscream;
+		};
+		3681E8852A54C1EE003392F9 /* FittedSheets */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3681E8842A54C1EE003392F9 /* XCRemoteSwiftPackageReference "FittedSheets" */;
+			productName = FittedSheets;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
