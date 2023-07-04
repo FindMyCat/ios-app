@@ -79,6 +79,7 @@ class DeviceBottomDrawerController:
     private func configureSheetController() {
         let sheeetOptions = SheetOptions(
             useInlineMode: true
+            isRubberBandEnabled: true
         )
 
         let allowedSheetSizes = [SheetSize.percent(0.4), SheetSize.percent(0.7), SheetSize.percent(0.1)]
