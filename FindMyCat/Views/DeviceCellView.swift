@@ -12,7 +12,7 @@ class Button: UIButton {
 
     override var isHighlighted: Bool {
           didSet {
-              UIView.animate(withDuration: 0.2) {
+              UIView.animate(withDuration: 0.15) {
                   self.transform = self.isHighlighted ? CGAffineTransform(scaleX: 0.95, y: 0.95) : .identity
                   self.alpha = self.isHighlighted ? 0.8 : 1.0
               }
@@ -27,6 +27,8 @@ class DeviceCellView: UITableViewCell {
 
     // Always visible views
     let deviceNameLabel = UILabel()
+    let deviceAddressLabel = UILabel()
+
     let batteryIcon = UIImageView()
 
     // Expanded state views
@@ -37,6 +39,9 @@ class DeviceCellView: UITableViewCell {
     // Colors
     let grayColor = CGColor(red: 44/255, green: 44/255, blue: 46/255, alpha: 1)
     let blueColor = UIColor(red: 10/255, green: 132/255, blue: 255/255, alpha: 1)
+
+    // Constants
+    let buttonSize = UIButton.Configuration.Size.large
 
     // MARK: - Initializers
 
@@ -54,54 +59,74 @@ class DeviceCellView: UITableViewCell {
 
     private func configureSubviews() {
 
-        batteryIcon.tintColor = .black
-
         contentView.clipsToBounds = true
 
-        contentView.addSubview(batteryIcon)
-        contentView.addSubview(expandedStateBatteryPercentage)
-
-        // Add constraints for the labels
-        deviceNameLabel.translatesAutoresizingMaskIntoConstraints = false
-        expandedStateBatteryPercentage.translatesAutoresizingMaskIntoConstraints = false
-        batteryIcon.translatesAutoresizingMaskIntoConstraints =  false
-
         configureDeviceNameLabel()
+        configureDeviceAddressLabel()
         configureBatteryIcon()
+        configureBatteryPercentageLabel()
         configureFindButton()
         configurePlaySoundButton()
-
-        NSLayoutConstraint.activate([
-
-            batteryIcon.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            batteryIcon.centerYAnchor.constraint(equalTo: deviceNameLabel.centerYAnchor),
-
-            expandedStateBatteryPercentage.centerXAnchor.constraint(equalTo: batteryIcon.centerXAnchor),
-            expandedStateBatteryPercentage.centerYAnchor.constraint(equalTo: batteryIcon.centerYAnchor, constant: 40)
-
-        ])
-
     }
 
     private func configureDeviceNameLabel() {
         deviceNameLabel.textAlignment = .left
+        deviceNameLabel.font = UIFont.boldSystemFont(ofSize: 16)
         contentView.addSubview(deviceNameLabel)
+
+        deviceNameLabel.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
             deviceNameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            deviceNameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20)
+            deviceNameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16)
         ])
+
+    }
+
+    private func configureDeviceAddressLabel() {
+        deviceAddressLabel.text = "Home"
+        contentView.addSubview(deviceAddressLabel)
+        deviceAddressLabel.font = UIFont.systemFont(ofSize: 13)
+        deviceAddressLabel.alpha = 0.3
+
+        deviceAddressLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            deviceAddressLabel.leadingAnchor.constraint(equalTo: deviceNameLabel.leadingAnchor),
+            deviceAddressLabel.topAnchor.constraint(equalTo: deviceNameLabel.bottomAnchor, constant: 5)
+        ])
+
     }
 
     private func configureBatteryIcon() {
+        batteryIcon.tintColor = .black
+        batteryIcon.translatesAutoresizingMaskIntoConstraints =  false
+        contentView.addSubview(batteryIcon)
 
+        NSLayoutConstraint.activate([
+            batteryIcon.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            batteryIcon.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 23)])
+    }
+
+    private func configureBatteryPercentageLabel() {
+        contentView.addSubview(expandedStateBatteryPercentage)
+
+        expandedStateBatteryPercentage.font = UIFont.systemFont(ofSize: 13)
+        expandedStateBatteryPercentage.alpha = 0.3
+
+        expandedStateBatteryPercentage.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            expandedStateBatteryPercentage.centerXAnchor.constraint(equalTo: batteryIcon.centerXAnchor),
+            expandedStateBatteryPercentage.centerYAnchor.constraint(equalTo: batteryIcon.centerYAnchor, constant: 40)
+
+        ])
     }
 
     private func configurePlaySoundButton() {
-//        soundButton.setTitle("Sound", for: .normal)
         soundButton.tintColor = blueColor
         soundButton.configuration = UIButton.Configuration.tinted()
-        soundButton.configuration?.buttonSize = .large
+        soundButton.configuration?.buttonSize = buttonSize
         soundButton.configuration?.imagePadding = 10
         soundButton.configuration?.cornerStyle = .large
         soundButton.setImage(UIImage(systemName: "speaker.wave.2.fill"), for: .normal)
@@ -125,7 +150,7 @@ class DeviceCellView: UITableViewCell {
         findButton.layer.borderColor = grayColor
         findButton.layer.borderWidth = 1
         findButton.layer.cornerRadius = 14.0
-        findButton.configuration?.buttonSize = .large
+        findButton.configuration?.buttonSize = buttonSize
         findButton.configuration?.imagePadding = 10
 
         findButton.setImage(UIImage(systemName: "paperplane.fill"), for: .normal)
@@ -134,14 +159,13 @@ class DeviceCellView: UITableViewCell {
 
         findButton.setTitle("Find", for: .normal)
         findButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 200)
-//        findButton.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
 
         findButton.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            findButton.leadingAnchor.constraint(equalTo: deviceNameLabel.leadingAnchor),
-            findButton.centerYAnchor.constraint(equalTo: deviceNameLabel.centerYAnchor, constant: 60)])
-        findButton.setNeedsLayout()
+            findButton.leadingAnchor.constraint(equalTo: deviceAddressLabel.leadingAnchor),
+            findButton.centerYAnchor.constraint(equalTo: deviceAddressLabel.centerYAnchor, constant: 60)])
+
     }
 
     // MARK: - Public Methods

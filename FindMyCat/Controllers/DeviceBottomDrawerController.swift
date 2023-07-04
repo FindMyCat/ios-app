@@ -192,9 +192,18 @@ class DeviceBottomDrawerController:
 
         cell.backgroundColor = .clear
 
+        // Set the name
         cell.deviceNameLabel.text = devices[indexPath.row].name
+        // Set the battery percentage
         if !positions.isEmpty && indexPath.row < positions.count {
             cell.setBatteryPercentage(percentage: positions[indexPath.row].attributes.batteryLevel)
+
+            // Set the address
+            getAddressFromPosition(position: positions[indexPath.row]) {
+                address in
+
+                cell.deviceAddressLabel.text = address
+            }
         }
 
         let bgColorView = UIView()
@@ -228,10 +237,10 @@ class DeviceBottomDrawerController:
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.row == selectedDeviceIndex {
                 // Return the expanded height of the cell
-                return 200 // Adjust the value based on your requirements
+                return 155 // Adjust the value based on your requirements
             } else {
                 // Return the default/collapsed height of the cell
-                return 60
+                return 68
             }
         }
 
@@ -251,7 +260,7 @@ class DeviceBottomDrawerController:
 
             if let placemark = placemarks?.first {
                 // Retrieve the address information from the placemark
-                let address = "\(placemark.subThoroughfare ?? "") \(placemark.thoroughfare ?? ""), \(placemark.locality ?? "") \(placemark.postalCode ?? ""), \(placemark.country ?? "")"
+                let address = "\(placemark.subThoroughfare ?? "") \(placemark.thoroughfare ?? ""), \(placemark.locality ?? ""), \(placemark.administrativeArea ?? "")"
                 completion(address)
             } else {
                 completion(nil)
