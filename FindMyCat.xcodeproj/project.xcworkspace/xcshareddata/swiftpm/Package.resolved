@@ -1,0 +1,68 @@
+{
+  "pins" : [
+    {
+      "identity" : "alamofire",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Alamofire/Alamofire.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "51a2d5077567b257ac1f227b6883c4ff1d7a491d"
+      }
+    },
+    {
+      "identity" : "fittedsheets",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ChitlangeSahas/FittedSheets",
+      "state" : {
+        "branch" : "main",
+        "revision" : "8611748753aee0483efbc7263fb231413e30f6f2"
+      }
+    },
+    {
+      "identity" : "mapbox-common-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mapbox/mapbox-common-ios.git",
+      "state" : {
+        "revision" : "584006ae5dcd08ba5ce206c3363bd679600ed39c",
+        "version" : "23.6.0"
+      }
+    },
+    {
+      "identity" : "mapbox-core-maps-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mapbox/mapbox-core-maps-ios.git",
+      "state" : {
+        "revision" : "4ba4f85e4b6d71134a32a46d0bc05b7395dc96c0",
+        "version" : "10.14.0"
+      }
+    },
+    {
+      "identity" : "mapbox-maps-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mapbox/mapbox-maps-ios.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "040aa8172040adc56eac567ffe7eeeaec5789dcb"
+      }
+    },
+    {
+      "identity" : "starscream",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/daltoniam/Starscream.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "c68359159dcf0b5de9b536b9a959e9e435e968d3"
+      }
+    },
+    {
+      "identity" : "turf-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mapbox/turf-swift.git",
+      "state" : {
+        "revision" : "87b5b37108ba9f37f0885b586d8f6355d8240dd8",
+        "version" : "2.6.1"
+      }
+    }
+  ],
+  "version" : 2
+}
