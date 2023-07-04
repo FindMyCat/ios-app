@@ -126,6 +126,12 @@ class DeviceBottomDrawerController:
         blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         controller.view.addSubview(blurEffectView)
 
+        // Disable panning on Sheet when interacting with the table.
+        sheetController.panGestureShouldBegin = {
+            _ in
+
+            return !self.tableView.isTracking
+        }
         // animate in
         sheetController.animateIn(to: self.parentView, in: self.parentVc)
     }
@@ -265,7 +271,7 @@ class DeviceBottomDrawerController:
 
         let configuration = UISwipeActionsConfiguration(actions: [deleteAction, editAction])
 
-        configuration.performsFirstActionWithFullSwipe = true
+        configuration.performsFirstActionWithFullSwipe = false
         return configuration
     }
 
