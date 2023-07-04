@@ -202,7 +202,12 @@ class DeviceBottomDrawerController:
             getAddressFromPosition(position: positions[indexPath.row]) {
                 address in
 
-                cell.deviceAddressLabel.text = address
+                if address == nil {
+                    cell.deviceAddressLabel.text = "Address unavailable."
+                } else {
+                    cell.deviceAddressLabel.text = address
+                }
+
             }
         }
 
@@ -242,7 +247,27 @@ class DeviceBottomDrawerController:
                 // Return the default/collapsed height of the cell
                 return 68
             }
+    }
+
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        print("swipe on cell")
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { _, _, completionHandler in
+            // Perform delete action for the cell at indexPath
+            completionHandler(true)
         }
+        deleteAction.image = UIImage(systemName: "trash.fill")
+
+        let editAction = UIContextualAction(style: .normal, title: "Edit") { _, _, completionHandler in
+            // Perform edit action for the cell at indexPath
+            completionHandler(true)
+        }
+        editAction.image = UIImage(systemName: "pencil")
+
+        let configuration = UISwipeActionsConfiguration(actions: [deleteAction, editAction])
+
+        configuration.performsFirstActionWithFullSwipe = true
+        return configuration
+    }
 
     // MARK: - Private Methods
 

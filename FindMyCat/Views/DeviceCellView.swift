@@ -23,11 +23,27 @@ class Button: UIButton {
       }
 }
 
+class EmojiTextField: UITextField {
+
+    // required for iOS 13
+    override var textInputContextIdentifier: String? { "" } // return non-nil to show the Emoji keyboard ¯\_(ツ)_/¯
+
+    override var textInputMode: UITextInputMode? {
+        for mode in UITextInputMode.activeInputModes {
+            if mode.primaryLanguage == "emoji" {
+                return mode
+            }
+        }
+        return nil
+    }
+}
+
 class DeviceCellView: UITableViewCell {
 
     // Always visible views
     let deviceNameLabel = UILabel()
     let deviceAddressLabel = UILabel()
+    let emojiLabel = UILabel()
 
     let batteryIcon = UIImageView()
 
@@ -42,6 +58,7 @@ class DeviceCellView: UITableViewCell {
 
     // Constants
     let buttonSize = UIButton.Configuration.Size.large
+    let profilePictureSize = 40.0
 
     // MARK: - Initializers
 
@@ -61,12 +78,36 @@ class DeviceCellView: UITableViewCell {
 
         contentView.clipsToBounds = true
 
+        configureProfilePictureEmojiLabel()
         configureDeviceNameLabel()
         configureDeviceAddressLabel()
         configureBatteryIcon()
-        configureBatteryPercentageLabel()
+//        configureBatteryPercentageLabel()
         configureFindButton()
         configurePlaySoundButton()
+
+    }
+
+    private func configureProfilePictureEmojiLabel() {
+        contentView.addSubview(emojiLabel)
+        emojiLabel.text = "💖"
+        emojiLabel.textAlignment = .center
+        emojiLabel.font = UIFont.systemFont(ofSize: profilePictureSize - 20)
+        emojiLabel.backgroundColor = UIColor.init(white: 0.96, alpha: 1)
+        emojiLabel.frame = CGRect(x: 0, y: 0, width: profilePictureSize, height: profilePictureSize)
+
+        emojiLabel.layer.cornerRadius = emojiLabel.bounds.width / 2
+        emojiLabel.layer.borderColor = UIColor.systemGray4.cgColor
+        emojiLabel.layer.borderWidth = 2
+        emojiLabel.clipsToBounds = true
+
+        emojiLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            emojiLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            emojiLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 14),
+            emojiLabel.widthAnchor.constraint(equalToConstant: profilePictureSize),
+            emojiLabel.heightAnchor.constraint(equalToConstant: profilePictureSize)
+        ])
     }
 
     private func configureDeviceNameLabel() {
@@ -77,14 +118,13 @@ class DeviceCellView: UITableViewCell {
         deviceNameLabel.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            deviceNameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            deviceNameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16)
+            deviceNameLabel.leadingAnchor.constraint(equalTo: emojiLabel.trailingAnchor, constant: 8),
+            deviceNameLabel.topAnchor.constraint(equalTo: emojiLabel.topAnchor, constant: 1)
         ])
 
     }
 
     private func configureDeviceAddressLabel() {
-        deviceAddressLabel.text = "Home"
         contentView.addSubview(deviceAddressLabel)
         deviceAddressLabel.font = UIFont.systemFont(ofSize: 13)
         deviceAddressLabel.alpha = 0.3
@@ -128,7 +168,7 @@ class DeviceCellView: UITableViewCell {
         soundButton.configuration = UIButton.Configuration.tinted()
         soundButton.configuration?.buttonSize = buttonSize
         soundButton.configuration?.imagePadding = 10
-        soundButton.configuration?.cornerStyle = .large
+        soundButton.configuration?.cornerStyle = .medium
         soundButton.setImage(UIImage(systemName: "speaker.wave.2.fill"), for: .normal)
 
         contentView.addSubview(soundButton)
@@ -145,11 +185,11 @@ class DeviceCellView: UITableViewCell {
         findButton.tintColor = UIColor(cgColor: grayColor)
 
         findButton.configuration = UIButton.Configuration.plain()
-        findButton.configuration?.cornerStyle = .large
+        findButton.configuration?.cornerStyle = .medium
 
         findButton.layer.borderColor = grayColor
         findButton.layer.borderWidth = 1
-        findButton.layer.cornerRadius = 14.0
+        findButton.layer.cornerRadius = 8.0
         findButton.configuration?.buttonSize = buttonSize
         findButton.configuration?.imagePadding = 10
 
