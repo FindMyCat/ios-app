@@ -78,7 +78,7 @@ class DeviceBottomDrawerController:
 
     private func configureSheetController() {
         let sheeetOptions = SheetOptions(
-            useInlineMode: true
+            useInlineMode: true,
             isRubberBandEnabled: true
         )
 
@@ -198,6 +198,7 @@ class DeviceBottomDrawerController:
         let positions = SharedData.getPositions()
 
         cell.backgroundColor = .clear
+        cell.delegate = self
 
         // Set the name
         cell.deviceNameLabel.text = devices[indexPath.row].name
@@ -298,5 +299,13 @@ class DeviceBottomDrawerController:
                 completion(nil)
             }
         }
+    }
+}
+
+extension DeviceBottomDrawerController: DeviceCellDelegate {
+    func launchPreciseFindScreen() {
+        let vc = PreciseViewContoller()
+        vc.modalPresentationStyle = .fullScreen
+        present(vc, animated: true)
     }
 }

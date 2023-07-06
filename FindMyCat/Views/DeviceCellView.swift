@@ -38,6 +38,10 @@ class EmojiTextField: UITextField {
     }
 }
 
+protocol DeviceCellDelegate: AnyObject {
+    func launchPreciseFindScreen()
+}
+
 class DeviceCellView: UITableViewCell {
 
     // Always visible views
@@ -59,6 +63,9 @@ class DeviceCellView: UITableViewCell {
     // Constants
     let buttonSize = UIButton.Configuration.Size.large
     let profilePictureSize = 40.0
+
+    // Delegate
+    weak var delegate: DeviceCellDelegate?
 
     // MARK: - Initializers
 
@@ -202,10 +209,17 @@ class DeviceCellView: UITableViewCell {
 
         findButton.translatesAutoresizingMaskIntoConstraints = false
 
+        findButton.addTarget(self, action: #selector(self.preciseFind), for: .touchUpInside)
+
         NSLayoutConstraint.activate([
             findButton.leadingAnchor.constraint(equalTo: deviceAddressLabel.leadingAnchor),
             findButton.centerYAnchor.constraint(equalTo: deviceAddressLabel.centerYAnchor, constant: 60)])
 
+    }
+
+    @objc private func preciseFind() {
+        print("clockckc")
+        delegate?.launchPreciseFindScreen()
     }
 
     // MARK: - Public Methods
