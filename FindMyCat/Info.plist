@@ -4,6 +4,18 @@
 <dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Need yo location</string>
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>Bluetooth is used to exchange Nearby Interaction configuration data with a connected accessory.</string>
+    <key>NSBluetoothPeripheralUsageDescription</key>
+    <string>This app uses bluetooth to connect to a FiRa device, to exchange parameters and start UWB ranging</string>
+    <key>NSCameraUsageDescription</key>
+    <string>This app uses the device camera to improve NI positioning, no image is taken or recorded.</string>
+    <key>NSNearbyInteractionAllowOnceUsageDescription</key>
+    <string>This app uses the Neraby Interactions feature to ranging with third third part UWB devices</string>
+    <key>NSNearbyInteractionUsageDescription</key>
+    <string>Demonstrate the Nearby Interaction third-party accessory API with a Bluetooth connected accessory</string>
+    <key>NSCameraUsageDescription</key>
+    <string>Need camera access for precise find screen</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
