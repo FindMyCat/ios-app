@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		363EC8052A57E42E0059E1CA /* UWBMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363EC8042A57E42E0059E1CA /* UWBMessages.swift */; };
+		363EC8082A57E4CA0059E1CA /* UWBUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363EC8072A57E4CA0059E1CA /* UWBUtils.swift */; };
 		36562BFF2A54D60000D95C4C /* PreciseFindViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36562BFE2A54D60000D95C4C /* PreciseFindViewController.swift */; };
 		36562C012A54DB1800D95C4C /* BluetoothLECentral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36562C002A54DB1800D95C4C /* BluetoothLECentral.swift */; };
 		36562C042A54DBC600D95C4C /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36562C032A54DBC600D95C4C /* SettingsViewController.swift */; };
@@ -41,6 +43,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		363EC8042A57E42E0059E1CA /* UWBMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UWBMessages.swift; sourceTree = "<group>"; };
+		363EC8072A57E4CA0059E1CA /* UWBUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UWBUtils.swift; sourceTree = "<group>"; };
 		36562BFE2A54D60000D95C4C /* PreciseFindViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreciseFindViewController.swift; sourceTree = "<group>"; };
 		36562C002A54DB1800D95C4C /* BluetoothLECentral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothLECentral.swift; sourceTree = "<group>"; };
 		36562C032A54DBC600D95C4C /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
@@ -89,6 +93,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		363EC8062A57E4BA0059E1CA /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				363EC8072A57E4CA0059E1CA /* UWBUtils.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
 		36562C022A54DB4000D95C4C /* bluetooth */ = {
 			isa = PBXGroup;
 			children = (
@@ -119,6 +131,7 @@
 		365E534E2A47648700AD6AE8 /* FindMyCat */ = {
 			isa = PBXGroup;
 			children = (
+				363EC8062A57E4BA0059E1CA /* Utils */,
 				36562C022A54DB4000D95C4C /* bluetooth */,
 				365E53752A48AF4600AD6AE8 /* network */,
 				365E536C2A476D2100AD6AE8 /* Controllers */,
@@ -143,6 +156,7 @@
 				365E53852A48EC9900AD6AE8 /* SharedData.swift */,
 				365E538C2A48FD3200AD6AE8 /* Positions.swift */,
 				365E538E2A49005800AD6AE8 /* WebsocketPayloadWrapper.swift */,
+				363EC8042A57E42E0059E1CA /* UWBMessages.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -300,11 +314,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				363EC8082A57E4CA0059E1CA /* UWBUtils.swift in Sources */,
 				36CC30882A4E95A400E8FCCA /* DeviceCellView.swift in Sources */,
 				365E53862A48EC9900AD6AE8 /* SharedData.swift in Sources */,
 				365E537E2A48AFDF00AD6AE8 /* CookieHandler.swift in Sources */,
 				36562C042A54DBC600D95C4C /* SettingsViewController.swift in Sources */,
 				365E53542A47648700AD6AE8 /* ViewController.swift in Sources */,
+				363EC8052A57E42E0059E1CA /* UWBMessages.swift in Sources */,
 				365E53692A476AE800AD6AE8 /* MapboxView.swift in Sources */,
 				365E53502A47648700AD6AE8 /* AppDelegate.swift in Sources */,
 				365E53742A478F6F00AD6AE8 /* Devices.swift in Sources */,

@@ -15,6 +15,10 @@ import os.log
 
 class PreciseViewContoller: UIViewController {
 
+    // MARK: - Device to connect to
+    var deviceDisplayName: String
+    var deviceUniqueBLEId: Int
+
     // MARK: - Simple views to show information
     private let arrowImgView = UIImageView(image: UIImage(systemName: "arrow.up"))
 
@@ -40,6 +44,18 @@ class PreciseViewContoller: UIViewController {
 
     // Extras
     let logger = os.Logger(subsystem: "com.chitlangesahas.FindMyCat", category: "PreciseViewContoller")
+
+    // MARK: - Initializers
+
+    init(deviceDisplayName: String, deviceUniqueBLEId: Int) {
+        self.deviceDisplayName = deviceDisplayName
+        self.deviceUniqueBLEId = deviceUniqueBLEId
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     // MARK: - View lifecycles
     override func viewDidLoad() {
@@ -101,7 +117,7 @@ class PreciseViewContoller: UIViewController {
     func setupDeviceName() {
         view.addSubview(deviceNameLabel)
 
-        deviceNameLabel.text = "Pumpkin"
+        deviceNameLabel.text = deviceDisplayName
         deviceNameLabel.font = UIFont.boldSystemFont(ofSize: 40)
         deviceNameLabel.textColor = viewLayerColor
 
@@ -203,13 +219,13 @@ class PreciseViewContoller: UIViewController {
     func accessoryInclude(index: Int) {
 
         if !qorvoDevices.isEmpty {
-            logger.log("accessoryInclude: \(index)")
-            let deviceID = qorvoDevices[0]?.bleUniqueID
+            logger.log("Accessory discovered: \(index)")
+            let deviceID = qorvoDevices[index]?.bleUniqueID
 
-            if (deviceID) != nil {
+            if deviceID == deviceUniqueBLEId {
                 // Connect to the accessory
-                if qorvoDevices[0]?.blePeripheralStatus == statusDiscovered {
-                    print("Connecting to Accessory")
+                if qorvoDevices[index]?.blePeripheralStatus == statusDiscovered {
+                    print("Connecting to Accessory. ID: \(qorvoDevices[index]?.bleUniqueID)")
                     connectToAccessory(deviceID!)
                 } else {
                     return
