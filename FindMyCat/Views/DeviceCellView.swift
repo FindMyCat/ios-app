@@ -218,7 +218,6 @@ class DeviceCellView: UITableViewCell {
     }
 
     @objc private func preciseFind() {
-        print("clockckc")
         delegate?.launchPreciseFindScreen()
     }
 

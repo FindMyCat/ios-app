@@ -148,6 +148,14 @@ class PreciseViewContoller: UIViewController {
             cancelButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -30),
             cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30)
         ])
+
+        // Add a target to the cancelButton
+        cancelButton.addTarget(self, action: #selector(cancelButtonPressed), for: .touchUpInside)
+
+    }
+
+    @objc private func cancelButtonPressed() {
+        dismiss(animated: true, completion: nil)
     }
 
     func setupSoundButton() {
