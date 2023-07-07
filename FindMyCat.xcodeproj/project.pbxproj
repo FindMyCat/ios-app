@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		363EC8052A57E42E0059E1CA /* UWBMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363EC8042A57E42E0059E1CA /* UWBMessages.swift */; };
 		363EC8082A57E4CA0059E1CA /* UWBUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363EC8072A57E4CA0059E1CA /* UWBUtils.swift */; };
+		363EC80A2A57E6990059E1CA /* Distance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363EC8092A57E6990059E1CA /* Distance.swift */; };
 		36562BFF2A54D60000D95C4C /* PreciseFindViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36562BFE2A54D60000D95C4C /* PreciseFindViewController.swift */; };
 		36562C012A54DB1800D95C4C /* BluetoothLECentral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36562C002A54DB1800D95C4C /* BluetoothLECentral.swift */; };
 		36562C042A54DBC600D95C4C /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36562C032A54DBC600D95C4C /* SettingsViewController.swift */; };
@@ -45,6 +46,7 @@
 /* Begin PBXFileReference section */
 		363EC8042A57E42E0059E1CA /* UWBMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UWBMessages.swift; sourceTree = "<group>"; };
 		363EC8072A57E4CA0059E1CA /* UWBUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UWBUtils.swift; sourceTree = "<group>"; };
+		363EC8092A57E6990059E1CA /* Distance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Distance.swift; sourceTree = "<group>"; };
 		36562BFE2A54D60000D95C4C /* PreciseFindViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreciseFindViewController.swift; sourceTree = "<group>"; };
 		36562C002A54DB1800D95C4C /* BluetoothLECentral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothLECentral.swift; sourceTree = "<group>"; };
 		36562C032A54DBC600D95C4C /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
@@ -97,18 +99,19 @@
 			isa = PBXGroup;
 			children = (
 				363EC8072A57E4CA0059E1CA /* UWBUtils.swift */,
+				363EC8092A57E6990059E1CA /* Distance.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
 		};
-		36562C022A54DB4000D95C4C /* bluetooth */ = {
+		36562C022A54DB4000D95C4C /* Bluetooth */ = {
 			isa = PBXGroup;
 			children = (
 				36562C002A54DB1800D95C4C /* BluetoothLECentral.swift */,
 				36562C032A54DBC600D95C4C /* SettingsViewController.swift */,
 				36562C052A54DC0900D95C4C /* DeviceTableViewCell.swift */,
 			);
-			path = bluetooth;
+			path = Bluetooth;
 			sourceTree = "<group>";
 		};
 		365E53432A47648700AD6AE8 = {
@@ -132,8 +135,8 @@
 			isa = PBXGroup;
 			children = (
 				363EC8062A57E4BA0059E1CA /* Utils */,
-				36562C022A54DB4000D95C4C /* bluetooth */,
-				365E53752A48AF4600AD6AE8 /* network */,
+				36562C022A54DB4000D95C4C /* Bluetooth */,
+				365E53752A48AF4600AD6AE8 /* Network */,
 				365E536C2A476D2100AD6AE8 /* Controllers */,
 				365E53672A476ACE00AD6AE8 /* Views */,
 				365E53632A4769BC00AD6AE8 /* Models */,
@@ -183,14 +186,14 @@
 			path = Controllers;
 			sourceTree = "<group>";
 		};
-		365E53752A48AF4600AD6AE8 /* network */ = {
+		365E53752A48AF4600AD6AE8 /* Network */ = {
 			isa = PBXGroup;
 			children = (
 				365E537C2A48AFD300AD6AE8 /* util */,
 				365E53772A48AF6300AD6AE8 /* TraccarAPIManager.swift */,
 				365E538A2A48EF5600AD6AE8 /* WebSocketManager.swift */,
 			);
-			path = network;
+			path = Network;
 			sourceTree = "<group>";
 		};
 		365E537C2A48AFD300AD6AE8 /* util */ = {
@@ -333,6 +336,7 @@
 				36562C0C2A56778A00D95C4C /* PreciseViewController.swift in Sources */,
 				36562C012A54DB1800D95C4C /* BluetoothLECentral.swift in Sources */,
 				365E536E2A476D3C00AD6AE8 /* DeviceBottomDrawerController.swift in Sources */,
+				363EC80A2A57E6990059E1CA /* Distance.swift in Sources */,
 				365E538F2A49005800AD6AE8 /* WebsocketPayloadWrapper.swift in Sources */,
 				365E538B2A48EF5600AD6AE8 /* WebSocketManager.swift in Sources */,
 				365E53822A48B54A00AD6AE8 /* LoginViewController.swift in Sources */,

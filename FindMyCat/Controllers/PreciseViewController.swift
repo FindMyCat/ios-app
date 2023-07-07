@@ -170,7 +170,7 @@ class PreciseViewContoller: UIViewController {
     func setupDistanceLabel() {
         view.addSubview(distanceLabel)
 
-        distanceLabel.text = "10 ft"
+//        distanceLabel.text = "10 ft"
         distanceLabel.font = UIFont.boldSystemFont(ofSize: 50)
         distanceLabel.textColor = viewLayerColor
 
@@ -247,11 +247,6 @@ class PreciseViewContoller: UIViewController {
     }
 
     func accessoryConnected(deviceID: Int) {
-        // If no device is selected, select the new device
-//        if selectedAccessory == -1 {
-//            selectDevice(deviceID)
-//        }
-
         // Create a NISession for the new device
         referenceDict[deviceID] = NISession()
         referenceDict[deviceID]?.delegate = self
@@ -268,20 +263,7 @@ class PreciseViewContoller: UIViewController {
         // Remove the NI Session and Location values related to the device ID
         referenceDict.removeValue(forKey: deviceID)
 
-//        if selectedAccessory == deviceID {
-//            selectDevice(-1)
-//        }
-
         accessoryUpdate()
-
-        // Update device list and take other actions depending on the amount of devices
-        let deviceCount = qorvoDevices.count
-
-        if deviceCount == 0 {
-//            selectDevice(-1)
-
-            print("Accessory disconnected")
-        }
     }
 
     func accessorySharedData(data: Data, accessoryName: String, deviceID: Int) {
@@ -353,12 +335,6 @@ class PreciseViewContoller: UIViewController {
         if let startedDevice = dataChannel.getDeviceFromUniqueID(deviceID) {
             startedDevice.blePeripheralStatus = statusRanging
         }
-
-//        for case let cell as DeviceTableViewCell in accessoriesTable.visibleCells {
-//            if cell.uniqueID == deviceID {
-//                cell.selectAsset(.miniLocation)
-//            }
-//        }
 
         // Enables Location assets when Qorvo device starts ranging
         // TODO: Check if this is still necessary
@@ -448,7 +424,40 @@ extension PreciseViewContoller: NISessionDelegate {
         }
 
 //        updateLocationFields(deviceID)
-//        updateMiniFields(deviceID)
+        updateDeviceData(deviceID)
+
+    }
+
+    func updateDeviceData(_ deviceID: Int) {
+
+        let qorvoDevice = dataChannel.getDeviceFromUniqueID(deviceID)
+        if qorvoDevice == nil { return }
+
+        // Get updated location values
+        let distance  = qorvoDevice?.uwbLocation?.distance
+        let azimuthCheck = azimuth((qorvoDevice?.uwbLocation?.direction)!)
+
+        // Check if azimuth check calcul is a number (ie: not infinite)
+        if azimuthCheck.isNaN {
+            return
+        }
+
+        var azimuth = 0
+        if Settings().isDirectionEnable {
+            azimuth =  Int( 90 * (Double(azimuthCheck)))
+        } else {
+            azimuth = Int(rad2deg(Double(azimuthCheck)))
+        }
+
+        distanceLabel.text = String(format: "%.1f ft", convertMetersToFeet(meters: distance!))
+
+        // Update  arrow
+        let radians: CGFloat = CGFloat(azimuth) * (.pi / 180)
+        UIView.animate(withDuration: 0.3) {
+            self.arrowImgView.transform = CGAffineTransform(rotationAngle: radians)
+        }
+
+        print(convertMetersToFeet(meters: distance!), radians)
 
     }
 
