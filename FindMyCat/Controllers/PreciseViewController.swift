@@ -15,23 +15,26 @@ import os.log
 
 class PreciseViewContoller: UIViewController {
 
-    // MARK: - Declarations
+    // MARK: - Simple views to show information
     private let arrowImgView = UIImageView(image: UIImage(systemName: "arrow.up"))
 
-    private var captureSession: AVCaptureSession?
-    private var previewLayer: AVCaptureVideoPreviewLayer?
+    private let deviceNameLabel = UILabel()
+    private let distanceLabel = UILabel()
+    private let cancelButton = UIButton()
+    private let soundButton = UIButton()
+    private let circle = UIView()
+    let viewLayerColor = UIColor.white
 
+    // MARK: AR camera layer for blurring
     private var arView: ARSCNView!
     let arConfig = ARWorldTrackingConfiguration()
 
+    // MARK: UWB
     var dataChannel = DataCommunicationChannel()
-
     // Dictionary to associate each NI Session to the qorvoDevice using the uniqueID
     var referenceDict = [Int: NISession]()
-
     // A mapping from a discovery token to a name.
     var accessoryMap = [NIDiscoveryToken: String]()
-
     var configuration: NINearbyAccessoryConfiguration?
     var isConverged = false
 
@@ -51,12 +54,16 @@ class PreciseViewContoller: UIViewController {
     private func setupSubviews() {
         setupCameraBlurLayer()
         setupArrowImage()
+        setupDeviceName()
+        setupControlButtons()
+        setupDistanceLabel()
+        setupCircleAroundArrow()
     }
 
     func setupArrowImage() {
         view.addSubview(arrowImgView)
 
-        arrowImgView.tintColor = .black
+        arrowImgView.tintColor = viewLayerColor
 
         arrowImgView.translatesAutoresizingMaskIntoConstraints = false
         let widthConstraint = arrowImgView.widthAnchor.constraint(equalToConstant: 200)
@@ -89,6 +96,94 @@ class PreciseViewContoller: UIViewController {
         let blurEffectView = UIVisualEffectView(effect: blurEffect)
         blurEffectView.frame = self.view.bounds
         self.view.addSubview(blurEffectView)
+    }
+
+    func setupDeviceName() {
+        view.addSubview(deviceNameLabel)
+
+        deviceNameLabel.text = "Pumpkin"
+        deviceNameLabel.font = UIFont.boldSystemFont(ofSize: 40)
+        deviceNameLabel.textColor = viewLayerColor
+
+        deviceNameLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            deviceNameLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 60),
+            deviceNameLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30)
+        ])
+    }
+
+    func setupControlButtons() {
+        setupCancelButton()
+        setupSoundButton()
+    }
+
+    func setupCancelButton() {
+        view.addSubview(cancelButton)
+
+        cancelButton.configuration = UIButton.Configuration.tinted()
+        cancelButton.setTitle("Cancel", for: .normal)
+        cancelButton.configuration?.cornerStyle = .capsule
+        cancelButton.configuration?.buttonSize = .large
+
+        cancelButton.tintColor = viewLayerColor
+        cancelButton.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            cancelButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -30),
+            cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30)
+        ])
+    }
+
+    func setupSoundButton() {
+        view.addSubview(soundButton)
+
+        soundButton.configuration = UIButton.Configuration.tinted()
+        soundButton.setTitle("Sound", for: .normal)
+        soundButton.configuration?.cornerStyle = .capsule
+        soundButton.configuration?.buttonSize = .large
+
+        soundButton.tintColor = viewLayerColor
+        soundButton.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            soundButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -30),
+            soundButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30)
+        ])
+    }
+
+    func setupDistanceLabel() {
+        view.addSubview(distanceLabel)
+
+        distanceLabel.text = "10 ft"
+        distanceLabel.font = UIFont.boldSystemFont(ofSize: 50)
+        distanceLabel.textColor = viewLayerColor
+
+        distanceLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            distanceLabel.bottomAnchor.constraint(equalTo: cancelButton.topAnchor, constant: -20),
+            distanceLabel.leadingAnchor.constraint(equalTo: cancelButton.leadingAnchor)
+        ])
+
+    }
+
+    func setupCircleAroundArrow() {
+        let circleSize = CGFloat(300)
+        circle.layer.cornerRadius = circleSize / 2
+        circle.layer.borderWidth = 4.0
+        circle.layer.borderColor = viewLayerColor.cgColor
+        circle.alpha = 0.4
+
+        view.addSubview(circle)
+
+        circle.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            circle.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            circle.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            circle.widthAnchor.constraint(equalToConstant: circleSize),
+            circle.heightAnchor.constraint(equalToConstant: circleSize)
+        ])
     }
 
     // MARK: - Setup Data channel
