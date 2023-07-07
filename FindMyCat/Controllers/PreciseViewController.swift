@@ -39,7 +39,7 @@ class PreciseViewContoller: UIViewController {
     var isConverged = false
 
     // Extras
-    let logger = os.Logger(subsystem: "com.example.apple-samplecode.NINearbyAccessorySample", category: "AccessoryDemoViewController")
+    let logger = os.Logger(subsystem: "com.chitlangesahas.FindMyCat", category: "PreciseViewContoller")
 
     // MARK: - View lifecycles
     override func viewDidLoad() {
