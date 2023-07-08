@@ -229,21 +229,19 @@ class PreciseFinderViewContoller: UIViewController {
     // MARK: - Data channel methods
     func accessoryInclude(index: Int) {
 
-        if !qorvoDevices.isEmpty {
-            logger.log("Accessory discovered: \(index)")
-            let deviceID = qorvoDevices[index]?.bleUniqueID
-
-            if deviceID == deviceUniqueBLEId {
-                // Connect to the accessory
-                if qorvoDevices[index]?.blePeripheralStatus == statusDiscovered {
-                    print("Connecting to Accessory. ID: \(qorvoDevices[index]?.bleUniqueID)")
-                    connectToAccessory(deviceID!)
-                } else {
-                    return
-                }
-            }
+        guard let device = dataChannel.getDeviceFromUniqueID(deviceUniqueBLEId) else {
+            return
         }
 
+        if device.bleUniqueID == deviceUniqueBLEId {
+            // Connect to the accessory
+            if device.blePeripheralStatus == statusDiscovered {
+                logger.info("Connecting to Accessory")
+                connectToAccessory(device.bleUniqueID)
+            } else {
+                return
+            }
+        }
     }
 
     func accessoryRemove(deviceID: Int) {
@@ -251,10 +249,7 @@ class PreciseFinderViewContoller: UIViewController {
     }
 
     func accessoryUpdate() {
-        // Update devices
-        qorvoDevices.forEach { (_) in
-            print("@accessoryUpdate")
-        }
+        // TODO: accessoryUpdate
     }
 
     func accessoryConnected(deviceID: Int) {

@@ -110,9 +110,8 @@ let statusDiscovered = "Discovered"
 let statusConnected = "Connected"
 let statusRanging = "Ranging"
 
-var qorvoDevices = [qorvoDevice?]()
-
 class DataCommunicationChannel: NSObject {
+    public var qorvoDevices = [qorvoDevice?]()
     var centralManager: CBCentralManager!
 
     var writeIterationsComplete = 0
@@ -131,7 +130,7 @@ class DataCommunicationChannel: NSObject {
     var bluetoothReady = false
     var shouldStartWhenReady = false
 
-    let logger = os.Logger(subsystem: "com.example.apple-samplecode.NINearbyAccessorySample", category: "DataChannel")
+    let logger = os.Logger(subsystem: "com.chitlangesahas.FindMyCat", category: "DataChannel")
 
     override init() {
         super.init()
