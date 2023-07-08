@@ -16,16 +16,18 @@ import os.log
 class PreciseFinderViewContoller: UIViewController {
 
     // MARK: - Device to connect to
-    var deviceDisplayName: String
-    var deviceUniqueBLEId: Int
+    private var deviceDisplayName: String
+    internal var deviceUniqueBLEId: Int
 
     // MARK: - Simple views to show information
     internal let arrowImgView = UIImageView(image: UIImage(systemName: "arrow.up"))
-    private let deviceNameLabel = UILabel()
     internal let distanceLabel = UILabel()
+
+    private let deviceNameLabel = UILabel()
     private let cancelButton = UIButton()
     private let soundButton = UIButton()
     private let circle = UIView()
+
     let viewLayerColor = UIColor.white
 
     // MARK: AR camera layer for blurring
@@ -34,11 +36,11 @@ class PreciseFinderViewContoller: UIViewController {
 
     // MARK: UWB
     // Dictionary to associate each NI Session to the qorvoDevice using the uniqueID
-    var referenceDict = [Int: NISession]()
+    internal var referenceDict = [Int: NISession]()
     // A mapping from a discovery token to a name.
-    var accessoryMap = [NIDiscoveryToken: String]()
-    var configuration: NINearbyAccessoryConfiguration?
-    var isConverged = false
+    internal var accessoryDiscoveryTokenToNameMap = [NIDiscoveryToken: String]()
+    internal var accessoryConfig: NINearbyAccessoryConfiguration?
+    internal var NIAlgorithmHasConverged = false
 
     // Extras
     let logger = os.Logger(subsystem: "com.chitlangesahas.FindMyCat", category: "PreciseViewContoller")

@@ -73,7 +73,7 @@ extension PreciseFinderViewContoller {
     }
 
     internal func cacheToken(_ token: NIDiscoveryToken, accessoryName: String) {
-        accessoryMap[token] = accessoryName
+        NIDiscoveryTokenToNameMap[token] = accessoryName
     }
 
     internal func handleUserDidNotAllow() {

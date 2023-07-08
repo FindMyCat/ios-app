@@ -10,6 +10,7 @@ import NearbyInteraction
 
 // MARK: - Data communication extension for Precise View finder.
 extension PreciseFinderViewContoller {
+    
     // MARK: - Setup Data channel
     internal func configureDataChannel() {
         DataCommunicationChannel.shared.accessoryDataHandler = accessorySharedData
@@ -126,8 +127,8 @@ extension PreciseFinderViewContoller {
     internal func setupAccessory(_ configData: Data, name: String, deviceID: Int) {
         print("Received configuration data from '\(name)'. Running session.")
         do {
-            configuration = try NINearbyAccessoryConfiguration(data: configData)
-            configuration?.isCameraAssistanceEnabled = true
+            accessoryConfig = try NINearbyAccessoryConfiguration(data: configData)
+            accessoryConfig?.isCameraAssistanceEnabled = true
         } catch {
             // Stop and display the issue because the incoming data is invalid.
             // In your app, debug the accessory data to ensure an expected
@@ -137,9 +138,9 @@ extension PreciseFinderViewContoller {
         }
 
         // Cache the token to correlate updates with this accessory.
-        cacheToken(configuration!.accessoryDiscoveryToken, accessoryName: name)
+        cacheToken(accessoryConfig!.accessoryDiscoveryToken, accessoryName: name)
 
-        referenceDict[deviceID]?.run(configuration!)
+        referenceDict[deviceID]?.run(accessoryConfig!)
         print("Accessory Session configured.")
 
     }

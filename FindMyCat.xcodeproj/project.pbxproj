@@ -10,7 +10,7 @@
 		362DC0062A59291F0079ECDB /* PreciseFindableDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362DC0052A59291F0079ECDB /* PreciseFindableDevice.swift */; };
 		362DC0092A5933440079ECDB /* DataCommunicationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362DC0082A5933440079ECDB /* DataCommunicationExtension.swift */; };
 		362DC00B2A5934950079ECDB /* HelpersExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362DC00A2A5934950079ECDB /* HelpersExtension.swift */; };
-		362DC00D2A5934F10079ECDB /* SessionDelegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362DC00C2A5934F10079ECDB /* SessionDelegates.swift */; };
+		362DC00D2A5934F10079ECDB /* NI_AR_SessionDelegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362DC00C2A5934F10079ECDB /* NI_AR_SessionDelegates.swift */; };
 		363EC8052A57E42E0059E1CA /* UWBMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363EC8042A57E42E0059E1CA /* UWBMessages.swift */; };
 		363EC8082A57E4CA0059E1CA /* UWBUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363EC8072A57E4CA0059E1CA /* UWBUtils.swift */; };
 		363EC80A2A57E6990059E1CA /* Distance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363EC8092A57E6990059E1CA /* Distance.swift */; };
@@ -49,7 +49,7 @@
 		362DC0052A59291F0079ECDB /* PreciseFindableDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreciseFindableDevice.swift; sourceTree = "<group>"; };
 		362DC0082A5933440079ECDB /* DataCommunicationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataCommunicationExtension.swift; sourceTree = "<group>"; };
 		362DC00A2A5934950079ECDB /* HelpersExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpersExtension.swift; sourceTree = "<group>"; };
-		362DC00C2A5934F10079ECDB /* SessionDelegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionDelegates.swift; sourceTree = "<group>"; };
+		362DC00C2A5934F10079ECDB /* NI_AR_SessionDelegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NI_AR_SessionDelegates.swift; sourceTree = "<group>"; };
 		363EC8042A57E42E0059E1CA /* UWBMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UWBMessages.swift; sourceTree = "<group>"; };
 		363EC8072A57E4CA0059E1CA /* UWBUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UWBUtils.swift; sourceTree = "<group>"; };
 		363EC8092A57E6990059E1CA /* Distance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Distance.swift; sourceTree = "<group>"; };
@@ -112,7 +112,7 @@
 			children = (
 				362DC0082A5933440079ECDB /* DataCommunicationExtension.swift */,
 				362DC00A2A5934950079ECDB /* HelpersExtension.swift */,
-				362DC00C2A5934F10079ECDB /* SessionDelegates.swift */,
+				362DC00C2A5934F10079ECDB /* NI_AR_SessionDelegates.swift */,
 			);
 			path = extensions;
 			sourceTree = "<group>";
@@ -366,7 +366,7 @@
 				36562C012A54DB1800D95C4C /* BluetoothLECentral.swift in Sources */,
 				365E536E2A476D3C00AD6AE8 /* DeviceBottomDrawerController.swift in Sources */,
 				363EC80A2A57E6990059E1CA /* Distance.swift in Sources */,
-				362DC00D2A5934F10079ECDB /* SessionDelegates.swift in Sources */,
+				362DC00D2A5934F10079ECDB /* NI_AR_SessionDelegates.swift in Sources */,
 				365E538F2A49005800AD6AE8 /* WebsocketPayloadWrapper.swift in Sources */,
 				365E538B2A48EF5600AD6AE8 /* WebSocketManager.swift in Sources */,
 				362DC0092A5933440079ECDB /* DataCommunicationExtension.swift in Sources */,

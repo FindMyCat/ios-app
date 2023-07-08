@@ -20,7 +20,7 @@ extension PreciseFinderViewContoller: ARSessionDelegate {
 extension PreciseFinderViewContoller: NISessionDelegate {
 
     func session(_ session: NISession, didGenerateShareableConfigurationData shareableConfigurationData: Data, for object: NINearbyObject) {
-        guard object.discoveryToken == configuration?.accessoryDiscoveryToken else { return }
+        guard object.discoveryToken == accessoryConfig?.accessoryDiscoveryToken else { return }
 
         // Prepare to send a message to the accessory.
         var msg = Data([MessageId.configureAndStart.rawValue])
@@ -45,10 +45,10 @@ extension PreciseFinderViewContoller: NISessionDelegate {
             print("Horizontal Angle: \(accessory.horizontalAngle)")
             print("verticalDirectionEstimate: \(accessory.verticalDirectionEstimate)")
             print("Converged")
-            isConverged = true
+            NIAlgorithmHasConverged = true
         case .notConverged([NIAlgorithmConvergenceStatus.Reason.insufficientLighting]):
             print("More light required")
-            isConverged = false
+            NIAlgorithmHasConverged = false
         default:
             print("Try moving in a different direction...")
         }
@@ -70,7 +70,7 @@ extension PreciseFinderViewContoller: NISessionDelegate {
                 updatedDevice.uwbLocation?.noUpdate  = false
             }
             // TODO: For IPhone 14 only
-            else if isConverged {
+            else if NIAlgorithmHasConverged {
                 guard let horizontalAngle = accessory.horizontalAngle else {return}
                 updatedDevice.uwbLocation?.direction = getDirectionFromHorizontalAngle(rad: horizontalAngle)
                 updatedDevice.uwbLocation?.elevation = accessory.verticalDirectionEstimate.rawValue
@@ -129,7 +129,7 @@ extension PreciseFinderViewContoller: NISessionDelegate {
         guard let accessory = nearbyObjects.first else { return }
 
         // Clear the app's accessory state.
-        accessoryMap.removeValue(forKey: accessory.discoveryToken)
+        NIDiscoveryTokenToNameMap.removeValue(forKey: accessory.discoveryToken)
 
         // Get the deviceID associated to the NISession
         let deviceID = deviceIDFromSession(session)
