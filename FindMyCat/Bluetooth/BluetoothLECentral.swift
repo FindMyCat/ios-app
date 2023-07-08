@@ -80,6 +80,8 @@ let statusRanging = "Ranging"
 class DataCommunicationChannel: NSObject {
     private var preciseFindableDevices = [PreciseFindableDevice?]()
 
+    static let shared = DataCommunicationChannel()
+
     var centralManager: CBCentralManager!
 
     var writeIterationsComplete = 0

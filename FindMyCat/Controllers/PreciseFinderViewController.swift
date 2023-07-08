@@ -34,7 +34,6 @@ class PreciseFinderViewContoller: UIViewController {
     let arConfig = ARWorldTrackingConfiguration()
 
     // MARK: UWB
-    var dataChannel = DataCommunicationChannel()
     // Dictionary to associate each NI Session to the qorvoDevice using the uniqueID
     var referenceDict = [Int: NISession]()
     // A mapping from a discovery token to a name.
@@ -156,7 +155,7 @@ class PreciseFinderViewContoller: UIViewController {
 
     @objc private func cancelButtonPressed() {
         // cleanup -- stop the data channel and disconnect from Device.
-        dataChannel.stop()
+        DataCommunicationChannel.shared.stop()
         disconnectFromAccessory(deviceUniqueBLEId)
         dismiss(animated: true, completion: nil)
     }
@@ -215,21 +214,21 @@ class PreciseFinderViewContoller: UIViewController {
 
     // MARK: - Setup Data channel
     private func configureDataChannel() {
-        dataChannel.accessoryDataHandler = accessorySharedData
+        DataCommunicationChannel.shared.accessoryDataHandler = accessorySharedData
 
         // Prepare the data communication channel.
-        dataChannel.accessoryDiscoveryHandler = accessoryInclude
-        dataChannel.accessoryTimeoutHandler = accessoryRemove
-        dataChannel.accessoryConnectedHandler = accessoryConnected
-        dataChannel.accessoryDisconnectedHandler = accessoryDisconnected
-        dataChannel.accessoryDataHandler = accessorySharedData
-        dataChannel.start()
+        DataCommunicationChannel.shared.accessoryDiscoveryHandler = accessoryInclude
+        DataCommunicationChannel.shared.accessoryTimeoutHandler = accessoryRemove
+        DataCommunicationChannel.shared.accessoryConnectedHandler = accessoryConnected
+        DataCommunicationChannel.shared.accessoryDisconnectedHandler = accessoryDisconnected
+        DataCommunicationChannel.shared.accessoryDataHandler = accessorySharedData
+        DataCommunicationChannel.shared.start()
 
     }
     // MARK: - Data channel methods
     func accessoryInclude(index: Int) {
 
-        guard let device = dataChannel.getDeviceFromUniqueID(deviceUniqueBLEId) else {
+        guard let device = DataCommunicationChannel.shared.getDeviceFromUniqueID(deviceUniqueBLEId) else {
             return
         }
 
@@ -338,7 +337,7 @@ class PreciseFinderViewContoller: UIViewController {
         print("Accessory Session started.")
 
         // Update the device Status
-        if let startedDevice = dataChannel.getDeviceFromUniqueID(deviceID) {
+        if let startedDevice = DataCommunicationChannel.shared.getDeviceFromUniqueID(deviceID) {
             startedDevice.blePeripheralStatus = statusRanging
         }
 
@@ -408,7 +407,7 @@ extension PreciseFinderViewContoller: NISessionDelegate {
         let deviceID = deviceIDFromSession(session)
         // print(NISession.deviceCapabilities)
 
-        if let updatedDevice = dataChannel.getDeviceFromUniqueID(deviceID) {
+        if let updatedDevice = DataCommunicationChannel.shared.getDeviceFromUniqueID(deviceID) {
             // set updated values
             updatedDevice.uwbLocation?.distance = distance
 
@@ -436,12 +435,12 @@ extension PreciseFinderViewContoller: NISessionDelegate {
 
     func updateDeviceData(_ deviceID: Int) {
 
-        let qorvoDevice = dataChannel.getDeviceFromUniqueID(deviceID)
-        if qorvoDevice == nil { return }
+        let preciseFindableDevice = DataCommunicationChannel.shared.getDeviceFromUniqueID(deviceID)
+        if preciseFindableDevice == nil { return }
 
         // Get updated location values
-        let distance  = qorvoDevice?.uwbLocation?.distance
-        let azimuthCheck = azimuth((qorvoDevice?.uwbLocation?.direction)!)
+        let distance  = preciseFindableDevice?.uwbLocation?.distance
+        let azimuthCheck = azimuth((preciseFindableDevice?.uwbLocation?.direction)!)
 
         // Check if azimuth check calcul is a number (ie: not infinite)
         if azimuthCheck.isNaN {
@@ -527,7 +526,7 @@ extension PreciseFinderViewContoller {
 
     func connectToAccessory(_ deviceID: Int) {
          do {
-             try dataChannel.connectPeripheral(deviceID)
+             try DataCommunicationChannel.shared.connectPeripheral(deviceID)
          } catch {
              print("Failed to connect to accessory: \(error)")
          }
@@ -535,7 +534,7 @@ extension PreciseFinderViewContoller {
 
     func disconnectFromAccessory(_ deviceID: Int) {
          do {
-             try dataChannel.disconnectPeripheral(deviceID)
+             try DataCommunicationChannel.shared.disconnectPeripheral(deviceID)
          } catch {
              print("Failed to disconnect from accessory: \(error)")
          }
@@ -543,7 +542,7 @@ extension PreciseFinderViewContoller {
 
     func sendDataToAccessory(_ data: Data, _ deviceID: Int) {
          do {
-             try dataChannel.sendData(data, deviceID)
+             try DataCommunicationChannel.shared.sendData(data, deviceID)
          } catch {
              print("Failed to send data to accessory: \(error)")
          }
@@ -564,9 +563,9 @@ extension PreciseFinderViewContoller {
 
     func shouldRetry(_ deviceID: Int) -> Bool {
         // Need to use the dictionary here, to know which device failed and check its connection state
-        let qorvoDevice = dataChannel.getDeviceFromUniqueID(deviceID)
+        let preciseFindableDevice = DataCommunicationChannel.shared.getDeviceFromUniqueID(deviceID)
 
-        if qorvoDevice?.blePeripheralStatus != statusDiscovered {
+        if preciseFindableDevice?.blePeripheralStatus != statusDiscovered {
             return true
         }
 
