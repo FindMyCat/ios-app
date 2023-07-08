@@ -64,6 +64,16 @@ class PreciseFinderViewContoller: UIViewController {
         configureDataChannel()
     }
 
+    deinit {
+        // Remove the observer when the view controller is deallocated
+        NotificationCenter.default.removeObserver(self,
+                                                  name: UIApplication.willResignActiveNotification,
+                                                  object: nil)
+
+        // Pause the ARSession before it gets deallocated
+        pauseARSession()
+    }
+
     // MARK: - Setup subviews
 
     private func setupSubviews() {
@@ -111,6 +121,12 @@ class PreciseFinderViewContoller: UIViewController {
         let blurEffectView = UIVisualEffectView(effect: blurEffect)
         blurEffectView.frame = self.view.bounds
         self.view.addSubview(blurEffectView)
+
+        // Add observer for pausing of AR session.
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(pauseARSession),
+                                               name: UIApplication.willResignActiveNotification,
+                                               object: nil)
     }
 
     func setupDeviceName() {
@@ -153,13 +169,6 @@ class PreciseFinderViewContoller: UIViewController {
 
     }
 
-    @objc private func cancelButtonPressed() {
-        // cleanup -- stop the data channel and disconnect from Device.
-        DataCommunicationChannel.shared.stop()
-        disconnectFromAccessory(deviceUniqueBLEId)
-        dismiss(animated: true, completion: nil)
-    }
-
     func setupSoundButton() {
         view.addSubview(soundButton)
 
@@ -180,7 +189,7 @@ class PreciseFinderViewContoller: UIViewController {
     func setupDistanceLabel() {
         view.addSubview(distanceLabel)
 
-//        distanceLabel.text = "10 ft"
+        //        distanceLabel.text = "10 ft"
         distanceLabel.font = UIFont.boldSystemFont(ofSize: 50)
         distanceLabel.textColor = viewLayerColor
 
@@ -212,6 +221,20 @@ class PreciseFinderViewContoller: UIViewController {
         ])
     }
 
+    // MARK: - Objc Helper methods
+
+    @objc func pauseARSession() {
+        // Pause the ARSession if it is running
+        arView.session.pause()
+    }
+
+    @objc private func cancelButtonPressed() {
+        // cleanup -- stop the data channel and disconnect from Device.
+        deinitDataCommunicationChannel()
+        disconnectFromAccessory(deviceUniqueBLEId)
+        dismiss(animated: true, completion: nil)
+    }
+
     // MARK: - Setup Data channel
     private func configureDataChannel() {
         DataCommunicationChannel.shared.accessoryDataHandler = accessorySharedData
@@ -225,7 +248,20 @@ class PreciseFinderViewContoller: UIViewController {
         DataCommunicationChannel.shared.start()
 
     }
-    // MARK: - Data channel methods
+
+    private func deinitDataCommunicationChannel() {
+        DataCommunicationChannel.shared.accessoryDataHandler = nil
+
+        // Prepare the data communication channel.
+        DataCommunicationChannel.shared.accessoryDiscoveryHandler = nil
+        DataCommunicationChannel.shared.accessoryTimeoutHandler = nil
+        DataCommunicationChannel.shared.accessoryConnectedHandler = nil
+        DataCommunicationChannel.shared.accessoryDisconnectedHandler = nil
+        DataCommunicationChannel.shared.accessoryDataHandler = nil
+        DataCommunicationChannel.shared.stop()
+    }
+
+    // MARK: - Data channel event handlers
     func accessoryInclude(index: Int) {
 
         guard let device = DataCommunicationChannel.shared.getDeviceFromUniqueID(deviceUniqueBLEId) else {
@@ -244,7 +280,7 @@ class PreciseFinderViewContoller: UIViewController {
     }
 
     func accessoryRemove(deviceID: Int) {
-
+        // TODO: accessoryRemove
     }
 
     func accessoryUpdate() {
