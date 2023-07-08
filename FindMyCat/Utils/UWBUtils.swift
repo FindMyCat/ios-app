@@ -12,7 +12,7 @@ import simd
 // MARK: - Utils.
 // Provides the azimuth from an argument 3D directional.
 func azimuth(_ direction: simd_float3) -> Float {
-    if Settings().isDirectionEnable {
+    if NISession.deviceCapabilities.supportsDirectionMeasurement {
         return asin(direction.x)
     } else {
         return atan2(direction.x, direction.z)

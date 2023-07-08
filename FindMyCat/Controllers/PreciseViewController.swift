@@ -451,7 +451,7 @@ extension PreciseViewContoller: NISessionDelegate {
         }
 
         var azimuth = 0
-        if Settings().isDirectionEnable {
+        if NISession.deviceCapabilities.supportsDirectionMeasurement {
             azimuth =  Int( 90 * (Double(azimuthCheck)))
         } else {
             azimuth = Int(rad2deg(Double(azimuthCheck)))
