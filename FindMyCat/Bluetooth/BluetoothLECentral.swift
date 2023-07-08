@@ -117,18 +117,18 @@ class DataCommunicationChannel: NSObject {
     @objc func timerHandler() {
         var index = 0
 
-        preciseFindableDevices.forEach { (qorvoDevice) in
+        preciseFindableDevices.forEach { (findableDevice) in
 
-            if qorvoDevice!.blePeripheralStatus == statusDiscovered {
+            if findableDevice!.blePeripheralStatus == statusDiscovered {
                 // Get current timestamp
                 let timeStamp = Int64((Date().timeIntervalSince1970 * 1000.0).rounded())
 
                 // Remove device if timestamp is bigger than 5000 msec
-                if timeStamp > (qorvoDevice!.bleTimestamp + 5000) {
-                    let deviceID = qorvoDevice?.bleUniqueID
+                if timeStamp > (findableDevice!.bleTimestamp + 5000) {
+                    let deviceID = findableDevice?.bleUniqueID
 
-                    logger.info("Device \(qorvoDevice?.blePeripheralName ?? "Unknown") timed-out removed at index \(index)")
-                    logger.info("Device timestamp: \(qorvoDevice!.bleTimestamp) Current timestamp: \(timeStamp) ")
+                    logger.info("Device \(findableDevice?.blePeripheralName ?? "Unknown") timed-out removed at index \(index)")
+                    logger.info("Device timestamp: \(findableDevice!.bleTimestamp) Current timestamp: \(timeStamp) ")
                     if preciseFindableDevices.indices.contains(index) {
                         preciseFindableDevices.remove(at: index)
                     }
