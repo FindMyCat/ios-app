@@ -195,8 +195,8 @@ class DataCommunicationChannel: NSObject {
         }
     }
 
-    func stop() throws {
-
+    func stop() {
+        centralManager.stopScan()
     }
 
     func connectPeripheral(_ uniqueID: Int) throws {

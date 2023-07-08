@@ -304,7 +304,7 @@ class DeviceBottomDrawerController:
 
 extension DeviceBottomDrawerController: DeviceCellDelegate {
     func launchPreciseFindScreen() {
-        let vc = PreciseViewContoller(deviceDisplayName: "Pumpkin", deviceUniqueBLEId: 215788291)
+        let vc = PreciseFinderViewContoller(deviceDisplayName: "Pumpkin", deviceUniqueBLEId: 215788291)
         vc.modalPresentationStyle = .fullScreen
 
         parentVc.present(vc, animated: true)

@@ -13,7 +13,7 @@ import RealityKit
 import NearbyInteraction
 import os.log
 
-class PreciseViewContoller: UIViewController {
+class PreciseFinderViewContoller: UIViewController {
 
     // MARK: - Device to connect to
     var deviceDisplayName: String
@@ -155,6 +155,9 @@ class PreciseViewContoller: UIViewController {
     }
 
     @objc private func cancelButtonPressed() {
+        // cleanup -- stop the data channel and disconnect from Device.
+        dataChannel.stop()
+        disconnectFromAccessory(deviceUniqueBLEId)
         dismiss(animated: true, completion: nil)
     }
 
@@ -359,14 +362,14 @@ class PreciseViewContoller: UIViewController {
 }
 
 // MARK: - `ARSessionDelegate`.
-extension PreciseViewContoller: ARSessionDelegate {
+extension PreciseFinderViewContoller: ARSessionDelegate {
     func sessionShouldAttemptRelocalization(_ session: ARSession) -> Bool {
         return false
     }
 }
 
 // MARK: - `NISessionDelegate`.
-extension PreciseViewContoller: NISessionDelegate {
+extension PreciseFinderViewContoller: NISessionDelegate {
 
     func session(_ session: NISession, didGenerateShareableConfigurationData shareableConfigurationData: Data, for object: NINearbyObject) {
         guard object.discoveryToken == configuration?.accessoryDiscoveryToken else { return }
@@ -525,7 +528,7 @@ extension PreciseViewContoller: NISessionDelegate {
 }
 
 // MARK: - Helpers.
-extension PreciseViewContoller {
+extension PreciseFinderViewContoller {
 
     func connectToAccessory(_ deviceID: Int) {
          do {
