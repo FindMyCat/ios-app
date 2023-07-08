@@ -129,7 +129,7 @@ extension PreciseFinderViewContoller: NISessionDelegate {
         guard let accessory = nearbyObjects.first else { return }
 
         // Clear the app's accessory state.
-        NIDiscoveryTokenToNameMap.removeValue(forKey: accessory.discoveryToken)
+        accessoryDiscoveryTokenToNameMap.removeValue(forKey: accessory.discoveryToken)
 
         // Get the deviceID associated to the NISession
         let deviceID = deviceIDFromSession(session)

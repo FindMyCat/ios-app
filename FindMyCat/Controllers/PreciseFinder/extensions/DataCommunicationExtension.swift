@@ -10,7 +10,7 @@ import NearbyInteraction
 
 // MARK: - Data communication extension for Precise View finder.
 extension PreciseFinderViewContoller {
-    
+
     // MARK: - Setup Data channel
     internal func configureDataChannel() {
         DataCommunicationChannel.shared.accessoryDataHandler = accessorySharedData
