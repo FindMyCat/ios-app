@@ -10,7 +10,6 @@
 		363EC8052A57E42E0059E1CA /* UWBMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363EC8042A57E42E0059E1CA /* UWBMessages.swift */; };
 		363EC8082A57E4CA0059E1CA /* UWBUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363EC8072A57E4CA0059E1CA /* UWBUtils.swift */; };
 		363EC80A2A57E6990059E1CA /* Distance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363EC8092A57E6990059E1CA /* Distance.swift */; };
-		36562BFF2A54D60000D95C4C /* PreciseFindViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36562BFE2A54D60000D95C4C /* PreciseFindViewController.swift */; };
 		36562C012A54DB1800D95C4C /* BluetoothLECentral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36562C002A54DB1800D95C4C /* BluetoothLECentral.swift */; };
 		36562C042A54DBC600D95C4C /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36562C032A54DBC600D95C4C /* SettingsViewController.swift */; };
 		36562C062A54DC0900D95C4C /* DeviceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36562C052A54DC0900D95C4C /* DeviceTableViewCell.swift */; };
@@ -47,7 +46,6 @@
 		363EC8042A57E42E0059E1CA /* UWBMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UWBMessages.swift; sourceTree = "<group>"; };
 		363EC8072A57E4CA0059E1CA /* UWBUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UWBUtils.swift; sourceTree = "<group>"; };
 		363EC8092A57E6990059E1CA /* Distance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Distance.swift; sourceTree = "<group>"; };
-		36562BFE2A54D60000D95C4C /* PreciseFindViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreciseFindViewController.swift; sourceTree = "<group>"; };
 		36562C002A54DB1800D95C4C /* BluetoothLECentral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothLECentral.swift; sourceTree = "<group>"; };
 		36562C032A54DBC600D95C4C /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		36562C052A54DC0900D95C4C /* DeviceTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceTableViewCell.swift; sourceTree = "<group>"; };
@@ -180,7 +178,6 @@
 				365E536D2A476D3C00AD6AE8 /* DeviceBottomDrawerController.swift */,
 				365E53812A48B54A00AD6AE8 /* LoginViewController.swift */,
 				365E53832A48B73300AD6AE8 /* HomeScreenController.swift */,
-				36562BFE2A54D60000D95C4C /* PreciseFindViewController.swift */,
 				36562C0B2A56778A00D95C4C /* PreciseViewController.swift */,
 			);
 			path = Controllers;
@@ -329,7 +326,6 @@
 				365E53742A478F6F00AD6AE8 /* Devices.swift in Sources */,
 				367763892A4E173F0096FF1F /* Constants.swift in Sources */,
 				365E53522A47648700AD6AE8 /* SceneDelegate.swift in Sources */,
-				36562BFF2A54D60000D95C4C /* PreciseFindViewController.swift in Sources */,
 				365E538D2A48FD3200AD6AE8 /* Positions.swift in Sources */,
 				3677638B2A4E1EDA0096FF1F /* MapMarkerView.swift in Sources */,
 				36562C062A54DC0900D95C4C /* DeviceTableViewCell.swift in Sources */,
