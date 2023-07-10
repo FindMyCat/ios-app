@@ -11,75 +11,68 @@ import FittedSheets
 
 class AddNewDeviceViewController: UIViewController {
 
+    let sheetView = UIView()
+
     override func viewDidLoad() {
 
-        super.viewDidLoad()
+        view.backgroundColor = UIColor.black.withAlphaComponent(0.6)
 
-        view.backgroundColor = .red
-
-//        configureSheetController()
     }
 
-    private func configureSheetController() {
-        let sheeetOptions = SheetOptions(
-            useInlineMode: true,
-            isRubberBandEnabled: true
-        )
+    override func viewWillAppear(_ animated: Bool) {
+        addSheet()
+        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
+        sheetView.addGestureRecognizer(panGesture)
+    }
 
-        let allowedSheetSizes = [SheetSize.percent(0.4), SheetSize.percent(0.7), SheetSize.percent(0.1)]
+    func addSheet() {
+        view.addSubview(sheetView)
 
-        let sheetController = SheetViewController(controller: self, sizes: allowedSheetSizes, options: sheeetOptions)
-        sheetController.allowGestureThroughOverlay = true
+        sheetView.backgroundColor = .white
 
-        sheetController.shouldDismiss = { _ in
-        // This is called just before the sheet is dismissed. Return false to prevent the build in dismiss events
-            return false
+        sheetView.layer.cornerRadius = 48
+
+        sheetView.translatesAutoresizingMaskIntoConstraints = false
+        let bottomConstraint = sheetView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 500)
+
+        NSLayoutConstraint.activate([
+            sheetView.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -10),
+            sheetView.heightAnchor.constraint(equalToConstant: 500),
+            sheetView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            bottomConstraint
+        ])
+
+        view.layoutIfNeeded()
+
+        // Animate the slide-in effect
+        bottomConstraint.constant = -5
+        UIView.animate(withDuration: 0.3) {
+            self.view.layoutIfNeeded()
         }
-        // The size of the grip in the pull bar
-        sheetController.gripSize = CGSize(width: 50, height: 6)
-        sheetController.gripColor = UIColor(red: 60/255, green: 60/255, blue: 67/255, alpha: 0.3)
-        sheetController.overlayColor = UIColor.clear
-
-        // The corner curve of the sheet (iOS 13 or later)
-        sheetController.cornerCurve                 = .continuous
-
-        // minimum distance above the pull bar, prevents bar from coming right up to the edge of the screen
-        sheetController.minimumSpaceAbovePullBar    = 0
-
-        // Determine if the rounding should happen on the pullbar or the presented controller only (should only be true when the pull bar's background color is .clear)
-        sheetController.treatPullBarAsClear         = false
-
-        // Disable the dismiss on background tap functionality
-        sheetController.dismissOnOverlayTap         = false
-
-        // Disable the ability to pull down to dismiss the modal
-        sheetController.dismissOnPull               = false
-
-        /// Allow pulling past the maximum height and bounce back. Defaults to true.
-        sheetController.allowPullingPastMaxHeight   = false
-
-        /// Automatically grow/move the sheet to accomidate the keyboard. Defaults to true.
-        sheetController.autoAdjustToKeyboard        = true
-
-        sheetController.contentBackgroundColor      = .clear
-
-        let blurEffect = UIBlurEffect(style: UIBlurEffect.Style.light)
-        let blurEffectView = UIVisualEffectView(effect: blurEffect)
-        blurEffectView.backgroundColor = UIColor.init(red: 243/255, green: 243/255, blue: 243/255, alpha: 0.7)
-
-        blurEffectView.frame = view.bounds
-        blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        view.addSubview(blurEffectView)
-
-//        // Disable panning on Sheet when interacting with the table.
-//        sheetController.panGestureShouldBegin = {
-//            _ in
-//
-//            return !self.tableView.isTracking
-//        }
-        // animate in
-        sheetController.animateIn(to: view, in: self)
-
-//        self.present(sheetController, animated: true, completion: nil)
     }
+
+    @objc func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
+        let translation = gesture.translation(in: view)
+
+        switch gesture.state {
+        case .changed:
+            if translation.y > 0 || translation.y < 0 {
+                sheetView.transform = CGAffineTransform(translationX: 0, y: translation.y)
+            }
+        case .ended, .cancelled:
+            if translation.y >= 100 {
+                UIView.animate(withDuration: 0.2) {
+                    self.sheetView.transform = CGAffineTransform(translationX: 0, y: self.view.frame.height)
+                }
+                dismiss(animated: true)
+            } else {
+                UIView.animate(withDuration: 0.2) {
+                    self.sheetView.transform = .identity
+                }
+            }
+        default:
+            break
+        }
+    }
+
 }

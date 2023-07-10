@@ -79,6 +79,15 @@ class DeviceCellView: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
+    override func prepareForReuse() {
+        // invoke superclass implementation
+        super.prepareForReuse()
+
+        // reset labels and icons
+        self.deviceAddressLabel.text = "..."
+        self.batteryIcon.image = nil
+    }
+
     // MARK: - Configurations of Subviews
 
     private func configureSubviews() {

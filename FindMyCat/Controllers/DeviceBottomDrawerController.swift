@@ -133,7 +133,7 @@ class DeviceBottomDrawerController:
         sheetController.panGestureShouldBegin = {
             _ in
 
-            return !self.tableView.isTracking || !self.addNewDeviceButton.isSelected
+            return !self.tableView.isTracking && !self.addNewDeviceButton.isSelected
         }
         // animate in
         sheetController.animateIn(to: self.parentView, in: self.parentVc)
@@ -226,10 +226,15 @@ class DeviceBottomDrawerController:
 
         // Set the name
         cell.deviceNameLabel.text = cellDevice.name
-        // Set the battery percentage
+
+        if cellDevice.lastUpdate == nil {
+            cell.deviceAddressLabel.text = Constants.DeviceOffline
+            cell.deviceAddressLabel.tintColor = .red
+        }
 
         if let targetPosition = positions.first(where: { $0.deviceId == cellDevice.id }) {
             print("Position found: \(targetPosition.deviceId)")
+            // Set the battery percentage
             cell.setBatteryPercentage(percentage: targetPosition.attributes.batteryLevel)
 
             // Set the address
@@ -237,16 +242,12 @@ class DeviceBottomDrawerController:
                 address in
 
                 if address == nil {
-                    cell.deviceAddressLabel.text = "Address unavailable."
+                    cell.deviceAddressLabel.text = Constants.AddressUnavailable
                 } else {
                     cell.deviceAddressLabel.text = address
                 }
 
             }
-        } else {
-            // Swift will reuse data from previous cell, (odd!) if not explicitly set
-            cell.batteryIcon.image = nil
-            cell.deviceAddressLabel.text = "Address unavailable."
         }
 
         let bgColorView = UIView()
@@ -334,7 +335,8 @@ class DeviceBottomDrawerController:
 
     @objc func addNewDeviceButtonClicked() {
         let vc = AddNewDeviceViewController()
-        vc.modalPresentationStyle = .formSheet
+        vc.modalPresentationStyle = .overFullScreen
+        vc.modalTransitionStyle = .crossDissolve
         parentVc.present(vc, animated: true)
     }
 
