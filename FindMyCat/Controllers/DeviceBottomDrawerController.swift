@@ -197,16 +197,16 @@ class DeviceBottomDrawerController:
         let devices = SharedData.getDevices()
         let positions = SharedData.getPositions()
 
-        let device = devices[indexPath.row]
+        let cellDevice = devices[indexPath.row]
 
         cell.backgroundColor = .clear
         cell.delegate = self
 
         // Set the name
-        cell.deviceNameLabel.text = devices[indexPath.row].name
+        cell.deviceNameLabel.text = cellDevice.name
         // Set the battery percentage
 
-        if let targetPosition = positions.first(where: { $0.deviceId == device.id }) {
+        if let targetPosition = positions.first(where: { $0.deviceId == cellDevice.id }) {
             print("Position found: \(targetPosition.deviceId)")
             cell.setBatteryPercentage(percentage: targetPosition.attributes.batteryLevel)
 
