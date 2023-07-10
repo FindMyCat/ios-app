@@ -48,8 +48,8 @@ class DeviceCellView: UITableViewCell {
     let deviceNameLabel = UILabel()
     let deviceAddressLabel = UILabel()
     let emojiLabel = UILabel()
-    let dotSeparator = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 10))
-    let lastSeen = UILabel()
+    let dotSeparatorView = UIView()
+    let lastSeenLabel = UILabel()
     let batteryIcon = UIImageView()
 
     // Expanded state views
@@ -85,8 +85,7 @@ class DeviceCellView: UITableViewCell {
         super.prepareForReuse()
 
         // reset labels and icons
-        self.batteryIcon.image = nil
-        self.deviceAddressLabel.text = nil
+//        self.batteryIcon.image = nil
     }
 
     // MARK: - Configurations of Subviews
@@ -102,6 +101,8 @@ class DeviceCellView: UITableViewCell {
 //        configureBatteryPercentageLabel()
         configureFindButton()
         configurePlaySoundButton()
+
+        configureLastSeenLabel()
 
     }
 
@@ -144,13 +145,49 @@ class DeviceCellView: UITableViewCell {
     private func configureDeviceAddressLabel() {
         contentView.addSubview(deviceAddressLabel)
         deviceAddressLabel.font = UIFont.systemFont(ofSize: 13)
-        deviceAddressLabel.alpha = 0.3
+        deviceAddressLabel.textColor = .systemGray2
 
         deviceAddressLabel.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
             deviceAddressLabel.leadingAnchor.constraint(equalTo: deviceNameLabel.leadingAnchor),
             deviceAddressLabel.topAnchor.constraint(equalTo: deviceNameLabel.bottomAnchor, constant: 5)
+        ])
+
+    }
+
+    private func configureLastSeenLabel() {
+
+        // Dot separator
+        contentView.addSubview(dotSeparatorView)
+
+        let dotDiameter = CGFloat(3)
+
+        dotSeparatorView.backgroundColor = .systemGray2
+
+        dotSeparatorView.translatesAutoresizingMaskIntoConstraints = false
+
+        dotSeparatorView.layer.cornerRadius = dotDiameter / 2
+
+        NSLayoutConstraint.activate([
+            dotSeparatorView.centerYAnchor.constraint(equalTo: deviceAddressLabel.centerYAnchor),
+            dotSeparatorView.leadingAnchor.constraint(equalTo: deviceAddressLabel.trailingAnchor, constant: 5),
+            dotSeparatorView.widthAnchor.constraint(equalToConstant: dotDiameter),
+            dotSeparatorView.heightAnchor.constraint(equalToConstant: dotDiameter)
+        ])
+
+        // Last seen label
+
+        contentView.addSubview(lastSeenLabel)
+
+        lastSeenLabel.font = UIFont.systemFont(ofSize: 13)
+        lastSeenLabel.textColor = .systemGray2
+
+        lastSeenLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            lastSeenLabel.leadingAnchor.constraint(equalTo: dotSeparatorView.trailingAnchor, constant: 5),
+            lastSeenLabel.centerYAnchor.constraint(equalTo: dotSeparatorView.centerYAnchor)
         ])
 
     }

@@ -28,6 +28,9 @@ class DeviceBottomDrawerController:
 
     private var selectedDeviceIndex: Int?
 
+    // Timer to refresh table cell data
+    private var tableReloadTimer: Timer?
+
     // MARK: - Initializers
     // Constructor
     init(parentView: UIView, parentVc: UIViewController) {
@@ -64,6 +67,16 @@ class DeviceBottomDrawerController:
 
     override func viewDidLayoutSubviews() {
         tableView.frame = controller.view.bounds
+    }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        stopTimer()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        startTimer()
     }
 
     // MARK: - Notification Observers
@@ -226,7 +239,10 @@ class DeviceBottomDrawerController:
 
         // Set the name
         cell.deviceNameLabel.text = cellDevice.name
-        cell.deviceAddressLabel.text = nil
+
+        // Reset cell labels
+        cell.dotSeparatorView.isHidden = true
+        cell.lastSeenLabel.isHidden = true
 
         if let targetPosition = positions.first(where: { $0.deviceId == cellDevice.id }) {
             // Set the battery percentage
@@ -255,6 +271,13 @@ class DeviceBottomDrawerController:
         // Replace Address with Offline if lastUpdate is nil (never recieved update)
         if cellDevice.lastUpdate == nil {
             cell.deviceAddressLabel.text = Constants.DeviceOffline
+        } else {
+            let lastSeen = DateTimeUtil.relativeTime(dateString: cellDevice.lastUpdate!)
+
+            cell.dotSeparatorView.isHidden = false
+
+            cell.lastSeenLabel.text = lastSeen
+            cell.lastSeenLabel.isHidden = false
         }
 
         let bgColorView = UIView()
@@ -345,6 +368,33 @@ class DeviceBottomDrawerController:
         vc.modalPresentationStyle = .overFullScreen
         vc.modalTransitionStyle = .crossDissolve
         parentVc.present(vc, animated: true)
+    }
+
+    // MARK: - Timer functions
+
+    @objc private func tableReloadTimerAction() {
+
+        // Reload all rows one by one, this prevents the whole table from flashing
+        let sectionIndex = 0
+        let totalRows = tableView.numberOfRows(inSection: sectionIndex)
+
+        for row in 0..<totalRows {
+            let indexPath = IndexPath(row: row, section: sectionIndex)
+            tableView.reloadRows(at: [indexPath], with: .automatic)
+        }
+    }
+
+    private func startTimer() {
+        // Invalidate any existing timer to prevent duplicates
+        stopTimer()
+
+        // Create a new timer and schedule it to repeat at the desired interval
+        tableReloadTimer = Timer.scheduledTimer(timeInterval: 10, target: self, selector: #selector(tableReloadTimerAction), userInfo: nil, repeats: true)
+    }
+
+    private func stopTimer() {
+        tableReloadTimer?.invalidate()
+        tableReloadTimer = nil
     }
 
 }
