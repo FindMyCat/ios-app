@@ -115,8 +115,6 @@ extension PreciseFinderViewContoller: NISessionDelegate {
             self.arrowImgView.transform = CGAffineTransform(rotationAngle: radians)
         }
 
-        print(convertMetersToFeet(meters: distance!), radians)
-
     }
 
     func session(_ session: NISession, didRemove nearbyObjects: [NINearbyObject], reason: NINearbyObject.RemovalReason) {

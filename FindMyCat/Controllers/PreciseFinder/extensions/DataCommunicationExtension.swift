@@ -21,8 +21,9 @@ extension PreciseFinderViewContoller {
         DataCommunicationChannel.shared.accessoryConnectedHandler = accessoryConnected
         DataCommunicationChannel.shared.accessoryDisconnectedHandler = accessoryDisconnected
         DataCommunicationChannel.shared.accessoryDataHandler = accessorySharedData
-        DataCommunicationChannel.shared.start()
 
+        logger.info("Connecting to Accessory")
+        connectToAccessoryUntilSuccess(deviceUniqueBLEId, maxRetries: 10, retryDelay: 1)
     }
 
     internal func deinitDataCommunicationChannel() {
@@ -34,25 +35,25 @@ extension PreciseFinderViewContoller {
         DataCommunicationChannel.shared.accessoryConnectedHandler = nil
         DataCommunicationChannel.shared.accessoryDisconnectedHandler = nil
         DataCommunicationChannel.shared.accessoryDataHandler = nil
-        DataCommunicationChannel.shared.stop()
+//        DataCommunicationChannel.shared.stop()
     }
 
     // MARK: - Data channel event handlers
     internal func accessoryInclude(index: Int) {
 
-        guard let device = DataCommunicationChannel.shared.getDeviceFromUniqueID(deviceUniqueBLEId) else {
-            return
-        }
-
-        if device.bleUniqueID == deviceUniqueBLEId {
-            // Connect to the accessory
-            if device.blePeripheralStatus == statusDiscovered {
-                logger.info("Connecting to Accessory")
-                connectToAccessory(device.bleUniqueID)
-            } else {
-                return
-            }
-        }
+//        guard let device = DataCommunicationChannel.shared.getDeviceFromUniqueID(deviceUniqueBLEId) else {
+//            return
+//        }
+//
+//        if device.bleUniqueID == deviceUniqueBLEId {
+//            // Connect to the accessory
+//            if device.blePeripheralStatus == statusDiscovered {
+//                logger.info("Connecting to Accessory")
+//                connectToAccessory(device.bleUniqueID)
+//            } else {
+//                return
+//            }
+//        }
     }
 
     internal func accessoryRemove(deviceID: Int) {

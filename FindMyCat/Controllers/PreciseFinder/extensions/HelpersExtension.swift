@@ -20,6 +20,34 @@ extension PreciseFinderViewContoller {
          }
     }
 
+    enum ConnectionError: Error {
+        case connectionFailed
+    }
+    internal func connectToAccessoryUntilSuccess(_ deviceID: Int, maxRetries: Int, retryDelay: TimeInterval) {
+        var retries = 0
+
+        func connectWithDelay() {
+            print("trying to connect")
+            do {
+                try DataCommunicationChannel.shared.connectPeripheral(deviceID)
+//                throw ConnectionError.connectionFailed
+                // Connection successful, return
+//                return
+            } catch {
+                print("Failed to connect to accessory: \(error)")
+                retries += 1
+                // Retry after delay
+                if retries < maxRetries {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + retryDelay) {
+                        connectWithDelay()
+                    }
+                }
+            }
+        }
+
+        connectWithDelay()
+    }
+
     internal func disconnectFromAccessory(_ deviceID: Int) {
          do {
              try DataCommunicationChannel.shared.disconnectPeripheral(deviceID)

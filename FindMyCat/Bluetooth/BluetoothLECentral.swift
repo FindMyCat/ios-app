@@ -120,6 +120,7 @@ class DataCommunicationChannel: NSObject {
 
         preciseFindableDevices.forEach { (preciseFindableDevice) in
 
+            print(preciseFindableDevice?.blePeripheralStatus)
             if preciseFindableDevice!.blePeripheralStatus == statusDiscovered {
                 // Get current timestamp
                 let timeStamp = Int64((Date().timeIntervalSince1970 * 1000.0).rounded())
@@ -163,7 +164,7 @@ class DataCommunicationChannel: NSObject {
     }
 
     func stop() {
-        centralManager.stopScan()
+//        centralManager.stopScan()
     }
 
     func connectPeripheral(_ uniqueID: Int) throws {
@@ -171,7 +172,7 @@ class DataCommunicationChannel: NSObject {
         if let deviceToConnect = getDeviceFromUniqueID(uniqueID) {
             // Throw error if status is not Discovered
             if deviceToConnect.blePeripheralStatus != statusDiscovered {
-                return
+                throw BluetoothLECentralError.noPeripheral
             }
             // Connect to the peripheral.
             logger.info("Connecting to Peripheral \(deviceToConnect.blePeripheral)")

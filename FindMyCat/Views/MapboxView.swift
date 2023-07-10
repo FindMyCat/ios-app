@@ -90,8 +90,6 @@ class MapboxView: UIView, CLLocationManagerDelegate {
     }
 
     @objc private func positionsUpdated(_ notification: Notification) {
-
-        print("positionUpdated: ", SharedData.getPositions())
         mapView.viewAnnotations.removeAll()
         // Update UI using the updated positions array
         updatePositions(positions: SharedData.getPositions())

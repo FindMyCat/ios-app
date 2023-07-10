@@ -13,14 +13,12 @@ class SharedData {
 
     private static var devices: [Device] = [] {
         didSet {
-            print("devices set")
             let userInfo = ["devices": devices]
             NotificationCenter.default.post(name: Notification.Name(Constants.DevicesUpdatedNotificationName), object: nil, userInfo: userInfo)
         }
     }
     private static var positions: [Position] = [] {
         didSet {
-            print("positions set")
             let userInfo = ["positions": positions]
             NotificationCenter.default.post(name: Notification.Name(Constants.PositionsUpdatedNotificationName), object: nil, userInfo: userInfo)
         }
@@ -40,8 +38,7 @@ class SharedData {
         fetchDevicesFromRestAPI {
             self.fetchPositionsFromRestAPI {
                 self.configureWebsocket {
-                    // All tasks completed
-                    print("All tasks completed")
+                   // Fetched complete.
                 }
             }
         }
@@ -122,7 +119,6 @@ class SharedData {
                     }
                 }
             } else if let positions = payloadWrapper.positions {
-                print("websocket positions", positions)
                 for newPosition in positions {
                     if let index = SharedData.positions.firstIndex(where: { $0.deviceId == newPosition.deviceId }) {
                         // Device with the same ID exists, update it

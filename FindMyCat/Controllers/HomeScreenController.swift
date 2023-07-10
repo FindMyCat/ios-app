@@ -21,6 +21,10 @@ class HomeScreenController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(devicesUpdated(_:)), name: Notification.Name(Constants.DevicesUpdatedNotificationName), object: nil)
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        DataCommunicationChannel.shared.start()
+    }
+
     @objc private func devicesUpdated(_ notification: Notification) {
 
         // Update UI using the updated devices array
