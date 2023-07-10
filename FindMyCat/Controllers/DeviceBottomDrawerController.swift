@@ -133,7 +133,7 @@ class DeviceBottomDrawerController:
         sheetController.panGestureShouldBegin = {
             _ in
 
-            return !self.tableView.isTracking
+            return !self.tableView.isTracking || !self.addNewDeviceButton.isSelected
         }
         // animate in
         sheetController.animateIn(to: self.parentView, in: self.parentVc)
@@ -159,6 +159,7 @@ class DeviceBottomDrawerController:
         drawerLabel.text = "Devices"
         drawerLabel.font =  UIFont.boldSystemFont(ofSize: 18)
         drawerLabel.topAnchor.constraint(equalTo: stackView.topAnchor).isActive = true
+        drawerLabel.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive = true
 
         // constraints
         drawerLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -203,9 +204,12 @@ class DeviceBottomDrawerController:
         addNewDeviceButton.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            addNewDeviceButton.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: -3)
+            addNewDeviceButton.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: 10),
+            addNewDeviceButton.centerXAnchor.constraint(equalTo: drawerLabel.centerXAnchor),
+            addNewDeviceButton.widthAnchor.constraint(equalToConstant: 50)
         ])
 
+        addNewDeviceButton.addTarget(self, action: #selector(addNewDeviceButtonClicked), for: .touchUpInside)
     }
 
     // MARK: - UITableView Delegate & DataSource
@@ -326,6 +330,14 @@ class DeviceBottomDrawerController:
             }
         }
     }
+    // MARK: - Button click handlers
+
+    @objc func addNewDeviceButtonClicked() {
+        let vc = AddNewDeviceViewController()
+        vc.modalPresentationStyle = .formSheet
+        parentVc.present(vc, animated: true)
+    }
+
 }
 
 extension DeviceBottomDrawerController: DeviceCellDelegate {

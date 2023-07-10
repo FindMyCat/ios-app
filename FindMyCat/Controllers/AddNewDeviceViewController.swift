@@ -15,7 +15,9 @@ class AddNewDeviceViewController: UIViewController {
 
         super.viewDidLoad()
 
-        configureSheetController()
+        view.backgroundColor = .red
+
+//        configureSheetController()
     }
 
     private func configureSheetController() {
@@ -76,6 +78,8 @@ class AddNewDeviceViewController: UIViewController {
 //            return !self.tableView.isTracking
 //        }
         // animate in
-        sheetController.animateIn()
+        sheetController.animateIn(to: view, in: self)
+
+//        self.present(sheetController, animated: true, completion: nil)
     }
 }
