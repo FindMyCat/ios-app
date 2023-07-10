@@ -24,6 +24,7 @@ class DeviceBottomDrawerController:
     private var stackView = UIStackView()
     private var drawerLabel = UILabel()
     private var tableView = UITableView()
+    private var addNewDeviceButton = UIButton()
 
     private var selectedDeviceIndex: Int?
 
@@ -57,6 +58,7 @@ class DeviceBottomDrawerController:
         configureDrawerLabel()
         configureHairline()
         configureTableView()
+        configureAddNewDeviceButton()
 
     }
 
@@ -187,6 +189,22 @@ class DeviceBottomDrawerController:
         tableView.leadingAnchor.constraint(equalTo: controller.view.leadingAnchor).isActive             = true
         tableView.trailingAnchor.constraint(equalTo: controller.view.trailingAnchor).isActive           = true
         tableView.bottomAnchor.constraint(equalTo: stackView.bottomAnchor, constant: 20).isActive       = true
+
+    }
+
+    func configureAddNewDeviceButton() {
+        stackView.addSubview(addNewDeviceButton)
+
+        let plusImageConfiguration = UIImage.SymbolConfiguration(pointSize: 23, weight: .medium)
+        let plusImage = UIImage(systemName: "plus", withConfiguration: plusImageConfiguration)
+
+        addNewDeviceButton.setImage(plusImage, for: .normal)
+
+        addNewDeviceButton.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            addNewDeviceButton.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: -3)
+        ])
 
     }
 
