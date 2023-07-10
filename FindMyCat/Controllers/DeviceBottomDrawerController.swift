@@ -84,7 +84,7 @@ class DeviceBottomDrawerController:
             isRubberBandEnabled: true
         )
 
-        let allowedSheetSizes = [SheetSize.percent(0.4), SheetSize.percent(0.7), SheetSize.percent(0.1)]
+        let allowedSheetSizes = [SheetSize.percent(0.4), SheetSize.percent(0.7), SheetSize.percent(0.15)]
 
         let sheetController = SheetViewController(controller: self.controller, sizes: allowedSheetSizes, options: sheeetOptions)
         sheetController.allowGestureThroughOverlay = true
@@ -226,28 +226,35 @@ class DeviceBottomDrawerController:
 
         // Set the name
         cell.deviceNameLabel.text = cellDevice.name
-
-        if cellDevice.lastUpdate == nil {
-            cell.deviceAddressLabel.text = Constants.DeviceOffline
-            cell.deviceAddressLabel.tintColor = .red
-        }
+        cell.deviceAddressLabel.text = nil
 
         if let targetPosition = positions.first(where: { $0.deviceId == cellDevice.id }) {
-            print("Position found: \(targetPosition.deviceId)")
             // Set the battery percentage
             cell.setBatteryPercentage(percentage: targetPosition.attributes.batteryLevel)
 
-            // Set the address
-            getAddressFromPosition(position: targetPosition) {
-                address in
-
-                if address == nil {
-                    cell.deviceAddressLabel.text = Constants.AddressUnavailable
-                } else {
-                    cell.deviceAddressLabel.text = address
+            getAddressFromPosition(position: targetPosition) { [weak cell] address in
+                guard let cell = cell else {
+                    return // Cell is no longer available
                 }
 
+                DispatchQueue.main.async {
+                    let currentIndexPath = tableView.indexPath(for: cell)
+
+                    // Ensure the captured cell is still at the same index path
+                    if currentIndexPath == indexPath {
+                        if address == nil {
+                            cell.deviceAddressLabel.text = Constants.AddressUnavailable
+                        } else {
+                            cell.deviceAddressLabel.text = address
+                        }
+                    }
+                }
             }
+        }
+
+        // Replace Address with Offline if lastUpdate is nil (never recieved update)
+        if cellDevice.lastUpdate == nil {
+            cell.deviceAddressLabel.text = Constants.DeviceOffline
         }
 
         let bgColorView = UIView()

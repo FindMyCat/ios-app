@@ -14,9 +14,9 @@
             filePath = "FindMyCat/Controllers/DeviceBottomDrawerController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "333"
-            endingLineNumber = "333"
-            landmarkName = "getAddressFromPosition(position:completion:)"
+            startingLineNumber = "343"
+            endingLineNumber = "343"
+            landmarkName = "addNewDeviceButtonClicked()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

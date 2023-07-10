@@ -48,7 +48,8 @@ class DeviceCellView: UITableViewCell {
     let deviceNameLabel = UILabel()
     let deviceAddressLabel = UILabel()
     let emojiLabel = UILabel()
-
+    let dotSeparator = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 10))
+    let lastSeen = UILabel()
     let batteryIcon = UIImageView()
 
     // Expanded state views
@@ -84,8 +85,8 @@ class DeviceCellView: UITableViewCell {
         super.prepareForReuse()
 
         // reset labels and icons
-        self.deviceAddressLabel.text = "..."
         self.batteryIcon.image = nil
+        self.deviceAddressLabel.text = nil
     }
 
     // MARK: - Configurations of Subviews
