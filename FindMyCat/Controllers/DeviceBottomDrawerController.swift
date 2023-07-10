@@ -197,17 +197,21 @@ class DeviceBottomDrawerController:
         let devices = SharedData.getDevices()
         let positions = SharedData.getPositions()
 
+        let device = devices[indexPath.row]
+
         cell.backgroundColor = .clear
         cell.delegate = self
 
         // Set the name
         cell.deviceNameLabel.text = devices[indexPath.row].name
         // Set the battery percentage
-        if !positions.isEmpty && indexPath.row < positions.count {
-            cell.setBatteryPercentage(percentage: positions[indexPath.row].attributes.batteryLevel)
+
+        if let targetPosition = positions.first(where: { $0.deviceId == device.id }) {
+            print("Position found: \(targetPosition.deviceId)")
+            cell.setBatteryPercentage(percentage: targetPosition.attributes.batteryLevel)
 
             // Set the address
-            getAddressFromPosition(position: positions[indexPath.row]) {
+            getAddressFromPosition(position: targetPosition) {
                 address in
 
                 if address == nil {
@@ -217,6 +221,10 @@ class DeviceBottomDrawerController:
                 }
 
             }
+        } else {
+            // Swift will reuse data from previous cell, (odd!) if not explicitly set
+            cell.batteryIcon.image = nil
+            cell.deviceAddressLabel.text = "Address unavailable."
         }
 
         let bgColorView = UIView()
