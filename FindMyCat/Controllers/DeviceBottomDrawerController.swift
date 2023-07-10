@@ -77,6 +77,8 @@ class DeviceBottomDrawerController:
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         startTimer()
+
+        tableView.reloadData()
     }
 
     // MARK: - Notification Observers

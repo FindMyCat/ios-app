@@ -30,9 +30,6 @@ extension PreciseFinderViewContoller {
             print("trying to connect")
             do {
                 try DataCommunicationChannel.shared.connectPeripheral(deviceID)
-//                throw ConnectionError.connectionFailed
-                // Connection successful, return
-//                return
             } catch {
                 print("Failed to connect to accessory: \(error)")
                 retries += 1
