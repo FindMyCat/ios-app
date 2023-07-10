@@ -24,8 +24,12 @@ class DeviceBottomDrawerController:
     private var stackView = UIStackView()
     private var drawerLabel = UILabel()
     private var tableView = UITableView()
+    private var addNewDeviceButton = UIButton()
 
     private var selectedDeviceIndex: Int?
+
+    // Timer to refresh table cell data
+    private var tableReloadTimer: Timer?
 
     // MARK: - Initializers
     // Constructor
@@ -57,6 +61,7 @@ class DeviceBottomDrawerController:
         configureDrawerLabel()
         configureHairline()
         configureTableView()
+        configureAddNewDeviceButton()
 
     }
 
@@ -64,14 +69,38 @@ class DeviceBottomDrawerController:
         tableView.frame = controller.view.bounds
     }
 
-    // MARK: - Notification Observers
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        stopTimer()
+    }
 
-    @objc private func devicesUpdated(_ notification: Notification) {
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        startTimer()
+
         tableView.reloadData()
     }
 
+    // MARK: - Notification Observers
+
+    @objc private func devicesUpdated(_ notification: Notification) {
+        // update cells one by one to reduce flickers
+       reloadTableDataCellByCell()
+    }
+
     @objc private func positionsUpdated(_ notification: Notification) {
-        tableView.reloadData()
+        // update cells one by one to reduce flickers
+        reloadTableDataCellByCell()
+    }
+
+    func reloadTableDataCellByCell() {
+        let sectionIndex = 0
+        let totalRows = tableView.numberOfRows(inSection: sectionIndex)
+
+        for row in 0..<totalRows {
+            let indexPath = IndexPath(row: row, section: sectionIndex)
+            tableView.reloadRows(at: [indexPath], with: .automatic)
+        }
     }
 
     // MARK: - Configuration of all subviews
@@ -82,7 +111,7 @@ class DeviceBottomDrawerController:
             isRubberBandEnabled: true
         )
 
-        let allowedSheetSizes = [SheetSize.percent(0.4), SheetSize.percent(0.7), SheetSize.percent(0.1)]
+        let allowedSheetSizes = [SheetSize.percent(0.4), SheetSize.percent(0.7), SheetSize.percent(0.15)]
 
         let sheetController = SheetViewController(controller: self.controller, sizes: allowedSheetSizes, options: sheeetOptions)
         sheetController.allowGestureThroughOverlay = true
@@ -131,7 +160,7 @@ class DeviceBottomDrawerController:
         sheetController.panGestureShouldBegin = {
             _ in
 
-            return !self.tableView.isTracking
+            return !self.tableView.isTracking && !self.addNewDeviceButton.isSelected
         }
         // animate in
         sheetController.animateIn(to: self.parentView, in: self.parentVc)
@@ -157,6 +186,7 @@ class DeviceBottomDrawerController:
         drawerLabel.text = "Devices"
         drawerLabel.font =  UIFont.boldSystemFont(ofSize: 18)
         drawerLabel.topAnchor.constraint(equalTo: stackView.topAnchor).isActive = true
+        drawerLabel.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive = true
 
         // constraints
         drawerLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -190,6 +220,25 @@ class DeviceBottomDrawerController:
 
     }
 
+    func configureAddNewDeviceButton() {
+        stackView.addSubview(addNewDeviceButton)
+
+        let plusImageConfiguration = UIImage.SymbolConfiguration(pointSize: 23, weight: .medium)
+        let plusImage = UIImage(systemName: "plus", withConfiguration: plusImageConfiguration)
+
+        addNewDeviceButton.setImage(plusImage, for: .normal)
+
+        addNewDeviceButton.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            addNewDeviceButton.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: 10),
+            addNewDeviceButton.centerXAnchor.constraint(equalTo: drawerLabel.centerXAnchor),
+            addNewDeviceButton.widthAnchor.constraint(equalToConstant: 50)
+        ])
+
+        addNewDeviceButton.addTarget(self, action: #selector(addNewDeviceButtonClicked), for: .touchUpInside)
+    }
+
     // MARK: - UITableView Delegate & DataSource
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -197,26 +246,57 @@ class DeviceBottomDrawerController:
         let devices = SharedData.getDevices()
         let positions = SharedData.getPositions()
 
+        let cellDevice = devices[indexPath.row]
+
         cell.backgroundColor = .clear
         cell.delegate = self
 
         // Set the name
-        cell.deviceNameLabel.text = devices[indexPath.row].name
-        // Set the battery percentage
-        if !positions.isEmpty && indexPath.row < positions.count {
-            cell.setBatteryPercentage(percentage: positions[indexPath.row].attributes.batteryLevel)
+        cell.deviceNameLabel.text = cellDevice.name
 
-            // Set the address
-            getAddressFromPosition(position: positions[indexPath.row]) {
-                address in
+        // Reset cell labels
+        cell.dotSeparatorView.isHidden = true
+        cell.lastSeenLabel.isHidden = true
+        cell.deviceAddressLabel.isHidden = true
+        cell.batteryIcon.isHidden = true
 
-                if address == nil {
-                    cell.deviceAddressLabel.text = "Address unavailable."
-                } else {
-                    cell.deviceAddressLabel.text = address
+        if let targetPosition = positions.first(where: { $0.deviceId == cellDevice.id }) {
+            getAddressFromPosition(position: targetPosition) { [weak cell] address in
+                guard let cell = cell else {
+                    return // Cell is no longer available
                 }
 
+                let currentIndexPath = tableView.indexPath(for: cell)
+
+                // Ensure the captured cell is still at the same index path
+                if currentIndexPath == indexPath {
+                    if address == nil {
+                        cell.deviceAddressLabel.text = Constants.AddressUnavailable
+                    } else {
+                        cell.deviceAddressLabel.text = address
+                    }
+
+                    // Replace Address with Offline if lastUpdate is nil (never recieved update)
+                    if cellDevice.lastUpdate != nil {
+                        let lastSeen = DateTimeUtil.relativeTime(dateString: cellDevice.lastUpdate!)
+
+                        cell.deviceAddressLabel.isHidden = false
+                        cell.dotSeparatorView.isHidden = false
+
+                        cell.lastSeenLabel.text = lastSeen
+                        cell.lastSeenLabel.isHidden = false
+                    }
+
+                    // Set the battery percentage
+                    cell.setBatteryPercentage(percentage: targetPosition.attributes.batteryLevel)
+
+                    cell.batteryIcon.isHidden = false
+
+                }
             }
+        } else if cellDevice.lastUpdate == nil {
+            cell.deviceAddressLabel.text = Constants.DeviceOffline
+            cell.deviceAddressLabel.isHidden = false
         }
 
         let bgColorView = UIView()
@@ -293,13 +373,50 @@ class DeviceBottomDrawerController:
 
             if let placemark = placemarks?.first {
                 // Retrieve the address information from the placemark
-                let address = "\(placemark.subThoroughfare ?? "") \(placemark.thoroughfare ?? ""), \(placemark.locality ?? ""), \(placemark.administrativeArea ?? "")"
+                // \(placemark.subThoroughfare ?? "") \(placemark.thoroughfare ?? ""),
+                let address = "\(placemark.locality ?? ""), \(placemark.administrativeArea ?? "")"
                 completion(address)
             } else {
                 completion(nil)
             }
         }
     }
+    // MARK: - Button click handlers
+
+    @objc func addNewDeviceButtonClicked() {
+        let vc = AddNewDeviceViewController()
+        vc.modalPresentationStyle = .overFullScreen
+        vc.modalTransitionStyle = .crossDissolve
+        parentVc.present(vc, animated: true)
+    }
+
+    // MARK: - Timer functions
+
+    @objc private func tableReloadTimerAction() {
+
+        // Reload all rows one by one, this prevents the whole table from flashing
+        let sectionIndex = 0
+        let totalRows = tableView.numberOfRows(inSection: sectionIndex)
+
+        for row in 0..<totalRows {
+            let indexPath = IndexPath(row: row, section: sectionIndex)
+            tableView.reloadRows(at: [indexPath], with: .automatic)
+        }
+    }
+
+    private func startTimer() {
+        // Invalidate any existing timer to prevent duplicates
+        stopTimer()
+
+        // Create a new timer and schedule it to repeat at the desired interval
+        tableReloadTimer = Timer.scheduledTimer(timeInterval: 20, target: self, selector: #selector(tableReloadTimerAction), userInfo: nil, repeats: true)
+    }
+
+    private func stopTimer() {
+        tableReloadTimer?.invalidate()
+        tableReloadTimer = nil
+    }
+
 }
 
 extension DeviceBottomDrawerController: DeviceCellDelegate {

@@ -1,9 +1,9 @@
 /*
  * @file      BluetoothLECentral.swift
  *
- * @brief     A class that manages connection and data transfer to the accessories using Core Bluetooth.
+ * @brief     A class that manages connection and data transfer to the NI accessories using Core Bluetooth.
  *
- * @author    Decawave Applications
+ * @author    Decawave Applications + Sahas Chitlange
  *
  * @attention Copyright (c) 2021 - 2022, Qorvo US, Inc.
  * All rights reserved
@@ -53,7 +53,6 @@ import Foundation
 import NearbyInteraction
 
 import CoreBluetooth
-import simd
 import os
 
 struct TransferService {
@@ -70,38 +69,6 @@ struct QorvoNIService {
     static let txCharacteristicUUID = CBUUID(string: "2E939AF2-6A61-11ED-A1EB-0242AC120002")
 }
 
-// Base struct to save the last location values
-struct Location {
-    var distance: Float
-    var direction: simd_float3
-    var elevation: Int
-    var noUpdate: Bool
-}
-
-class qorvoDevice {
-    var blePeripheral: CBPeripheral         // BLE Peripheral instance
-    var rxCharacteristic: CBCharacteristic? // Characteristics to be used when receiving data
-    var txCharacteristic: CBCharacteristic? // Characteristics to be used when sending data
-
-    var bleUniqueID: Int
-    var blePeripheralName: String            // Name to display
-    var blePeripheralStatus: String?         // Status to display
-    var bleTimestamp: Int64                  // Last time that the device adverstised
-    var uwbLocation: Location?
-
-    init(peripheral: CBPeripheral, uniqueID: Int, peripheralName: String, timeStamp: Int64 ) {
-
-        self.blePeripheral = peripheral
-        self.bleUniqueID = uniqueID
-        self.blePeripheralName = peripheralName
-        self.blePeripheralStatus = statusDiscovered
-        self.bleTimestamp = timeStamp
-        self.uwbLocation = Location(distance: 0,
-                                    direction: SIMD3<Float>(x: 0, y: 0, z: 0), elevation: NINearbyObject.VerticalDirectionEstimate.unknown.rawValue,
-                                    noUpdate: false)
-    }
-}
-
 enum BluetoothLECentralError: Error {
     case noPeripheral
 }
@@ -110,16 +77,17 @@ let statusDiscovered = "Discovered"
 let statusConnected = "Connected"
 let statusRanging = "Ranging"
 
-var qorvoDevices = [qorvoDevice?]()
-
 class DataCommunicationChannel: NSObject {
+    private var preciseFindableDevices = [PreciseFindableDevice?]()
+
+    static let shared = DataCommunicationChannel()
+
     var centralManager: CBCentralManager!
 
     var writeIterationsComplete = 0
     var connectionIterationsComplete = 0
 
     // The number of times to retry scanning for accessories.
-    // Change this value based on your app's testing use case.
     let defaultIterations = 5
 
     var accessoryDiscoveryHandler: ((Int) -> Void)?
@@ -131,13 +99,13 @@ class DataCommunicationChannel: NSObject {
     var bluetoothReady = false
     var shouldStartWhenReady = false
 
-    let logger = os.Logger(subsystem: "com.example.apple-samplecode.NINearbyAccessorySample", category: "DataChannel")
+    let logger = os.Logger(subsystem: "com.chitlangesahas.FindMyCat", category: "DataChannel")
 
     override init() {
         super.init()
         centralManager = CBCentralManager(delegate: self, queue: nil, options: [CBCentralManagerOptionShowPowerAlertKey: true])
 
-        // Initialises the Timer used for Haptic and Sound feedbacks
+        // Initialises the Timer used for calling accessory handlers based on updates.
         _ = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(timerHandler), userInfo: nil, repeats: true)
     }
 
@@ -150,20 +118,21 @@ class DataCommunicationChannel: NSObject {
     @objc func timerHandler() {
         var index = 0
 
-        qorvoDevices.forEach { (qorvoDevice) in
+        preciseFindableDevices.forEach { (preciseFindableDevice) in
 
-            if qorvoDevice!.blePeripheralStatus == statusDiscovered {
+            print(preciseFindableDevice?.blePeripheralStatus)
+            if preciseFindableDevice!.blePeripheralStatus == statusDiscovered {
                 // Get current timestamp
                 let timeStamp = Int64((Date().timeIntervalSince1970 * 1000.0).rounded())
 
                 // Remove device if timestamp is bigger than 5000 msec
-                if timeStamp > (qorvoDevice!.bleTimestamp + 5000) {
-                    let deviceID = qorvoDevice?.bleUniqueID
+                if timeStamp > (preciseFindableDevice!.bleTimestamp + 5000) {
+                    let deviceID = preciseFindableDevice?.bleUniqueID
 
-                    logger.info("Device \(qorvoDevice?.blePeripheralName ?? "Unknown") timed-out removed at index \(index)")
-                    logger.info("Device timestamp: \(qorvoDevice!.bleTimestamp) Current timestamp: \(timeStamp) ")
-                    if qorvoDevices.indices.contains(index) {
-                        qorvoDevices.remove(at: index)
+                    logger.info("Device \(preciseFindableDevice?.blePeripheralName ?? "Unknown") timed-out removed at index \(index)")
+                    logger.info("Device timestamp: \(preciseFindableDevice!.bleTimestamp) Current timestamp: \(timeStamp) ")
+                    if preciseFindableDevices.indices.contains(index) {
+                        preciseFindableDevices.remove(at: index)
                     }
                     if let didTimeoutHandler = accessoryTimeoutHandler {
                         didTimeoutHandler(deviceID!)
@@ -175,11 +144,10 @@ class DataCommunicationChannel: NSObject {
         }
     }
 
-    // Get Qorvo device from the uniqueID
-    func getDeviceFromUniqueID(_ uniqueID: Int) -> qorvoDevice? {
+    func getDeviceFromUniqueID(_ uniqueID: Int) -> PreciseFindableDevice? {
 
-        if let index = qorvoDevices.firstIndex(where: {$0?.bleUniqueID == uniqueID}) {
-            return qorvoDevices[index]
+        if let index = preciseFindableDevices.firstIndex(where: {$0?.bleUniqueID == uniqueID}) {
+            return preciseFindableDevices[index]
         } else {
             return nil
         }
@@ -196,7 +164,7 @@ class DataCommunicationChannel: NSObject {
     }
 
     func stop() {
-        centralManager.stopScan()
+//        centralManager.stopScan()
     }
 
     func connectPeripheral(_ uniqueID: Int) throws {
@@ -204,7 +172,7 @@ class DataCommunicationChannel: NSObject {
         if let deviceToConnect = getDeviceFromUniqueID(uniqueID) {
             // Throw error if status is not Discovered
             if deviceToConnect.blePeripheralStatus != statusDiscovered {
-                return
+                throw BluetoothLECentralError.noPeripheral
             }
             // Connect to the peripheral.
             logger.info("Connecting to Peripheral \(deviceToConnect.blePeripheral)")
@@ -270,12 +238,12 @@ class DataCommunicationChannel: NSObject {
     // Sends data to the peripheral.
     private func writeData(_ data: Data, _ uniqueID: Int) {
 
-        let qorvoDevice = getDeviceFromUniqueID(uniqueID)
+        let preciseFindableDevice = getDeviceFromUniqueID(uniqueID)
 
-        guard let discoveredPeripheral = qorvoDevice?.blePeripheral
+        guard let discoveredPeripheral = preciseFindableDevice?.blePeripheral
         else { return }
 
-        guard let transferCharacteristic = qorvoDevice?.rxCharacteristic
+        guard let transferCharacteristic = preciseFindableDevice?.rxCharacteristic
         else { return }
 
         logger.info("Getting TX Characteristics from device \(uniqueID).")
@@ -362,30 +330,29 @@ extension DataCommunicationChannel: CBCentralManagerDelegate {
         let timeStamp = Int64((Date().timeIntervalSince1970 * 1000.0).rounded())
 
         // Check if peripheral is already discovered
-        if let qorvoDevice = getDeviceFromUniqueID(peripheral.hashValue) {
+        if let preciseFindableDevice = getDeviceFromUniqueID(peripheral.hashValue) {
 
             // if yes, update the timestamp
-            qorvoDevice.bleTimestamp = timeStamp
+            preciseFindableDevice.bleTimestamp = timeStamp
 
             return
         }
 
-        // If not discovered, include peripheral to qorvoDevices[]
+        // If not discovered, include peripheral to preciseFindableDevices
         let name = advertisementData[CBAdvertisementDataLocalNameKey] as? String
-        qorvoDevices.append(qorvoDevice(peripheral: peripheral,
+        preciseFindableDevices.append(PreciseFindableDevice(peripheral: peripheral,
                                         uniqueID: peripheral.hashValue,
                                         peripheralName: name ?? "Unknown",
                                         timeStamp: timeStamp))
 
-        if let newPeripheral = qorvoDevices.last {
+        if let newPeripheral = preciseFindableDevices.last {
             let nameToPrint = newPeripheral?.blePeripheralName
             let id = newPeripheral?.bleUniqueID
-            logger.info("Peripheral \(nameToPrint ?? "Unknown") , included in qorvoDevices with unique ID")
-            print(id)
+            logger.info("Peripheral \(nameToPrint ?? "Unknown") , included in preciseFindableDevices with unique ID")
         }
 
         if let didDiscoverHandler = accessoryDiscoveryHandler {
-            didDiscoverHandler(qorvoDevices.count - 1)
+            didDiscoverHandler(preciseFindableDevices.count - 1)
         }
     }
 
@@ -416,13 +383,13 @@ extension DataCommunicationChannel: CBCentralManagerDelegate {
         logger.info("Peripheral Disconnected")
 
         let uniqueID = peripheral.hashValue
-        let qorvoDevice = getDeviceFromUniqueID(uniqueID)
+        let preciseFindableDevice = getDeviceFromUniqueID(uniqueID)
 
         // Update Timestamp to avoid premature disconnection
         let timeStamp = Int64((Date().timeIntervalSince1970 * 1000.0).rounded())
-        qorvoDevice!.bleTimestamp = timeStamp
+        preciseFindableDevice!.bleTimestamp = timeStamp
         // Finally, update the device status
-        qorvoDevice!.blePeripheralStatus = statusDiscovered
+        preciseFindableDevice!.blePeripheralStatus = statusDiscovered
 
         if let didDisconnectHandler = accessoryDisconnectedHandler {
             didDisconnectHandler(uniqueID)
@@ -482,7 +449,7 @@ extension DataCommunicationChannel: CBPeripheralDelegate {
         }
 
         let uniqueID = peripheral.hashValue
-        let qorvoDevice = getDeviceFromUniqueID(uniqueID)
+        let preciseFindableDevice = getDeviceFromUniqueID(uniqueID)
 
         // Check the newly filled peripheral services array for more services.
         guard let serviceCharacteristics = service.characteristics else { return }
@@ -490,26 +457,26 @@ extension DataCommunicationChannel: CBPeripheralDelegate {
         // Assign RX Characteristic to the device structure
         for characteristic in serviceCharacteristics where characteristic.uuid == TransferService.rxCharacteristicUUID {
             // Subscribe to the transfer service's `rxCharacteristic`.
-            qorvoDevice?.rxCharacteristic = characteristic
+            preciseFindableDevice?.rxCharacteristic = characteristic
             logger.info("discovered characteristic: \(characteristic)")
         }
         for characteristic in serviceCharacteristics where characteristic.uuid == QorvoNIService.rxCharacteristicUUID {
             // Subscribe to the transfer service's `rxCharacteristic`.
-            qorvoDevice?.rxCharacteristic = characteristic
+            preciseFindableDevice?.rxCharacteristic = characteristic
             logger.info("discovered characteristic: \(characteristic)")
         }
 
         // Assign TX Characteristic to the device structure
         for characteristic in serviceCharacteristics where characteristic.uuid == TransferService.txCharacteristicUUID {
             // Subscribe to the transfer service's `txCharacteristic`.
-            qorvoDevice?.txCharacteristic = characteristic
+            preciseFindableDevice?.txCharacteristic = characteristic
             logger.info("discovered characteristic: \(characteristic)")
             peripheral.setNotifyValue(true, for: characteristic)
         }
 
         for characteristic in serviceCharacteristics where characteristic.uuid == QorvoNIService.txCharacteristicUUID {
             // Subscribe to the transfer service's `txCharacteristic`.
-            qorvoDevice?.txCharacteristic = characteristic
+            preciseFindableDevice?.txCharacteristic = characteristic
             logger.info("discovered characteristic: \(characteristic)")
             peripheral.setNotifyValue(true, for: characteristic)
         }
@@ -535,9 +502,9 @@ extension DataCommunicationChannel: CBPeripheralDelegate {
         logger.info("Received \(characteristicData.count) bytes: \(str)")
 
         let uniqueID = peripheral.hashValue
-        let qorvoDevice = getDeviceFromUniqueID(uniqueID)
+        let preciseFindableDevice = getDeviceFromUniqueID(uniqueID)
 
-        if let dataHandler = self.accessoryDataHandler, let accessoryName = qorvoDevice?.blePeripheralName {
+        if let dataHandler = self.accessoryDataHandler, let accessoryName = preciseFindableDevice?.blePeripheralName {
             dataHandler(characteristicData, accessoryName, uniqueID)
         }
     }

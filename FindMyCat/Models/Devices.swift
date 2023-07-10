@@ -8,8 +8,13 @@
 import Foundation
 
 class Device: Decodable {
-    var id: Int?
-    var attributes: [String: String]?
+
+    struct Attributes: Decodable {
+        var emoji: String?
+    }
+
+    var id: Int
+    var attributes: Attributes?
     var groupId: Int?
     var name: String
     var uniqueId: String?
@@ -24,8 +29,9 @@ class Device: Decodable {
     var disabled: Bool?
     var expirationTime: Date?
 
-    init(name: String) {
+    init(name: String, id: Int) {
         self.name = name
+        self.id = id
     }
 
     func getName() -> String {
