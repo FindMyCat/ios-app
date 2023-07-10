@@ -82,11 +82,23 @@ class DeviceBottomDrawerController:
     // MARK: - Notification Observers
 
     @objc private func devicesUpdated(_ notification: Notification) {
-        tableView.reloadData()
+        // update cells one by one to reduce flickers
+       reloadTableDataCellByCell()
     }
 
     @objc private func positionsUpdated(_ notification: Notification) {
-        tableView.reloadData()
+        // update cells one by one to reduce flickers
+        reloadTableDataCellByCell()
+    }
+
+    func reloadTableDataCellByCell() {
+        let sectionIndex = 0
+        let totalRows = tableView.numberOfRows(inSection: sectionIndex)
+
+        for row in 0..<totalRows {
+            let indexPath = IndexPath(row: row, section: sectionIndex)
+            tableView.reloadRows(at: [indexPath], with: .automatic)
+        }
     }
 
     // MARK: - Configuration of all subviews
@@ -243,41 +255,46 @@ class DeviceBottomDrawerController:
         // Reset cell labels
         cell.dotSeparatorView.isHidden = true
         cell.lastSeenLabel.isHidden = true
+        cell.deviceAddressLabel.isHidden = true
+        cell.batteryIcon.isHidden = true
 
         if let targetPosition = positions.first(where: { $0.deviceId == cellDevice.id }) {
-            // Set the battery percentage
-            cell.setBatteryPercentage(percentage: targetPosition.attributes.batteryLevel)
-
             getAddressFromPosition(position: targetPosition) { [weak cell] address in
                 guard let cell = cell else {
                     return // Cell is no longer available
                 }
 
-                DispatchQueue.main.async {
-                    let currentIndexPath = tableView.indexPath(for: cell)
+                let currentIndexPath = tableView.indexPath(for: cell)
 
-                    // Ensure the captured cell is still at the same index path
-                    if currentIndexPath == indexPath {
-                        if address == nil {
-                            cell.deviceAddressLabel.text = Constants.AddressUnavailable
-                        } else {
-                            cell.deviceAddressLabel.text = address
-                        }
+                // Ensure the captured cell is still at the same index path
+                if currentIndexPath == indexPath {
+                    if address == nil {
+                        cell.deviceAddressLabel.text = Constants.AddressUnavailable
+                    } else {
+                        cell.deviceAddressLabel.text = address
                     }
+
+                    // Replace Address with Offline if lastUpdate is nil (never recieved update)
+                    if cellDevice.lastUpdate != nil {
+                        let lastSeen = DateTimeUtil.relativeTime(dateString: cellDevice.lastUpdate!)
+
+                        cell.deviceAddressLabel.isHidden = false
+                        cell.dotSeparatorView.isHidden = false
+
+                        cell.lastSeenLabel.text = lastSeen
+                        cell.lastSeenLabel.isHidden = false
+                    }
+
+                    // Set the battery percentage
+                    cell.setBatteryPercentage(percentage: targetPosition.attributes.batteryLevel)
+
+                    cell.batteryIcon.isHidden = false
+
                 }
             }
-        }
-
-        // Replace Address with Offline if lastUpdate is nil (never recieved update)
-        if cellDevice.lastUpdate == nil {
+        } else if cellDevice.lastUpdate == nil {
             cell.deviceAddressLabel.text = Constants.DeviceOffline
-        } else {
-            let lastSeen = DateTimeUtil.relativeTime(dateString: cellDevice.lastUpdate!)
-
-            cell.dotSeparatorView.isHidden = false
-
-            cell.lastSeenLabel.text = lastSeen
-            cell.lastSeenLabel.isHidden = false
+            cell.deviceAddressLabel.isHidden = false
         }
 
         let bgColorView = UIView()
@@ -354,7 +371,8 @@ class DeviceBottomDrawerController:
 
             if let placemark = placemarks?.first {
                 // Retrieve the address information from the placemark
-                let address = "\(placemark.subThoroughfare ?? "") \(placemark.thoroughfare ?? ""), \(placemark.locality ?? ""), \(placemark.administrativeArea ?? "")"
+                // \(placemark.subThoroughfare ?? "") \(placemark.thoroughfare ?? ""),
+                let address = "\(placemark.locality ?? ""), \(placemark.administrativeArea ?? "")"
                 completion(address)
             } else {
                 completion(nil)
@@ -389,7 +407,7 @@ class DeviceBottomDrawerController:
         stopTimer()
 
         // Create a new timer and schedule it to repeat at the desired interval
-        tableReloadTimer = Timer.scheduledTimer(timeInterval: 10, target: self, selector: #selector(tableReloadTimerAction), userInfo: nil, repeats: true)
+        tableReloadTimer = Timer.scheduledTimer(timeInterval: 20, target: self, selector: #selector(tableReloadTimerAction), userInfo: nil, repeats: true)
     }
 
     private func stopTimer() {
