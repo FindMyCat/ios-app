@@ -82,7 +82,7 @@ class AddNewDeviceViewController: UIViewController {
 
         NSLayoutConstraint.activate([
             scanningLabel.centerXAnchor.constraint(equalTo: sheetView.centerXAnchor),
-            scanningLabel.topAnchor.constraint(equalTo: sheetView.topAnchor, constant: 12)
+            scanningLabel.topAnchor.constraint(equalTo: sheetView.topAnchor, constant: 24)
         ])
     }
 
