@@ -12,6 +12,7 @@ import FittedSheets
 class AddNewDeviceViewController: UIViewController {
 
     let sheetView = UIView()
+    let scanningLabel = UILabel()
 
     override func viewDidLoad() {
 
@@ -23,6 +24,10 @@ class AddNewDeviceViewController: UIViewController {
         addSheet()
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
         sheetView.addGestureRecognizer(panGesture)
+
+        addScanningView()
+
+        addScanningLabel()
     }
 
     func addSheet() {
@@ -49,6 +54,33 @@ class AddNewDeviceViewController: UIViewController {
         UIView.animate(withDuration: 0.3) {
             self.view.layoutIfNeeded()
         }
+    }
+
+    func addScanningView() {
+
+        // Create the scanning view
+        let scanningAnimationView = ScanningAnimationView(frame: CGRect(x: 0, y: 0, width: sheetView.frame.width, height: sheetView.frame.height))
+
+        sheetView.addSubview(scanningAnimationView)
+
+        scanningAnimationView.startAnimation()
+
+        scanningAnimationView.translatesAutoresizingMaskIntoConstraints = false
+
+    }
+
+    func addScanningLabel() {
+        sheetView.addSubview(scanningLabel)
+
+        scanningLabel.text = "Add Device"
+        scanningLabel.font = UIFont.boldSystemFont(ofSize: 18)
+
+        scanningLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            scanningLabel.centerXAnchor.constraint(equalTo: sheetView.centerXAnchor),
+            scanningLabel.topAnchor.constraint(equalTo: sheetView.topAnchor, constant: 12)
+        ])
     }
 
     @objc func handlePanGesture(_ gesture: UIPanGestureRecognizer) {

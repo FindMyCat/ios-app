@@ -13,6 +13,7 @@
 		362DC00D2A5934F10079ECDB /* NI_AR_SessionDelegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362DC00C2A5934F10079ECDB /* NI_AR_SessionDelegates.swift */; };
 		36392F0C2A5BB8E100DE866C /* AddNewDeviceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36392F0B2A5BB8E100DE866C /* AddNewDeviceViewController.swift */; };
 		36392F0E2A5C7EE100DE866C /* DateTimeUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36392F0D2A5C7EE100DE866C /* DateTimeUtil.swift */; };
+		36392F102A5DBD2F00DE866C /* ScanningAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36392F0F2A5DBD2F00DE866C /* ScanningAnimationView.swift */; };
 		363EC8052A57E42E0059E1CA /* UWBMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363EC8042A57E42E0059E1CA /* UWBMessages.swift */; };
 		363EC8082A57E4CA0059E1CA /* UWBUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363EC8072A57E4CA0059E1CA /* UWBUtils.swift */; };
 		363EC80A2A57E6990059E1CA /* Distance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363EC8092A57E6990059E1CA /* Distance.swift */; };
@@ -54,6 +55,7 @@
 		362DC00C2A5934F10079ECDB /* NI_AR_SessionDelegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NI_AR_SessionDelegates.swift; sourceTree = "<group>"; };
 		36392F0B2A5BB8E100DE866C /* AddNewDeviceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNewDeviceViewController.swift; sourceTree = "<group>"; };
 		36392F0D2A5C7EE100DE866C /* DateTimeUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateTimeUtil.swift; sourceTree = "<group>"; };
+		36392F0F2A5DBD2F00DE866C /* ScanningAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanningAnimationView.swift; sourceTree = "<group>"; };
 		363EC8042A57E42E0059E1CA /* UWBMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UWBMessages.swift; sourceTree = "<group>"; };
 		363EC8072A57E4CA0059E1CA /* UWBUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UWBUtils.swift; sourceTree = "<group>"; };
 		363EC8092A57E6990059E1CA /* Distance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Distance.swift; sourceTree = "<group>"; };
@@ -206,6 +208,7 @@
 				365E53682A476AE800AD6AE8 /* MapboxView.swift */,
 				3677638A2A4E1EDA0096FF1F /* MapMarkerView.swift */,
 				36CC30872A4E95A400E8FCCA /* DeviceCellView.swift */,
+				36392F0F2A5DBD2F00DE866C /* ScanningAnimationView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -368,6 +371,7 @@
 				36392F0E2A5C7EE100DE866C /* DateTimeUtil.swift in Sources */,
 				365E538D2A48FD3200AD6AE8 /* Positions.swift in Sources */,
 				3677638B2A4E1EDA0096FF1F /* MapMarkerView.swift in Sources */,
+				36392F102A5DBD2F00DE866C /* ScanningAnimationView.swift in Sources */,
 				36562C062A54DC0900D95C4C /* DeviceTableViewCell.swift in Sources */,
 				36562C0C2A56778A00D95C4C /* PreciseFinderViewController.swift in Sources */,
 				36392F0C2A5BB8E100DE866C /* AddNewDeviceViewController.swift in Sources */,
