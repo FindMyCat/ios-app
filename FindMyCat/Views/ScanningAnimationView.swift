@@ -53,7 +53,7 @@ class ScanningAnimationView: UIView {
         let centerY = (4 * bounds.height) / 5
         let spread = 100
         let animationCircleFillColor = UIColor.systemGray
-        
+
         /*! Creates a circular path around the view*/
         let path = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: spread, height: spread))
 

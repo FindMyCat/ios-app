@@ -13,6 +13,7 @@ class AddNewDeviceViewController: UIViewController {
 
     let sheetView = UIView()
     let scanningLabel = UILabel()
+    let closeButton = UIButton()
 
     override func viewDidLoad() {
 
@@ -28,6 +29,8 @@ class AddNewDeviceViewController: UIViewController {
         addScanningView()
 
         addScanningLabel()
+
+        addCloseButton()
     }
 
     func addSheet() {
@@ -83,6 +86,38 @@ class AddNewDeviceViewController: UIViewController {
         ])
     }
 
+    func addCloseButton() {
+        sheetView.addSubview(closeButton)
+
+        var configuration = UIButton.Configuration.tinted()
+        configuration.cornerStyle = .capsule
+
+        closeButton.configuration = configuration
+
+        let imageConfig = UIImage.SymbolConfiguration(pointSize: 10, weight: .bold)
+        closeButton.setImage(UIImage(systemName: "xmark", withConfiguration: imageConfig), for: .normal)
+
+        closeButton.tintColor = .gray
+
+        closeButton.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            closeButton.trailingAnchor.constraint(equalTo: sheetView.trailingAnchor, constant: -24),
+            closeButton.topAnchor.constraint(equalTo: sheetView.topAnchor, constant: 24),
+            closeButton.widthAnchor.constraint(equalToConstant: 25),
+            closeButton.heightAnchor.constraint(equalToConstant: 25)
+        ])
+        closeButton.addTarget(self, action: #selector(dismissSelf), for: .touchUpInside)
+    }
+
+    @objc func dismissSelf() {
+        // make sheet animate out of frame and then dismiss
+        UIView.animate(withDuration: 0.2) {
+            self.sheetView.transform = CGAffineTransform(translationX: 0, y: self.view.frame.height)
+        }
+        dismiss(animated: true)
+    }
+
     @objc func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
         let translation = gesture.translation(in: view)
 
@@ -92,7 +127,7 @@ class AddNewDeviceViewController: UIViewController {
                 sheetView.transform = CGAffineTransform(translationX: 0, y: translation.y)
             }
         case .ended, .cancelled:
-            if translation.y >= 100 {
+            if translation.y >= 300 {
                 UIView.animate(withDuration: 0.2) {
                     self.sheetView.transform = CGAffineTransform(translationX: 0, y: self.view.frame.height)
                 }
