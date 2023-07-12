@@ -14,7 +14,6 @@ class AddNewDeviceViewController: UIViewController {
     let sheetView = UIView()
     let scanningLabel = UILabel()
     let closeButton = UIButton()
-
     override func viewDidLoad() {
 
         view.backgroundColor = UIColor.black.withAlphaComponent(0.6)
@@ -31,6 +30,8 @@ class AddNewDeviceViewController: UIViewController {
         addScanningLabel()
 
         addCloseButton()
+
+        addCircularView()
     }
 
     func addSheet() {
@@ -108,6 +109,39 @@ class AddNewDeviceViewController: UIViewController {
             closeButton.heightAnchor.constraint(equalToConstant: 25)
         ])
         closeButton.addTarget(self, action: #selector(dismissSelf), for: .touchUpInside)
+    }
+
+    func addCircularView() {
+        let circularLayout = CircularViewLayout(frame: CGRect(x: 0, y: 70, width: sheetView.bounds.width, height: sheetView.bounds.height - 70))
+        circularLayout.backgroundColor = .clear
+
+        let circleSize = CGFloat(80)
+        let view1 = UIView(frame: CGRect(x: 0, y: 0, width: circleSize, height: circleSize))
+        view1.translatesAutoresizingMaskIntoConstraints = false
+        view1.widthAnchor.constraint(equalToConstant: circleSize).isActive = true
+        view1.heightAnchor.constraint(equalToConstant: circleSize).isActive = true
+        view1.layer.cornerRadius = circleSize / 2.0
+        view1.backgroundColor = .red
+
+        let view2 = UIView(frame: CGRect(x: 0, y: 0, width: circleSize, height: circleSize))
+        view2.translatesAutoresizingMaskIntoConstraints = false
+        view2.widthAnchor.constraint(equalToConstant: circleSize).isActive = true
+        view2.heightAnchor.constraint(equalToConstant: circleSize).isActive = true
+        view2.layer.cornerRadius = circleSize / 2.0
+        view2.backgroundColor = .green
+
+        let view3 = UIView(frame: CGRect(x: 0, y: 0, width: circleSize, height: circleSize))
+        view3.translatesAutoresizingMaskIntoConstraints = false
+        view3.widthAnchor.constraint(equalToConstant: circleSize).isActive = true
+        view3.heightAnchor.constraint(equalToConstant: circleSize).isActive = true
+        view3.layer.cornerRadius = circleSize / 2
+        view3.backgroundColor = .blue
+
+        circularLayout.addCircularView(view1)
+        circularLayout.addCircularView(view2)
+//        circularLayout.addCircularView(view3)
+
+        sheetView.addSubview(circularLayout)
     }
 
     @objc func dismissSelf() {
