@@ -8,9 +8,9 @@
 
 import Foundation
 
-class CookieHandler {
+class CookieHandlerUtil {
 
-    static let shared: CookieHandler = CookieHandler()
+    static let shared: CookieHandlerUtil = CookieHandlerUtil()
 
     let defaults = UserDefaults.standard
     let cookieStorage = HTTPCookieStorage.shared
