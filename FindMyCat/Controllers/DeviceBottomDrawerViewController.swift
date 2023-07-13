@@ -384,7 +384,7 @@ class DeviceBottomDrawerController:
     // MARK: - Button click handlers
 
     @objc func addNewDeviceButtonClicked() {
-        let vc = ScanDevicesViewController()
+        let vc = ScanDevicesNavigationController()
         vc.modalPresentationStyle = .overFullScreen
         vc.modalTransitionStyle = .crossDissolve
         parentVc.present(vc, animated: true)
