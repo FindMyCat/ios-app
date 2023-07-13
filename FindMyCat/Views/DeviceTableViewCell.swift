@@ -42,7 +42,7 @@ protocol DeviceCellDelegate: AnyObject {
     func launchPreciseFindScreen()
 }
 
-class DeviceCellView: UITableViewCell {
+class DeviceTableViewCell: UITableViewCell {
 
     // Always visible views
     let deviceNameLabel = UILabel()

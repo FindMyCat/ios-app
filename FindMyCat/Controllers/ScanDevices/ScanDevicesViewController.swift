@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import FittedSheets
 
-class AddNewDeviceViewController: UIViewController {
+class ScanDevicesViewController: UIViewController {
 
     let sheetView = UIView()
     let scanningLabel = UILabel()

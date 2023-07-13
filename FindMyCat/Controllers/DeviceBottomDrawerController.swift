@@ -55,7 +55,7 @@ class DeviceBottomDrawerController:
 
         configureSheetController()
 
-        tableView.register(DeviceCellView.self, forCellReuseIdentifier: "DeviceCell")
+        tableView.register(DeviceTableViewCell.self, forCellReuseIdentifier: "DeviceCell")
 
         configureStackView()
         configureDrawerLabel()
@@ -242,7 +242,7 @@ class DeviceBottomDrawerController:
     // MARK: - UITableView Delegate & DataSource
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "DeviceCell", for: indexPath) as! DeviceCellView
+        let cell = tableView.dequeueReusableCell(withIdentifier: "DeviceCell", for: indexPath) as! DeviceTableViewCell
         let devices = SharedData.getDevices()
         let positions = SharedData.getPositions()
 
@@ -384,7 +384,7 @@ class DeviceBottomDrawerController:
     // MARK: - Button click handlers
 
     @objc func addNewDeviceButtonClicked() {
-        let vc = AddNewDeviceViewController()
+        let vc = ScanDevicesViewController()
         vc.modalPresentationStyle = .overFullScreen
         vc.modalTransitionStyle = .crossDissolve
         parentVc.present(vc, animated: true)
