@@ -367,14 +367,24 @@ class DeviceBottomDrawerController:
         logger.log("swipe on cell")
 
         let device = SharedData.getDevices()[indexPath.row]
-        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { _, _, completionHandler in
+        let deleteAction = UIContextualAction(style: .destructive, title: "Remove Device") { _, _, completionHandler in
             // Perform delete action for the cell at indexPath
+            let alertController = UIAlertController(title: "Remove Device", message: Constants.RemoveDeviceConfirmationMessage, preferredStyle: .alert)
 
-            TraccarAPIManager.shared.deleteDevice(id: device.id) {
-                response in
-
-                debugPrint(response)
+            let confirmAction = UIAlertAction(title: "OK", style: .default) { _ in
+                // Perform the action here after the user confirms
+                TraccarAPIManager.shared.deleteDevice(id: device.id) {
+                    _ in
+                }
             }
+
+            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+
+            alertController.addAction(confirmAction)
+            alertController.addAction(cancelAction)
+
+            self.present(alertController, animated: true, completion: nil)
+
             completionHandler(true)
         }
         deleteAction.image = UIImage(systemName: "trash.fill")

@@ -17,4 +17,6 @@ struct Constants {
     static let AddressUnavailable = "Address Unavailable"
     static let DeviceOffline = "Offline"
 
+    // Confirmation Messages
+    static let RemoveDeviceConfirmationMessage = "Are you sure you want to remove the device from your account?"
 }
