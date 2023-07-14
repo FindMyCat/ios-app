@@ -365,8 +365,16 @@ class DeviceBottomDrawerController:
 
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         logger.log("swipe on cell")
+
+        let device = SharedData.getDevices()[indexPath.row]
         let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { _, _, completionHandler in
             // Perform delete action for the cell at indexPath
+
+            TraccarAPIManager.shared.deleteDevice(id: device.id) {
+                response in
+
+                debugPrint(response)
+            }
             completionHandler(true)
         }
         deleteAction.image = UIImage(systemName: "trash.fill")
