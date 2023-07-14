@@ -16,7 +16,7 @@ class ScanDevicesViewController: UIViewController {
 
     override func viewDidLoad() {
 
-        navigationController?.pushViewController(AddEditDeviceViewController(), animated: true)
+        navigationController?.pushViewController(AddEditDeviceViewController(), animated: false)
 
         addSheet()
 

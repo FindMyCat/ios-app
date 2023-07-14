@@ -19,6 +19,7 @@
 		36392F1C2A5FA1D500DE866C /* AvatarEmojiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36392F1B2A5FA1D500DE866C /* AvatarEmojiView.swift */; };
 		36392F1E2A5FA87100DE866C /* ScanDevicesNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36392F1D2A5FA87100DE866C /* ScanDevicesNavigationController.swift */; };
 		36392F202A5FADB400DE866C /* DismissableSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36392F1F2A5FADB400DE866C /* DismissableSheet.swift */; };
+		36392F2A2A60CEC300DE866C /* CocoaTextField in Frameworks */ = {isa = PBXBuildFile; productRef = 36392F292A60CEC300DE866C /* CocoaTextField */; };
 		363EC8052A57E42E0059E1CA /* UWBMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363EC8042A57E42E0059E1CA /* UWBMessages.swift */; };
 		363EC8082A57E4CA0059E1CA /* UWBUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363EC8072A57E4CA0059E1CA /* UWBUtil.swift */; };
 		363EC80A2A57E6990059E1CA /* DistanceUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363EC8092A57E6990059E1CA /* DistanceUtil.swift */; };
@@ -102,6 +103,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3681E8862A54C1EE003392F9 /* FittedSheets in Frameworks */,
+				36392F2A2A60CEC300DE866C /* CocoaTextField in Frameworks */,
 				365E537B2A48AFC700AD6AE8 /* Alamofire in Frameworks */,
 				36562C082A54DCAE00D95C4C /* NearbyInteraction.framework in Frameworks */,
 				365E53662A476A0C00AD6AE8 /* MapboxMaps in Frameworks */,
@@ -318,6 +320,7 @@
 				365E537A2A48AFC700AD6AE8 /* Alamofire */,
 				365E53882A48EF0200AD6AE8 /* Starscream */,
 				3681E8852A54C1EE003392F9 /* FittedSheets */,
+				36392F292A60CEC300DE866C /* CocoaTextField */,
 			);
 			productName = FindMyCat;
 			productReference = 365E534C2A47648700AD6AE8 /* FindMyCat.app */;
@@ -352,6 +355,7 @@
 				365E53792A48AFC700AD6AE8 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				365E53872A48EF0200AD6AE8 /* XCRemoteSwiftPackageReference "Starscream" */,
 				3681E8842A54C1EE003392F9 /* XCRemoteSwiftPackageReference "FittedSheets" */,
+				36392F282A60CEC300DE866C /* XCRemoteSwiftPackageReference "CocoaTextField" */,
 			);
 			productRefGroup = 365E534D2A47648700AD6AE8 /* Products */;
 			projectDirPath = "";
@@ -659,6 +663,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		36392F282A60CEC300DE866C /* XCRemoteSwiftPackageReference "CocoaTextField" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/edgar-zigis/CocoaTextField.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		365E53642A476A0C00AD6AE8 /* XCRemoteSwiftPackageReference "mapbox-maps-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/mapbox/mapbox-maps-ios.git";
@@ -694,6 +706,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		36392F292A60CEC300DE866C /* CocoaTextField */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 36392F282A60CEC300DE866C /* XCRemoteSwiftPackageReference "CocoaTextField" */;
+			productName = CocoaTextField;
+		};
 		365E53652A476A0C00AD6AE8 /* MapboxMaps */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 365E53642A476A0C00AD6AE8 /* XCRemoteSwiftPackageReference "mapbox-maps-ios" */;

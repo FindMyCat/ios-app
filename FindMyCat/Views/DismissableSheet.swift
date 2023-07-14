@@ -1,5 +1,5 @@
 //
-//  BottomSheetExtraCurvedView.swift
+//  DismissableSheet.swift
 //  FindMyCat
 //
 //  Created by Sahas Chitlange on 7/12/23.
@@ -38,7 +38,7 @@ class DismissableSheet: UIView {
     func addCloseButton() {
         addSubview(closeButton)
 
-        var configuration = UIButton.Configuration.filled()
+        var configuration = UIButton.Configuration.tinted()
         configuration.cornerStyle = .capsule
 
         closeButton.configuration = configuration
