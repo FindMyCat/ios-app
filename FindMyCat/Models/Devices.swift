@@ -14,10 +14,10 @@ class Device: Decodable {
     }
 
     var id: Int
+    var name: String
+    var uniqueId: String
     var attributes: Attributes?
     var groupId: Int?
-    var name: String
-    var uniqueId: String?
     var status: String?
     var lastUpdate: String?
     var positionId: Int?
@@ -29,9 +29,10 @@ class Device: Decodable {
     var disabled: Bool?
     var expirationTime: Date?
 
-    init(name: String, id: Int) {
+    init(name: String, id: Int, uniqueId: String) {
         self.name = name
         self.id = id
+        self.uniqueId = uniqueId
     }
 
     func getName() -> String {

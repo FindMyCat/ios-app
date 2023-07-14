@@ -65,14 +65,6 @@ class DeviceTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func prepareForReuse() {
-        // invoke superclass implementation
-        super.prepareForReuse()
-
-        // reset labels and icons
-//        self.batteryIcon.image = nil
-    }
-
     // MARK: - Configurations of Subviews
 
     private func configureSubviews() {
@@ -93,7 +85,6 @@ class DeviceTableViewCell: UITableViewCell {
 
     private func configureProfilePictureEmojiLabel() {
         contentView.addSubview(emojiLabel)
-        emojiLabel.text = "💖"
         emojiLabel.textAlignment = .center
         emojiLabel.font = UIFont.systemFont(ofSize: profilePictureSize - 20)
         emojiLabel.backgroundColor = UIColor.init(white: 0.96, alpha: 1)

@@ -45,9 +45,21 @@ class SharedData {
 
      }
 
+    public func updateDataFromApi() {
+        fetchDevicesFromRestAPI {
+            self.fetchPositionsFromRestAPI {
+                // update the data from API
+            }
+        }
+    }
+
     // MARK: Getters for Devices and Position static variables
     public static func getDevices() -> [Device] {
         return self.devices
+    }
+
+    public static func getDevicesCount() -> Int {
+        return self.devices.count
     }
 
     public static func getPositions() -> [Position] {
@@ -72,7 +84,7 @@ class SharedData {
     }
 
     private func fetchPositionsFromRestAPI(completion: @escaping () -> Void) {
-        print("fetching devices from REST API")
+        print("fetching positions from REST API")
         TraccarAPIManager.shared.fetchPositions {
             result in
 

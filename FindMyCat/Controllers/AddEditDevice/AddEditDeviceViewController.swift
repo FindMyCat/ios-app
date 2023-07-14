@@ -163,8 +163,24 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
             submitButton.widthAnchor.constraint(equalToConstant: 100)
         ])
 
+        submitButton.addTarget(self, action: #selector(createOrEditDevice), for: .touchUpInside)
     }
 
+    @objc func createOrEditDevice() {
+        guard let deviceName = deviceNameTextField.text,
+              let deviceUniqueId = uniqueIdReadOnlyTextField.text,
+              let emoji = avatarEmojiView.textField.text
+        else {
+            return
+        }
+
+        TraccarAPIManager.shared.createDevice(name: deviceName, uniqueId: deviceUniqueId, emoji: emoji) {
+            response in
+
+            print(response)
+        }
+
+    }
     @objc private func keyboardWillChangeFrame(_ notification: Notification) {
         guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
 

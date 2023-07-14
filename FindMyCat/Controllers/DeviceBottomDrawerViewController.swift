@@ -84,6 +84,26 @@ class DeviceBottomDrawerController:
     // MARK: - Notification Observers
 
     @objc private func devicesUpdated(_ notification: Notification) {
+
+        let totalDevices = SharedData.getDevicesCount()
+        let tableViewRows = tableView.numberOfRows(inSection: 0)
+
+        if totalDevices != tableViewRows {
+            if totalDevices > tableViewRows {
+                let rowsToAdd = totalDevices - tableViewRows
+                for index in 0..<rowsToAdd {
+                    let indexPath = IndexPath(row: index, section: 0)
+                    tableView.insertRows(at: [indexPath], with: .fade)
+                }
+            }
+            if totalDevices < tableViewRows {
+                let rowsToRemove = tableViewRows - totalDevices
+                for index in 0..<rowsToRemove {
+                    let indexPath = IndexPath(row: index, section: 0)
+                    tableView.deleteRows(at: [indexPath], with: .fade)
+                }
+            }
+        }
         // update cells one by one to reduce flickers
        reloadTableDataCellByCell()
     }
@@ -99,7 +119,7 @@ class DeviceBottomDrawerController:
 
         for row in 0..<totalRows {
             let indexPath = IndexPath(row: row, section: sectionIndex)
-            tableView.reloadRows(at: [indexPath], with: .automatic)
+            tableView.reloadRows(at: [indexPath], with: .fade)
         }
     }
 
@@ -298,6 +318,9 @@ class DeviceBottomDrawerController:
             cell.deviceAddressLabel.text = Constants.DeviceOffline
             cell.deviceAddressLabel.isHidden = false
         }
+        if cellDevice.attributes?.emoji != nil {
+            cell.emojiLabel.text = cellDevice.attributes?.emoji
+        }
 
         let bgColorView = UIView()
         bgColorView.backgroundColor = UIColor(red: 60/255, green: 60/255, blue: 67/255, alpha: 0.3)
@@ -421,7 +444,15 @@ class DeviceBottomDrawerController:
 
 extension DeviceBottomDrawerController: DeviceCellDelegate {
     func launchPreciseFindScreen() {
-        let vc = PreciseFinderViewContoller(deviceDisplayName: "Pumpkin", deviceUniqueBLEId: 215788291)
+
+        guard selectedDeviceIndex != nil else {return}
+
+        let selectedDevice = SharedData.getDevices()[selectedDeviceIndex!]
+        let selectedDeviceName = selectedDevice.name
+        let selectedDeviceUniqueBLEId = Int(selectedDevice.uniqueId)!
+
+        let vc = PreciseFinderViewContoller(deviceDisplayName: selectedDeviceName, deviceUniqueBLEId: selectedDeviceUniqueBLEId)
+
         vc.modalPresentationStyle = .fullScreen
 
         parentVc.present(vc, animated: true)
