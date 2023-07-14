@@ -52,6 +52,12 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
         avatarEmojiView.translatesAutoresizingMaskIntoConstraints = false
         sheetView.addSubview(avatarEmojiView)
 
+        avatarEmojiView.layer.shadowColor = UIColor.black.cgColor
+        avatarEmojiView.layer.shadowOpacity = 0.2
+        avatarEmojiView.layer.shadowOffset = CGSize(width: 0, height: 2)
+        avatarEmojiView.layer.shadowRadius = 40
+        avatarEmojiView.layer.masksToBounds = false
+
         NSLayoutConstraint.activate([
             avatarEmojiView.centerXAnchor.constraint(equalTo: sheetView.centerXAnchor),
 
