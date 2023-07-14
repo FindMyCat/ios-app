@@ -53,7 +53,7 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
         sheetView.addSubview(avatarEmojiView)
 
         avatarEmojiView.layer.shadowColor = UIColor.black.cgColor
-        avatarEmojiView.layer.shadowOpacity = 0.2
+        avatarEmojiView.layer.shadowOpacity = 0.4
         avatarEmojiView.layer.shadowOffset = CGSize(width: 0, height: 2)
         avatarEmojiView.layer.shadowRadius = 40
         avatarEmojiView.layer.masksToBounds = false

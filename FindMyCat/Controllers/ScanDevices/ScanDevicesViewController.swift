@@ -13,9 +13,11 @@ class ScanDevicesViewController: UIViewController {
 
     let sheetView = DismissableSheet()
     let scanningLabel = UILabel()
+    var scanningAnimationView: ScanningAnimationView!
 
     override func viewDidLoad() {
 
+        super.viewDidLoad()
         navigationController?.pushViewController(AddEditDeviceViewController(), animated: false)
 
         addSheet()
@@ -28,23 +30,24 @@ class ScanDevicesViewController: UIViewController {
 
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        scanningAnimationView.startAnimation()
+    }
+
     func addSheet() {
         view.addSubview(sheetView)
 
         sheetView.showInView(view, height: 500)
-
     }
 
     func addScanningView() {
 
         // Create the scanning view
-        let scanningAnimationView = ScanningAnimationView(frame: CGRect(x: 0, y: 70, width: sheetView.frame.width, height: sheetView.frame.height))
+        scanningAnimationView = ScanningAnimationView(frame: CGRect(x: 0, y: 70, width: sheetView.frame.width, height: sheetView.frame.height))
 
         sheetView.addSubview(scanningAnimationView)
-
-        scanningAnimationView.startAnimation()
-
-        scanningAnimationView.translatesAutoresizingMaskIntoConstraints = false
 
     }
 

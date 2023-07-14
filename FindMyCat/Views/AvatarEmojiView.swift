@@ -30,7 +30,7 @@ class AvatarEmojiView: UIView, UITextFieldDelegate {
 
         textField =  EmojiTextField(frame: frame)
         textField.text = "🤪"
-        textField.font = UIFont.systemFont(ofSize: 80)
+        textField.font = UIFont.systemFont(ofSize: 70)
         textField.layer.cornerRadius = textField.frame.width / 2
         textField.layer.borderWidth = 2
         textField.layer.borderColor = UIColor.systemGray4.cgColor
