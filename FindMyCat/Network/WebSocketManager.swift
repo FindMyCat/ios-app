@@ -8,8 +8,11 @@
 import Starscream
 import Combine
 import Foundation
+import os.log
 
 class WebSocketManager: WebSocketDelegate {
+
+    let logger = Logger(subsystem: "Network", category: String(describing: WebSocketManager.self))
 
     let urlString = "ws://ec2-18-191-185-127.us-east-2.compute.amazonaws.com:8082/api/socket"
 
@@ -40,27 +43,26 @@ class WebSocketManager: WebSocketDelegate {
     func didReceive(event: Starscream.WebSocketEvent, client: Starscream.WebSocketClient) {
       switch event {
       case .connected(let headers):
-        print("connected \(headers)")
+          logger.log("connected \(headers)")
       case .disconnected(let reason, let closeCode):
-        print("disconnected \(reason) \(closeCode)")
+          logger.log("disconnected \(reason) \(closeCode)")
       case .text(let text):
-//        print("received text: \(text)")
-        subject.send(text)
+          subject.send(text)
       case .binary(let data):
-        print("received data: \(data)")
+          logger.log("received data: \(data)")
       case .pong(let pongData):
-        print("received pong: \(pongData)")
+          logger.log("received pong")
       case .ping(let pingData):
-        print("received ping: \(pingData)")
+          logger.log("received ping")
       case .error(let error):
-        print("error \(error)")
+          logger.error("error \(error)")
       case .viabilityChanged:
-        print("viabilityChanged")
+          logger.log("viabilityChanged")
       case .reconnectSuggested:
-        print("reconnectSuggested")
+          logger.log("reconnectSuggested")
       case .cancelled:
           socket?.connect()
-        print("cancelled")
+          logger.log("cancelled")
       }
     }
 }

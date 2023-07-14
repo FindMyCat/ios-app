@@ -6,8 +6,12 @@
 //
 
 import Foundation
+import os.log
 
 class DateTimeUtil {
+
+    static let logger = Logger(subsystem: "Utils", category: String(describing: DateTimeUtil.self))
+
     public static func relativeTime(dateString: String) -> String {
 
         let dateFormatter = DateFormatter()
@@ -42,7 +46,7 @@ class DateTimeUtil {
             }
 
         } else {
-            print("Invalid date string")
+            logger.error("Invalid date string")
         }
         return ""
     }

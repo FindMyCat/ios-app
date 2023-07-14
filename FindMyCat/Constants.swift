@@ -8,10 +8,13 @@
 import Foundation
 
 struct Constants {
+
+    // Notifications
     static let DevicesUpdatedNotificationName = "DevicesUpdated"
     static let PositionsUpdatedNotificationName = "PositionsUpdated"
 
+    // Device Remote Status strings
     static let AddressUnavailable = "Address Unavailable"
-
     static let DeviceOffline = "Offline"
+
 }

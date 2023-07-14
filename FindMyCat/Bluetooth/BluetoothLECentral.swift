@@ -77,10 +77,10 @@ let statusDiscovered = "Discovered"
 let statusConnected = "Connected"
 let statusRanging = "Ranging"
 
-class DataCommunicationChannel: NSObject {
+class BLEDataCommunicationChannel: NSObject {
     private var preciseFindableDevices = [PreciseFindableDevice?]()
 
-    static let shared = DataCommunicationChannel()
+    static let shared = BLEDataCommunicationChannel()
 
     var centralManager: CBCentralManager!
 
@@ -99,7 +99,7 @@ class DataCommunicationChannel: NSObject {
     var bluetoothReady = false
     var shouldStartWhenReady = false
 
-    let logger = os.Logger(subsystem: "com.chitlangesahas.FindMyCat", category: "DataChannel")
+    let logger = os.Logger(subsystem: "Bluetooth", category: String(describing: BLEDataCommunicationChannel.self))
 
     override init() {
         super.init()
@@ -120,7 +120,6 @@ class DataCommunicationChannel: NSObject {
 
         preciseFindableDevices.forEach { (preciseFindableDevice) in
 
-            print(preciseFindableDevice?.blePeripheralStatus)
             if preciseFindableDevice!.blePeripheralStatus == statusDiscovered {
                 // Get current timestamp
                 let timeStamp = Int64((Date().timeIntervalSince1970 * 1000.0).rounded())
@@ -164,7 +163,7 @@ class DataCommunicationChannel: NSObject {
     }
 
     func stop() {
-//        centralManager.stopScan()
+        centralManager.stopScan()
     }
 
     func connectPeripheral(_ uniqueID: Int) throws {
@@ -192,6 +191,7 @@ class DataCommunicationChannel: NSObject {
             }
             // Disconnect from peripheral.
             logger.info("Disconnecting from Peripheral \(deviceToDisconnect.blePeripheral)")
+            deviceToDisconnect.blePeripheralStatus = statusDiscovered
             centralManager.cancelPeripheralConnection(deviceToDisconnect.blePeripheral)
         } else {
             throw BluetoothLECentralError.noPeripheral
@@ -265,7 +265,7 @@ class DataCommunicationChannel: NSObject {
     }
 }
 
-extension DataCommunicationChannel: CBCentralManagerDelegate {
+extension BLEDataCommunicationChannel: CBCentralManagerDelegate {
     /*
      * When Bluetooth is powered, starts Bluetooth operations.
      *
@@ -406,7 +406,7 @@ extension DataCommunicationChannel: CBCentralManagerDelegate {
 }
 
 // An extention to implement `CBPeripheralDelegate` methods.
-extension DataCommunicationChannel: CBPeripheralDelegate {
+extension BLEDataCommunicationChannel: CBPeripheralDelegate {
 
     // Reacts to peripheral services invalidation.
     func peripheral(_ peripheral: CBPeripheral, didModifyServices invalidatedServices: [CBService]) {

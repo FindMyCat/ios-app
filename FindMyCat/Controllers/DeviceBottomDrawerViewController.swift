@@ -9,6 +9,7 @@ import Foundation
 import UIKit
 import FittedSheets
 import CoreLocation
+import os.log
 
 class DeviceBottomDrawerController:
         UIViewController,
@@ -30,6 +31,8 @@ class DeviceBottomDrawerController:
 
     // Timer to refresh table cell data
     private var tableReloadTimer: Timer?
+
+    let logger = Logger(subsystem: "ViewControllers", category: String(describing: DeviceBottomDrawerController.self))
 
     // MARK: - Initializers
     // Constructor
@@ -361,7 +364,7 @@ class DeviceBottomDrawerController:
     }
 
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        print("swipe on cell")
+        logger.log("swipe on cell")
         let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { _, _, completionHandler in
             // Perform delete action for the cell at indexPath
             completionHandler(true)
@@ -390,7 +393,7 @@ class DeviceBottomDrawerController:
 
         geocoder.reverseGeocodeLocation(location) { placemarks, error in
             if let error = error {
-                print("Reverse geocoding error: \(error.localizedDescription)")
+                self.logger.error("Reverse geocoding error: \(error.localizedDescription)")
                 completion(nil)
             }
 

@@ -7,9 +7,11 @@
 
 import Foundation
 import Combine
-
+import os.log
 class SharedData {
     static let shared = SharedData()
+
+    let logger = Logger(subsystem: "Models", category: String(describing: SharedData.self))
 
     private static var devices: [Device] = [] {
         didSet {
@@ -68,7 +70,7 @@ class SharedData {
 
     // MARK: Network handlers
     private func fetchDevicesFromRestAPI(completion: @escaping () -> Void) {
-        print("fetching devices from REST API")
+        logger.log("fetching devices from REST API")
         TraccarAPIManager.shared.fetchDevices {
             result in
 
@@ -77,14 +79,14 @@ class SharedData {
                 // Set devices in shared data so it's acceccible to all consuming classes.
                 SharedData.devices = devices
             case .failure(let error):
-                print("Could not fetch Devices from REST endpoint ", error)
+                self.logger.error("Could not fetch Devices from REST endpoint \(error)")
             }
             completion()
         }
     }
 
     private func fetchPositionsFromRestAPI(completion: @escaping () -> Void) {
-        print("fetching positions from REST API")
+        logger.log("fetching positions from REST API")
         TraccarAPIManager.shared.fetchPositions {
             result in
 
@@ -92,9 +94,8 @@ class SharedData {
             case .success(let positions):
                 // Set devices in shared data so it's acceccible to all consuming classes.
                 SharedData.positions = positions
-                print(positions)
             case .failure(let error):
-                print("Could not fetch Devices from REST endpoint ", error)
+                self.logger.error("Could not fetch Devices from REST endpoint \(error)")
             }
             completion()
         }
@@ -142,7 +143,7 @@ class SharedData {
                 }
             }
         } catch {
-            print("Error decoding JSON: \(error)")
+            logger.error("Error decoding JSON: \(error)")
         }
 
     }

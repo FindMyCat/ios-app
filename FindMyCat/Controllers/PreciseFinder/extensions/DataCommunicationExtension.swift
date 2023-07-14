@@ -13,47 +13,33 @@ extension PreciseFinderViewContoller {
 
     // MARK: - Setup Data channel
     internal func configureDataChannel() {
-        DataCommunicationChannel.shared.accessoryDataHandler = accessorySharedData
+        BLEDataCommunicationChannel.shared.accessoryDataHandler = accessorySharedData
 
         // Prepare the data communication channel.
-        DataCommunicationChannel.shared.accessoryDiscoveryHandler = accessoryInclude
-        DataCommunicationChannel.shared.accessoryTimeoutHandler = accessoryRemove
-        DataCommunicationChannel.shared.accessoryConnectedHandler = accessoryConnected
-        DataCommunicationChannel.shared.accessoryDisconnectedHandler = accessoryDisconnected
-        DataCommunicationChannel.shared.accessoryDataHandler = accessorySharedData
+        BLEDataCommunicationChannel.shared.accessoryDiscoveryHandler = accessoryInclude
+        BLEDataCommunicationChannel.shared.accessoryTimeoutHandler = accessoryRemove
+        BLEDataCommunicationChannel.shared.accessoryConnectedHandler = accessoryConnected
+        BLEDataCommunicationChannel.shared.accessoryDisconnectedHandler = accessoryDisconnected
+        BLEDataCommunicationChannel.shared.accessoryDataHandler = accessorySharedData
 
         logger.info("Connecting to Accessory")
         connectToAccessoryUntilSuccess(deviceUniqueBLEId, maxRetries: 10, retryDelay: 1)
     }
 
     internal func deinitDataCommunicationChannel() {
-        DataCommunicationChannel.shared.accessoryDataHandler = nil
+        BLEDataCommunicationChannel.shared.accessoryDataHandler = nil
 
         // Prepare the data communication channel.
-        DataCommunicationChannel.shared.accessoryDiscoveryHandler = nil
-        DataCommunicationChannel.shared.accessoryTimeoutHandler = nil
-        DataCommunicationChannel.shared.accessoryConnectedHandler = nil
-        DataCommunicationChannel.shared.accessoryDisconnectedHandler = nil
-        DataCommunicationChannel.shared.accessoryDataHandler = nil
-//        DataCommunicationChannel.shared.stop()
+        BLEDataCommunicationChannel.shared.accessoryDiscoveryHandler = nil
+        BLEDataCommunicationChannel.shared.accessoryTimeoutHandler = nil
+        BLEDataCommunicationChannel.shared.accessoryConnectedHandler = nil
+        BLEDataCommunicationChannel.shared.accessoryDisconnectedHandler = nil
+        BLEDataCommunicationChannel.shared.accessoryDataHandler = nil
     }
 
     // MARK: - Data channel event handlers
     internal func accessoryInclude(index: Int) {
 
-//        guard let device = DataCommunicationChannel.shared.getDeviceFromUniqueID(deviceUniqueBLEId) else {
-//            return
-//        }
-//
-//        if device.bleUniqueID == deviceUniqueBLEId {
-//            // Connect to the accessory
-//            if device.blePeripheralStatus == statusDiscovered {
-//                logger.info("Connecting to Accessory")
-//                connectToAccessory(device.bleUniqueID)
-//            } else {
-//                return
-//            }
-//        }
     }
 
     internal func accessoryRemove(deviceID: Int) {
@@ -88,7 +74,7 @@ extension PreciseFinderViewContoller {
         // The accessory begins each message with an identifier byte.
         // Ensure the message length is within a valid range.
         if data.count < 1 {
-            print("Accessory shared data length was less than 1.")
+            logger.error("Accessory shared data length was less than 1.")
             return
         }
 
@@ -116,17 +102,17 @@ extension PreciseFinderViewContoller {
             fatalError("Accessory should not send 'stop'.")
         // User defined/notification messages
         case .getReserved:
-            print("Get not implemented in this version")
+            logger.info("Get not implemented in this version")
         case .setReserved:
-            print("Set not implemented in this version")
+            logger.info("Set not implemented in this version")
         case .iOSNotify:
-            print("Notification not implemented in this version")
+            logger.info("Notification not implemented in this version")
         }
     }
 
     // MARK: - Accessory messages handling
     internal func setupAccessory(_ configData: Data, name: String, deviceID: Int) {
-        print("Received configuration data from '\(name)'. Running session.")
+        logger.log("Received configuration data from '\(name)'. Running session.")
         do {
             accessoryConfig = try NINearbyAccessoryConfiguration(data: configData)
             accessoryConfig?.isCameraAssistanceEnabled = true
@@ -134,7 +120,7 @@ extension PreciseFinderViewContoller {
             // Stop and display the issue because the incoming data is invalid.
             // In your app, debug the accessory data to ensure an expected
             // format.
-            print("Failed to create NINearbyAccessoryConfiguration for '\(name)'. Error: \(error)")
+            logger.error("Failed to create NINearbyAccessoryConfiguration for '\(name)'. Error: \(error)")
             return
         }
 
@@ -142,15 +128,15 @@ extension PreciseFinderViewContoller {
         cacheToken(accessoryConfig!.accessoryDiscoveryToken, accessoryName: name)
 
         referenceDict[deviceID]?.run(accessoryConfig!)
-        print("Accessory Session configured.")
+        logger.log("Accessory Session configured.")
 
     }
 
     internal func handleAccessoryUwbDidStart(_ deviceID: Int) {
-        print("Accessory Session started.")
+        logger.log("Accessory Session started.")
 
         // Update the device Status
-        if let startedDevice = DataCommunicationChannel.shared.getDeviceFromUniqueID(deviceID) {
+        if let startedDevice = BLEDataCommunicationChannel.shared.getDeviceFromUniqueID(deviceID) {
             startedDevice.blePeripheralStatus = statusRanging
         }
 
@@ -160,7 +146,7 @@ extension PreciseFinderViewContoller {
     }
 
     internal func handleAccessoryUwbDidStop(_ deviceID: Int) {
-        print("Accessory Session stopped.")
+        logger.log("Accessory Session stopped.")
 
         // Disconnect from device
         disconnectFromAccessory(deviceID)

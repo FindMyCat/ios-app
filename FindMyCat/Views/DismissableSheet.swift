@@ -84,8 +84,6 @@ class DismissableSheet: UIView {
 
     @objc func dismissSelf() {
 
-        print("dismiss")
-
         guard let viewController = self.next?.next as? UIViewController else {
                 return
             }

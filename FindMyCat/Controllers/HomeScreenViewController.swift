@@ -22,7 +22,7 @@ class HomeScreenController: UIViewController {
     }
 
     override func viewDidAppear(_ animated: Bool) {
-        DataCommunicationChannel.shared.start()
+        BLEDataCommunicationChannel.shared.start()
     }
 
     @objc private func devicesUpdated(_ notification: Notification) {

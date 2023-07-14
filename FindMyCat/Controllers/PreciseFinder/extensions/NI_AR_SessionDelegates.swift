@@ -27,30 +27,28 @@ extension PreciseFinderViewContoller: NISessionDelegate {
         msg.append(shareableConfigurationData)
 
         let str = msg.map { String(format: "0x%02x, ", $0) }.joined()
-        logger.info("Sending shareable configuration bytes: \(str)")
+        logger.log("Sending shareable configuration bytes: \(str)")
 
         // Send the message to the correspondent accessory.
         sendDataToAccessory(msg, deviceIDFromSession(session))
-        print("Sent shareable configuration data.")
+        logger.log("Sent shareable configuration data.")
     }
 
     func session(_ session: NISession, didUpdateAlgorithmConvergence convergence: NIAlgorithmConvergence, for object: NINearbyObject?) {
-        print("Convergence Status:\(convergence.status)")
+        logger.log("Convergence Status: \(String(describing: convergence.status))")
         // TODO: To Refactor delete to only know converged or not
 
         guard let accessory = object else { return}
 
         switch convergence.status {
         case .converged:
-            print("Horizontal Angle: \(accessory.horizontalAngle)")
-            print("verticalDirectionEstimate: \(accessory.verticalDirectionEstimate)")
-            print("Converged")
+            logger.log("Converged")
             NIAlgorithmHasConverged = true
         case .notConverged([NIAlgorithmConvergenceStatus.Reason.insufficientLighting]):
-            print("More light required")
+            logger.log("More light required")
             NIAlgorithmHasConverged = false
         default:
-            print("Try moving in a different direction...")
+            logger.log("Try moving in a different direction...")
         }
 
     }
@@ -59,9 +57,8 @@ extension PreciseFinderViewContoller: NISessionDelegate {
         guard let distance  = accessory.distance else { return }
 
         let deviceID = deviceIDFromSession(session)
-        // print(NISession.deviceCapabilities)
 
-        if let updatedDevice = DataCommunicationChannel.shared.getDeviceFromUniqueID(deviceID) {
+        if let updatedDevice = BLEDataCommunicationChannel.shared.getDeviceFromUniqueID(deviceID) {
             // set updated values
             updatedDevice.uwbLocation?.distance = distance
 
@@ -72,14 +69,12 @@ extension PreciseFinderViewContoller: NISessionDelegate {
             // TODO: For IPhone 14 only
             else if NIAlgorithmHasConverged {
                 guard let horizontalAngle = accessory.horizontalAngle else {return}
-                updatedDevice.uwbLocation?.direction = getDirectionFromHorizontalAngle(rad: horizontalAngle)
+                updatedDevice.uwbLocation?.direction = uwbUtilManager.getDirectionFromHorizontalAngle(rad: horizontalAngle)
                 updatedDevice.uwbLocation?.elevation = accessory.verticalDirectionEstimate.rawValue
                 updatedDevice.uwbLocation?.noUpdate  = false
             } else {
                 updatedDevice.uwbLocation?.noUpdate  = true
             }
-
-            updatedDevice.blePeripheralStatus = statusRanging
         }
 
         updateDeviceData(deviceID)
@@ -88,12 +83,12 @@ extension PreciseFinderViewContoller: NISessionDelegate {
 
     func updateDeviceData(_ deviceID: Int) {
 
-        let preciseFindableDevice = DataCommunicationChannel.shared.getDeviceFromUniqueID(deviceID)
+        let preciseFindableDevice = BLEDataCommunicationChannel.shared.getDeviceFromUniqueID(deviceID)
         if preciseFindableDevice == nil { return }
 
         // Get updated location values
         let distance  = preciseFindableDevice?.uwbLocation?.distance
-        let azimuthCheck = azimuth((preciseFindableDevice?.uwbLocation?.direction)!)
+        let azimuthCheck = uwbUtilManager.azimuth((preciseFindableDevice?.uwbLocation?.direction)!)
 
         // Check if azimuth check calcul is a number (ie: not infinite)
         if azimuthCheck.isNaN {
@@ -104,7 +99,7 @@ extension PreciseFinderViewContoller: NISessionDelegate {
         if NISession.deviceCapabilities.supportsDirectionMeasurement {
             azimuth =  Int( 90 * (Double(azimuthCheck)))
         } else {
-            azimuth = Int(rad2deg(Double(azimuthCheck)))
+            azimuth = Int(uwbUtilManager.rad2deg(Double(azimuthCheck)))
         }
 
         distanceLabel.text = String(format: "%.1f ft", convertMetersToFeet(meters: distance!))
@@ -121,7 +116,7 @@ extension PreciseFinderViewContoller: NISessionDelegate {
 
         // Retry the session only if the peer timed out.
         guard reason == .timeout else { return }
-        print("Session timed out")
+        logger.log("Session timed out")
 
         // The session runs with one accessory.
         guard let accessory = nearbyObjects.first else { return }
@@ -140,14 +135,14 @@ extension PreciseFinderViewContoller: NISessionDelegate {
     }
 
     func sessionWasSuspended(_ session: NISession) {
-        print("Session was suspended.")
+        logger.log("Session was suspended.")
         let msg = Data([MessageId.stop.rawValue])
 
         sendDataToAccessory(msg, deviceIDFromSession(session))
     }
 
     func sessionSuspensionEnded(_ session: NISession) {
-        print("Session suspension ended.")
+        logger.log("Session suspension ended.")
         // When suspension ends, restart the configuration procedure with the accessory.
         let msg = Data([MessageId.initialize.rawValue])
 
@@ -160,13 +155,13 @@ extension PreciseFinderViewContoller: NISessionDelegate {
         switch error {
         case NIError.invalidConfiguration:
             // Debug the accessory data to ensure an expected format.
-            print("The accessory configuration data is invalid. Please debug it and try again.")
+            logger.error("The accessory configuration data is invalid. Please debug it and try again.")
         case NIError.userDidNotAllow:
             handleUserDidNotAllow()
         case NIError.invalidConfiguration:
-            print("Check the ARConfiguration used to run the ARSession")
+            logger.log("Check the ARConfiguration used to run the ARSession")
         default:
-            print("invalidated: \(error)")
+            logger.log("invalidated: \(error)")
             handleSessionInvalidation(deviceID)
         }
     }

@@ -14,9 +14,9 @@ extension PreciseFinderViewContoller {
 
     internal func connectToAccessory(_ deviceID: Int) {
          do {
-             try DataCommunicationChannel.shared.connectPeripheral(deviceID)
+             try BLEDataCommunicationChannel.shared.connectPeripheral(deviceID)
          } catch {
-             print("Failed to connect to accessory: \(error)")
+             logger.error("Failed to connect to accessory: \(error)")
          }
     }
 
@@ -27,11 +27,10 @@ extension PreciseFinderViewContoller {
         var retries = 0
 
         func connectWithDelay() {
-            print("trying to connect")
             do {
-                try DataCommunicationChannel.shared.connectPeripheral(deviceID)
+                try BLEDataCommunicationChannel.shared.connectPeripheral(deviceID)
             } catch {
-                print("Failed to connect to accessory: \(error)")
+                logger.error("Failed to connect to accessory: \(error)")
                 retries += 1
                 // Retry after delay
                 if retries < maxRetries {
@@ -47,22 +46,22 @@ extension PreciseFinderViewContoller {
 
     internal func disconnectFromAccessory(_ deviceID: Int) {
          do {
-             try DataCommunicationChannel.shared.disconnectPeripheral(deviceID)
+             try BLEDataCommunicationChannel.shared.disconnectPeripheral(deviceID)
          } catch {
-             print("Failed to disconnect from accessory: \(error)")
+             logger.error("Failed to disconnect from accessory: \(error)")
          }
      }
 
     internal func sendDataToAccessory(_ data: Data, _ deviceID: Int) {
          do {
-             try DataCommunicationChannel.shared.sendData(data, deviceID)
+             try BLEDataCommunicationChannel.shared.sendData(data, deviceID)
          } catch {
-             print("Failed to send data to accessory: \(error)")
+             logger.error("Failed to send data to accessory: \(error)")
          }
      }
 
     internal func handleSessionInvalidation(_ deviceID: Int) {
-        print("Session invalidated. Restarting.")
+        logger.log("Session invalidated. Restarting.")
         // Ask the accessory to stop.
         sendDataToAccessory(Data([MessageId.stop.rawValue]), deviceID)
 
@@ -76,7 +75,7 @@ extension PreciseFinderViewContoller {
 
     internal func shouldRetry(_ deviceID: Int) -> Bool {
         // Need to use the dictionary here, to know which device failed and check its connection state
-        let preciseFindableDevice = DataCommunicationChannel.shared.getDeviceFromUniqueID(deviceID)
+        let preciseFindableDevice = BLEDataCommunicationChannel.shared.getDeviceFromUniqueID(deviceID)
 
         if preciseFindableDevice?.blePeripheralStatus != statusDiscovered {
             return true
@@ -103,7 +102,7 @@ extension PreciseFinderViewContoller {
 
     internal func handleUserDidNotAllow() {
         // Beginning in iOS 15, persistent access state in Settings.
-        print("Nearby Interactions access required. You can change access for NIAccessory in Settings.")
+        logger.error("Nearby Interactions access required. You can change access for NIAccessory in Settings.")
 
         // Create an alert to request the user go to Settings.
         let accessAlert = UIAlertController(title: "Access Required",

@@ -42,8 +42,11 @@ class PreciseFinderViewContoller: UIViewController {
     internal var accessoryConfig: NINearbyAccessoryConfiguration?
     internal var NIAlgorithmHasConverged = false
 
-    // Extras
-    let logger = os.Logger(subsystem: "com.chitlangesahas.FindMyCat", category: "PreciseViewContoller")
+    // MARK: - Util managers
+    let uwbUtilManager = UWBUtils()
+
+    // MARK: - Extras
+    let logger = Logger(subsystem: "ViewControllers", category: String(describing: PreciseFinderViewContoller.self))
 
     // MARK: - Initializers
 

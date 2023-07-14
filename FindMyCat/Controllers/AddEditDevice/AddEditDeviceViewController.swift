@@ -175,9 +175,7 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
         }
 
         TraccarAPIManager.shared.createDevice(name: deviceName, uniqueId: deviceUniqueId, emoji: emoji) {
-            response in
-
-            print(response)
+            _ in
         }
 
     }
@@ -216,8 +214,6 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
     }
 
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-           // Perform your action here
-           print("Done button pressed")
 
            // Dismiss the keyboard
 
