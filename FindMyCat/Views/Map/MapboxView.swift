@@ -107,7 +107,7 @@ class MapboxView: UIView, CLLocationManagerDelegate {
             // One position, camera is on the coordinate as center
             let newCoordinate = CLLocationCoordinate2D(latitude: position.latitude, longitude: position.longitude)
 
-            mapView.camera.ease(to: CameraOptions(center: newCoordinate, zoom: 14), duration: 0.3) { [weak self] _ in
+            mapView.camera.ease(to: CameraOptions(center: newCoordinate, zoom: 10), duration: 0.3) { [weak self] _ in
                 self?.mapView.viewAnnotations.removeAll()
                 self?.addAnnotations(positions: positions)
             }
@@ -143,7 +143,7 @@ class MapboxView: UIView, CLLocationManagerDelegate {
                 allowOverlap: false,
                 anchor: ViewAnnotationAnchor.bottom
             )
-            
+
             if let device = SharedData.getDevices().first(where: { $0.id == position.deviceId }) {
                 let frame = CGRect(x: 0, y: 0, width: 60, height: 60)
                 let pin = CustomAnnotationView(frame: frame)
