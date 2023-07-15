@@ -44,8 +44,6 @@ class ScannedDeviceView: UIView {
         addSubview(indexLabel)
         addSubview(numberLabel)
 
-        print(indexLabel)
-
         indexLabel.translatesAutoresizingMaskIntoConstraints = false
         indexLabel.tintColor = .black
 
