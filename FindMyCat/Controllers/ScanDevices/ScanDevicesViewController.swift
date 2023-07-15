@@ -76,19 +76,24 @@ class ScanDevicesViewController: UIViewController {
 
         for (index, scannedDevice) in BLEDataCommunicationChannel.shared.preciseFindableDevices.enumerated() {
 
-            let device = ScannedDeviceView(frame: CGRect(x: 0, y: 0, width: circleSize, height: circleSize))
+            if SharedData.getDevices().contains(where: {$0.uniqueId == String(scannedDevice!.bleUniqueID)}) {
+                // device already paired, no need to show in scanned devices.
 
-            if let bleUniqueID = scannedDevice?.bleUniqueID {
-                device.numberLabel.text = String(bleUniqueID)
-                device.tag = bleUniqueID
             } else {
-                device.numberLabel.text = "unknown"
+                let device = ScannedDeviceView(frame: CGRect(x: 0, y: 0, width: circleSize, height: circleSize))
+
+                if let bleUniqueID = scannedDevice?.bleUniqueID {
+                    device.numberLabel.text = String(bleUniqueID)
+                    device.tag = bleUniqueID
+                } else {
+                    device.numberLabel.text = "unknown"
+                }
+
+                let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap))
+                device.addGestureRecognizer(tapGesture)
+
+                circularLayout.addCircularView(device)
             }
-
-            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap))
-            device.addGestureRecognizer(tapGesture)
-
-            circularLayout.addCircularView(device)
         }
 
         sheetView.addSubview(circularLayout)
