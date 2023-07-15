@@ -17,6 +17,9 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
     var deviceNameTextField: CocoaTextField!
     var uniqueIdReadOnlyTextField: CocoaTextField!
 
+    private var isInEditingMode = false
+    private var deviceIdForEditing: Int!
+
     let submitButton = UIButton()
 
     // Variables for Keyboard view frame control
@@ -24,6 +27,7 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
     private var isKeyboardShowing = false
     private var keyboardHeight: CGFloat = 0.0
 
+    // MARK: - View Lifecycles
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -47,7 +51,30 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
 
     }
 
-    func addAvatarEmojiView() {
+    // MARK: - Public setters
+
+    public func setUniqueId(uniqueId: String) {
+        uniqueIdReadOnlyTextField.text = uniqueId
+    }
+
+    public func setEditingMode(shouldBeInEditingMode: Bool) {
+        isInEditingMode = shouldBeInEditingMode
+    }
+
+    public func setEmoji(emoji: String) {
+        avatarEmojiView.textField.text = emoji
+    }
+
+    public func setDeviceName(name: String) {
+        deviceNameTextField.text = name
+    }
+
+    public func setDeviceIdForEditing(id: Int) {
+        deviceIdForEditing = id
+    }
+
+    // MARK: - Sub views setup
+    private func addAvatarEmojiView() {
         avatarEmojiView = AvatarEmojiView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
         avatarEmojiView.translatesAutoresizingMaskIntoConstraints = false
         sheetView.addSubview(avatarEmojiView)
@@ -71,7 +98,7 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
         self.view.endEditing(true)
     }
 
-    func addScanningLabel() {
+    private func addScanningLabel() {
         sheetView.addSubview(scanningLabel)
 
         scanningLabel.text = "Add Device"
@@ -85,7 +112,7 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
         ])
     }
 
-    func addDeviceNameTextField() {
+    private func addDeviceNameTextField() {
         deviceNameTextField = CocoaTextField()
         deviceNameTextField.delegate = self
         deviceNameTextField.placeholder = "Device Name"
@@ -112,7 +139,7 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
     }
 
     // Todo: make it read only and able to copy the device id
-    func addUniqueIdReadOnlyTextField() {
+    private func addUniqueIdReadOnlyTextField() {
         uniqueIdReadOnlyTextField = CocoaTextField()
         uniqueIdReadOnlyTextField.delegate = self
         uniqueIdReadOnlyTextField.placeholder = "Unique Id"
@@ -137,11 +164,9 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
             uniqueIdReadOnlyTextField.topAnchor.constraint(equalTo: deviceNameTextField.bottomAnchor, constant: 20)
         ])
 
-        uniqueIdReadOnlyTextField.text = "123492"
-
     }
 
-    func addSubmitButton() {
+    private func addSubmitButton() {
 
         sheetView.addSubview(submitButton)
 
@@ -166,6 +191,7 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
         submitButton.addTarget(self, action: #selector(createOrEditDevice), for: .touchUpInside)
     }
 
+    // MARK: - action handlers
     @objc func createOrEditDevice() {
         guard let deviceName = deviceNameTextField.text,
               let deviceUniqueId = uniqueIdReadOnlyTextField.text,
@@ -174,11 +200,30 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
             return
         }
 
-        TraccarAPIManager.shared.createDevice(name: deviceName, uniqueId: deviceUniqueId, emoji: emoji) {
-            _ in
+        if isInEditingMode {
+            TraccarAPIManager.shared.updateDevice(name: deviceName, id: deviceIdForEditing, uniqueId: deviceUniqueId, emoji: emoji) {
+                response in
+                switch response {
+                case .success:
+                    self.dismiss(animated: true)
+                default:
+                    print("Could not update device")
+                }
+            }
+        } else {
+            TraccarAPIManager.shared.createDevice(name: deviceName, uniqueId: deviceUniqueId, emoji: emoji) {
+                response in
+                switch response {
+                case .success:
+                    self.dismiss(animated: true)
+                default:
+                    print("Could not create device")
+                }
+            }
         }
 
     }
+
     @objc private func keyboardWillChangeFrame(_ notification: Notification) {
         guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
 

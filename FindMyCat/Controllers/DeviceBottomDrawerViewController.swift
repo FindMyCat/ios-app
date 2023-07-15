@@ -367,7 +367,7 @@ class DeviceBottomDrawerController:
         logger.log("swipe on cell")
 
         let device = SharedData.getDevices()[indexPath.row]
-        let deleteAction = UIContextualAction(style: .destructive, title: "Remove Device") { _, _, completionHandler in
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { _, _, completionHandler in
             // Perform delete action for the cell at indexPath
             let alertController = UIAlertController(title: "Remove Device", message: Constants.RemoveDeviceConfirmationMessage, preferredStyle: .alert)
 
@@ -391,6 +391,17 @@ class DeviceBottomDrawerController:
 
         let editAction = UIContextualAction(style: .normal, title: "Edit") { _, _, completionHandler in
             // Perform edit action for the cell at indexPath
+
+            let vc = AddEditDeviceViewController()
+
+            self.parentVc.present(vc, animated: true)
+
+            vc.setDeviceName(name: device.name)
+            vc.setEmoji(emoji: (device.attributes?.emoji)!)
+            vc.setUniqueId(uniqueId: device.uniqueId)
+            vc.setEditingMode(shouldBeInEditingMode: true)
+            vc.setDeviceIdForEditing(id: device.id)
+
             completionHandler(true)
         }
         editAction.image = UIImage(systemName: "pencil")

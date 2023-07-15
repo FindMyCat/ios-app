@@ -348,7 +348,7 @@ extension BLEDataCommunicationChannel: CBCentralManagerDelegate {
         if let newPeripheral = preciseFindableDevices.last {
             let nameToPrint = newPeripheral?.blePeripheralName
             let id = newPeripheral?.bleUniqueID
-            logger.info("Peripheral \(nameToPrint ?? "Unknown") , included in preciseFindableDevices with unique ID")
+            logger.info("Peripheral \(nameToPrint ?? "Unknown") , included in preciseFindableDevices with unique ID \(String(describing: id))")
         }
 
         if let didDiscoverHandler = accessoryDiscoveryHandler {

@@ -92,10 +92,6 @@ class DismissableSheet: UIView {
             return
         }
 
-        let bottomConstraint = bottomAnchor.constraint(equalTo: superview.bottomAnchor, constant: frame.height)
-
-        bottomConstraint.isActive = true
-
         UIView.animate(withDuration: 0.3, animations: {
 
             self.transform = CGAffineTransform(translationX: 0, y: self.superview?.frame.height ?? 0)
