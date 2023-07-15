@@ -203,6 +203,10 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
                 response in
                 switch response {
                 case .success:
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        SharedData.shared.updateDataFromApi()
+                }
+
                     self.dismiss(animated: true)
                 default:
                     print("Could not update device")
@@ -213,6 +217,9 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
                 response in
                 switch response {
                 case .success:
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        SharedData.shared.updateDataFromApi()
+                    }
                     self.navigationController?.dismiss(animated: true)
                 default:
                     print("Could not create device")

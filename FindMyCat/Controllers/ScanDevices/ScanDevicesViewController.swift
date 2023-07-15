@@ -19,7 +19,6 @@ class ScanDevicesViewController: UIViewController {
     override func viewDidLoad() {
 
         super.viewDidLoad()
-//        navigationController?.pushViewController(AddEditDeviceViewController(), animated: false)
 
         addSheet()
 
@@ -74,7 +73,7 @@ class ScanDevicesViewController: UIViewController {
 
         let circleSize = CGFloat(100)
 
-        for (index, scannedDevice) in BLEDataCommunicationChannel.shared.preciseFindableDevices.enumerated() {
+        for (_, scannedDevice) in BLEDataCommunicationChannel.shared.preciseFindableDevices.enumerated() {
 
             if SharedData.getDevices().contains(where: {$0.uniqueId == String(scannedDevice!.bleUniqueID)}) {
                 // device already paired, no need to show in scanned devices.

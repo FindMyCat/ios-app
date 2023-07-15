@@ -50,7 +50,7 @@ class SharedData {
     public func updateDataFromApi() {
         fetchDevicesFromRestAPI {
             self.fetchPositionsFromRestAPI {
-                // update the data from API
+
             }
         }
     }

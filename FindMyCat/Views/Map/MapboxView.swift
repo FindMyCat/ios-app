@@ -111,6 +111,8 @@ class MapboxView: UIView, CLLocationManagerDelegate {
                 self?.mapView.viewAnnotations.removeAll()
                 self?.addAnnotations(positions: positions)
             }
+        } else {
+            mapView.viewAnnotations.removeAll()
         }
     }
 
@@ -141,16 +143,14 @@ class MapboxView: UIView, CLLocationManagerDelegate {
                 allowOverlap: false,
                 anchor: ViewAnnotationAnchor.bottom
             )
+            
+            if let device = SharedData.getDevices().first(where: { $0.id == position.deviceId }) {
+                let frame = CGRect(x: 0, y: 0, width: 60, height: 60)
+                let pin = CustomAnnotationView(frame: frame)
+                pin.setEmoji(emoji: (device.attributes?.emoji)!)
 
-            guard let device = SharedData.getDevices().first(where: { $0.id == position.deviceId }) else {
-                return
+                try? mapView.viewAnnotations.add(pin, options: options)
             }
-
-            let frame = CGRect(x: 0, y: 0, width: 60, height: 60)
-            let pin = CustomAnnotationView(frame: frame)
-            pin.setEmoji(emoji: (device.attributes?.emoji)!)
-
-            try? mapView.viewAnnotations.add(pin, options: options)
         }
     }
 
