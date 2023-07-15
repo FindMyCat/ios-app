@@ -243,7 +243,7 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
     private func adjustViewForKeyboard() {
         if isKeyboardShowing {
             // Move the view up by the keyboard height
-            view.frame.origin.y = -2 * keyboardHeight / 3
+            view.frame.origin.y = -1.8 * keyboardHeight / 3
         } else {
             // Reset the view position
             view.frame.origin.y = 0
