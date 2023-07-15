@@ -20,6 +20,7 @@
 		36392F1E2A5FA87100DE866C /* ScanDevicesNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36392F1D2A5FA87100DE866C /* ScanDevicesNavigationController.swift */; };
 		36392F202A5FADB400DE866C /* DismissableSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36392F1F2A5FADB400DE866C /* DismissableSheet.swift */; };
 		36392F2A2A60CEC300DE866C /* CocoaTextField in Frameworks */ = {isa = PBXBuildFile; productRef = 36392F292A60CEC300DE866C /* CocoaTextField */; };
+		36392F2C2A626A3A00DE866C /* ScannedDeviceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36392F2B2A626A3A00DE866C /* ScannedDeviceView.swift */; };
 		363EC8052A57E42E0059E1CA /* UWBMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363EC8042A57E42E0059E1CA /* UWBMessages.swift */; };
 		363EC8082A57E4CA0059E1CA /* UWBUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363EC8072A57E4CA0059E1CA /* UWBUtil.swift */; };
 		363EC80A2A57E6990059E1CA /* DistanceUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363EC8092A57E6990059E1CA /* DistanceUtil.swift */; };
@@ -66,6 +67,7 @@
 		36392F1B2A5FA1D500DE866C /* AvatarEmojiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarEmojiView.swift; sourceTree = "<group>"; };
 		36392F1D2A5FA87100DE866C /* ScanDevicesNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanDevicesNavigationController.swift; sourceTree = "<group>"; };
 		36392F1F2A5FADB400DE866C /* DismissableSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DismissableSheet.swift; sourceTree = "<group>"; };
+		36392F2B2A626A3A00DE866C /* ScannedDeviceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannedDeviceView.swift; sourceTree = "<group>"; };
 		363EC8042A57E42E0059E1CA /* UWBMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UWBMessages.swift; sourceTree = "<group>"; };
 		363EC8072A57E4CA0059E1CA /* UWBUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UWBUtil.swift; sourceTree = "<group>"; };
 		363EC8092A57E6990059E1CA /* DistanceUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceUtil.swift; sourceTree = "<group>"; };
@@ -148,6 +150,7 @@
 			children = (
 				36392F0F2A5DBD2F00DE866C /* ScanningAnimationView.swift */,
 				36392F112A5F0BF000DE866C /* CircularViewLayout.swift */,
+				36392F2B2A626A3A00DE866C /* ScannedDeviceView.swift */,
 			);
 			path = ScanDevices;
 			sourceTree = "<group>";
@@ -428,6 +431,7 @@
 				363EC80A2A57E6990059E1CA /* DistanceUtil.swift in Sources */,
 				36392F1E2A5FA87100DE866C /* ScanDevicesNavigationController.swift in Sources */,
 				362DC00D2A5934F10079ECDB /* NI_AR_SessionDelegates.swift in Sources */,
+				36392F2C2A626A3A00DE866C /* ScannedDeviceView.swift in Sources */,
 				365E538F2A49005800AD6AE8 /* WebsocketPayloadWrapper.swift in Sources */,
 				365E538B2A48EF5600AD6AE8 /* WebSocketManager.swift in Sources */,
 				362DC0092A5933440079ECDB /* DataCommunicationExtension.swift in Sources */,

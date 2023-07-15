@@ -13,9 +13,9 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
 
     let sheetView = DismissableSheet()
     let scanningLabel = UILabel()
-    var avatarEmojiView: AvatarEmojiView!
-    var deviceNameTextField: CocoaTextField!
-    var uniqueIdReadOnlyTextField: CocoaTextField!
+    var avatarEmojiView = AvatarEmojiView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+    var deviceNameTextField = CocoaTextField()
+    var uniqueIdReadOnlyTextField = CocoaTextField()
 
     private var isInEditingMode = false
     private var deviceIdForEditing: Int!
@@ -51,31 +51,31 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
 
     }
 
-    // MARK: - Public setters
-
-    public func setUniqueId(uniqueId: String) {
+    init(uniqueId: String, emoji: String?, name: String, id: Int) {
         uniqueIdReadOnlyTextField.text = uniqueId
+        avatarEmojiView.textField.text = emoji
+        deviceNameTextField.text = name
+        deviceIdForEditing = id
+        super.init(nibName: nil, bundle: nil)
     }
+
+    init(uniqueId: String) {
+        uniqueIdReadOnlyTextField.text = uniqueId
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    // MARK: - Public setters
 
     public func setEditingMode(shouldBeInEditingMode: Bool) {
         isInEditingMode = shouldBeInEditingMode
     }
 
-    public func setEmoji(emoji: String) {
-        avatarEmojiView.textField.text = emoji
-    }
-
-    public func setDeviceName(name: String) {
-        deviceNameTextField.text = name
-    }
-
-    public func setDeviceIdForEditing(id: Int) {
-        deviceIdForEditing = id
-    }
-
     // MARK: - Sub views setup
     private func addAvatarEmojiView() {
-        avatarEmojiView = AvatarEmojiView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
         avatarEmojiView.translatesAutoresizingMaskIntoConstraints = false
         sheetView.addSubview(avatarEmojiView)
 
@@ -113,7 +113,6 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
     }
 
     private func addDeviceNameTextField() {
-        deviceNameTextField = CocoaTextField()
         deviceNameTextField.delegate = self
         deviceNameTextField.placeholder = "Device Name"
         deviceNameTextField.inactiveHintColor = .systemGray3
@@ -140,7 +139,6 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
 
     // Todo: make it read only and able to copy the device id
     private func addUniqueIdReadOnlyTextField() {
-        uniqueIdReadOnlyTextField = CocoaTextField()
         uniqueIdReadOnlyTextField.delegate = self
         uniqueIdReadOnlyTextField.placeholder = "Unique Id"
         uniqueIdReadOnlyTextField.inactiveHintColor = .systemGray3
@@ -215,7 +213,7 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
                 response in
                 switch response {
                 case .success:
-                    self.dismiss(animated: true)
+                    self.navigationController?.dismiss(animated: true)
                 default:
                     print("Could not create device")
                 }

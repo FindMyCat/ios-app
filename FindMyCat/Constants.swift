@@ -12,6 +12,7 @@ struct Constants {
     // Notifications
     static let DevicesUpdatedNotificationName = "DevicesUpdated"
     static let PositionsUpdatedNotificationName = "PositionsUpdated"
+    static let PreciseFindableDevicesUpdatedNotificationName = "PreciseFindableDevicesUpdated"
 
     // Device Remote Status strings
     static let AddressUnavailable = "Address Unavailable"

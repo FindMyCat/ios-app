@@ -31,6 +31,7 @@ class DeviceBottomDrawerController:
 
     // Timer to refresh table cell data
     private var tableReloadTimer: Timer?
+    private var tableIndexToRemove: Int?
 
     let logger = Logger(subsystem: "ViewControllers", category: String(describing: DeviceBottomDrawerController.self))
 
@@ -95,15 +96,15 @@ class DeviceBottomDrawerController:
             if totalDevices > tableViewRows {
                 let rowsToAdd = totalDevices - tableViewRows
                 for index in 0..<rowsToAdd {
-                    let indexPath = IndexPath(row: index, section: 0)
-                    tableView.insertRows(at: [indexPath], with: .fade)
+                    let indexPath = IndexPath(row: index + (totalDevices - 1), section: 0)
+                    tableView.insertRows(at: [indexPath], with: .automatic)
                 }
             }
             if totalDevices < tableViewRows {
                 let rowsToRemove = tableViewRows - totalDevices
-                for index in 0..<rowsToRemove {
-                    let indexPath = IndexPath(row: index, section: 0)
-                    tableView.deleteRows(at: [indexPath], with: .fade)
+                for _ in 0..<rowsToRemove {
+                    let indexPath = IndexPath(row: tableIndexToRemove!, section: 0)
+                    tableView.deleteRows(at: [indexPath], with: .left)
                 }
             }
         }
@@ -373,6 +374,7 @@ class DeviceBottomDrawerController:
 
             let confirmAction = UIAlertAction(title: "OK", style: .default) { _ in
                 // Perform the action here after the user confirms
+                self.tableIndexToRemove = indexPath.row
                 TraccarAPIManager.shared.deleteDevice(id: device.id) {
                     _ in
                 }
@@ -392,15 +394,11 @@ class DeviceBottomDrawerController:
         let editAction = UIContextualAction(style: .normal, title: "Edit") { _, _, completionHandler in
             // Perform edit action for the cell at indexPath
 
-            let vc = AddEditDeviceViewController()
+            let vc = AddEditDeviceViewController(uniqueId: device.uniqueId, emoji: (device.attributes?.emoji)!, name: device.name, id: device.id)
 
             self.parentVc.present(vc, animated: true)
 
-            vc.setDeviceName(name: device.name)
-            vc.setEmoji(emoji: (device.attributes?.emoji)!)
-            vc.setUniqueId(uniqueId: device.uniqueId)
             vc.setEditingMode(shouldBeInEditingMode: true)
-            vc.setDeviceIdForEditing(id: device.id)
 
             completionHandler(true)
         }

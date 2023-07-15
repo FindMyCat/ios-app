@@ -14,11 +14,12 @@ class ScanDevicesViewController: UIViewController {
     let sheetView = DismissableSheet()
     let scanningLabel = UILabel()
     var scanningAnimationView: ScanningAnimationView!
+    var circularLayout: CircularViewLayout!
 
     override func viewDidLoad() {
 
         super.viewDidLoad()
-        navigationController?.pushViewController(AddEditDeviceViewController(), animated: false)
+//        navigationController?.pushViewController(AddEditDeviceViewController(), animated: false)
 
         addSheet()
 
@@ -28,6 +29,8 @@ class ScanDevicesViewController: UIViewController {
 
         addCircularView()
 
+        // Register for scanning devices notifications
+        NotificationCenter.default.addObserver(self, selector: #selector(updateView), name: Notification.Name(Constants.PreciseFindableDevicesUpdatedNotificationName), object: nil)
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -66,36 +69,54 @@ class ScanDevicesViewController: UIViewController {
     }
 
     func addCircularView() {
-        let circularLayout = CircularViewLayout(frame: CGRect(x: 0, y: 70, width: sheetView.bounds.width, height: sheetView.bounds.height - 70))
+        circularLayout = CircularViewLayout(frame: CGRect(x: 0, y: 70, width: sheetView.bounds.width, height: sheetView.bounds.height - 70))
         circularLayout.backgroundColor = .clear
 
-        let circleSize = CGFloat(80)
-        let view1 = UIView(frame: CGRect(x: 0, y: 0, width: circleSize, height: circleSize))
-        view1.translatesAutoresizingMaskIntoConstraints = false
-        view1.widthAnchor.constraint(equalToConstant: circleSize).isActive = true
-        view1.heightAnchor.constraint(equalToConstant: circleSize).isActive = true
-        view1.layer.cornerRadius = circleSize / 2.0
-        view1.backgroundColor = .red
+        let circleSize = CGFloat(100)
 
-        let view2 = UIView(frame: CGRect(x: 0, y: 0, width: circleSize, height: circleSize))
-        view2.translatesAutoresizingMaskIntoConstraints = false
-        view2.widthAnchor.constraint(equalToConstant: circleSize).isActive = true
-        view2.heightAnchor.constraint(equalToConstant: circleSize).isActive = true
-        view2.layer.cornerRadius = circleSize / 2.0
-        view2.backgroundColor = .green
+        for (index, scannedDevice) in BLEDataCommunicationChannel.shared.preciseFindableDevices.enumerated() {
 
-        let view3 = UIView(frame: CGRect(x: 0, y: 0, width: circleSize, height: circleSize))
-        view3.translatesAutoresizingMaskIntoConstraints = false
-        view3.widthAnchor.constraint(equalToConstant: circleSize).isActive = true
-        view3.heightAnchor.constraint(equalToConstant: circleSize).isActive = true
-        view3.layer.cornerRadius = circleSize / 2
-        view3.backgroundColor = .blue
+            let device = ScannedDeviceView(frame: CGRect(x: 0, y: 0, width: circleSize, height: circleSize))
 
-        circularLayout.addCircularView(view1)
-        circularLayout.addCircularView(view2)
-//        circularLayout.addCircularView(view3)
+            if let bleUniqueID = scannedDevice?.bleUniqueID {
+                device.numberLabel.text = String(bleUniqueID)
+                device.tag = bleUniqueID
+            } else {
+                device.numberLabel.text = "unknown"
+            }
+
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap))
+            device.addGestureRecognizer(tapGesture)
+
+            circularLayout.addCircularView(device)
+        }
 
         sheetView.addSubview(circularLayout)
+
+    }
+
+    @objc func handleTap(_ gesture: UITapGestureRecognizer) {
+        if let deviceView = gesture.view as? ScannedDeviceView {
+               let selectedDevice = deviceView.tag
+               scannedDeviceTapped(selectedDeviceId: selectedDevice)
+           }
+    }
+
+    func scannedDeviceTapped(selectedDeviceId: Int) {
+        let selectedDevice = BLEDataCommunicationChannel.shared.getDeviceFromUniqueID(selectedDeviceId)
+
+        guard let uniqueId = selectedDevice?.bleUniqueID else {
+            return
+        }
+        let vc = AddEditDeviceViewController(uniqueId: String(uniqueId))
+
+        navigationController?.pushViewController(vc, animated: true)
+    }
+
+    @objc func updateView() {
+        circularLayout.removeFromSuperview()
+        // Add the updated circular views based on the new array values
+        addCircularView()
     }
 
 }
