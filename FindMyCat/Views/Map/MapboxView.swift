@@ -142,9 +142,13 @@ class MapboxView: UIView, CLLocationManagerDelegate {
                 anchor: ViewAnnotationAnchor.bottom
             )
 
+            guard let device = SharedData.getDevices().first(where: { $0.id == position.deviceId }) else {
+                return
+            }
+
             let frame = CGRect(x: 0, y: 0, width: 60, height: 60)
             let pin = CustomAnnotationView(frame: frame)
-            pin.setIcon(systemName: "pawprint", color: .black)
+            pin.setEmoji(emoji: (device.attributes?.emoji)!)
 
             try? mapView.viewAnnotations.add(pin, options: options)
         }

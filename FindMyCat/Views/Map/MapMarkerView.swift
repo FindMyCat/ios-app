@@ -10,12 +10,7 @@ import Foundation
 
 class CustomAnnotationView: UIView {
 
-    private let iconImageView: UIImageView = {
-            let imageView = UIImageView()
-            imageView.contentMode = .scaleAspectFit
-            imageView.translatesAutoresizingMaskIntoConstraints = false
-            return imageView
-        }()
+    private let avatarEmojiLabel = UILabel()
 
     // MARK: - View Lifecycles
 
@@ -82,25 +77,20 @@ class CustomAnnotationView: UIView {
     }
 
     private func setupSubviews() {
-        addSubview(iconImageView)
-
-        NSLayoutConstraint.activate([
-              iconImageView.centerXAnchor.constraint(equalTo: centerXAnchor),
-              iconImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
-              iconImageView.widthAnchor.constraint(lessThanOrEqualTo: widthAnchor),
-              iconImageView.heightAnchor.constraint(lessThanOrEqualTo: heightAnchor),
-              iconImageView.widthAnchor.constraint(equalTo: iconImageView.heightAnchor, multiplier: 1.0)
-          ])
+        addSubview(avatarEmojiLabel)
      }
 
     // MARK: - Public methods
 
-    public func setIcon(systemName: String, color: UIColor = .black) {
-        let configuration = UIImage.SymbolConfiguration(pointSize: 20)
-        let iconImage = UIImage(systemName: systemName, withConfiguration: configuration)?
-            .withRenderingMode(.alwaysTemplate)
-        iconImageView.image = iconImage
-        iconImageView.tintColor = color
+    public func setEmoji(emoji: String) {
+        avatarEmojiLabel.text = emoji
+        avatarEmojiLabel.textAlignment = .center
+        avatarEmojiLabel.font = .systemFont(ofSize: 30)
+        avatarEmojiLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+              avatarEmojiLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
+              avatarEmojiLabel.centerYAnchor.constraint(equalTo: centerYAnchor)
+          ])
     }
 
 }
