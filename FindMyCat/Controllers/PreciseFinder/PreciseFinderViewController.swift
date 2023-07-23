@@ -28,6 +28,8 @@ class PreciseFinderViewContoller: UIViewController {
     private let soundButton = UIButton()
     private let circle = UIView()
 
+    internal let searchingLabel = UILabel()
+
     let viewLayerColor = UIColor.white
 
     // MARK: AR camera layer for blurring
@@ -87,6 +89,32 @@ class PreciseFinderViewContoller: UIViewController {
         setupControlButtons()
         setupDistanceLabel()
         setupCircleAroundArrow()
+        addSearchingLabel()
+    }
+
+    func addSearchingLabel() {
+        view.addSubview(searchingLabel)
+        searchingLabel.font = .boldSystemFont(ofSize: 20)
+        searchingLabel.text = "Searching..."
+        searchingLabel.textColor = viewLayerColor
+
+        searchingLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            searchingLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            searchingLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+
+        searchingLabel.alpha = 0.8
+
+        let timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(updateAlpha), userInfo: nil, repeats: true)
+        timer.fire()
+
+    }
+
+    @objc func updateAlpha() {
+        UIView.animate(withDuration: 0.5, animations: {
+                   self.searchingLabel.alpha = self.searchingLabel.alpha == 1.0 ? 0.3 : 1.0
+               })
     }
 
     func setupArrowImage() {
@@ -104,6 +132,7 @@ class PreciseFinderViewContoller: UIViewController {
             heightConstraint,
             widthConstraint
         ])
+        arrowImgView.isHidden = true
     }
 
     func setupCameraBlurLayer() {

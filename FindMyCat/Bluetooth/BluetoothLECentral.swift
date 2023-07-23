@@ -130,7 +130,7 @@ class BLEDataCommunicationChannel: NSObject {
                 let timeStamp = Int64((Date().timeIntervalSince1970 * 1000.0).rounded())
 
                 // Remove device if timestamp is bigger than 5000 msec
-                if timeStamp > (preciseFindableDevice!.bleTimestamp + 15000) {
+                if timeStamp > (preciseFindableDevice!.bleTimestamp + 5000) {
                     let deviceID = preciseFindableDevice?.bleUniqueID
 
                     logger.info("Device \(preciseFindableDevice?.blePeripheralName ?? "Unknown") timed-out removed at index \(index)")

@@ -26,4 +26,6 @@ enum MessageId: UInt8 {
     case setReserved = 0x21
 
     case iOSNotify = 0x2F
+
+    case playSound = 0x30
 }

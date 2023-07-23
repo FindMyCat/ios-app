@@ -61,7 +61,8 @@ extension PreciseFinderViewContoller: NISessionDelegate {
         if let updatedDevice = BLEDataCommunicationChannel.shared.getDeviceFromUniqueID(deviceID) {
             // set updated values
             updatedDevice.uwbLocation?.distance = distance
-
+            arrowImgView.isHidden = false
+            searchingLabel.isHidden = true
             if let direction = accessory.direction {
                 updatedDevice.uwbLocation?.direction = direction
                 updatedDevice.uwbLocation?.noUpdate  = false
@@ -129,7 +130,7 @@ extension PreciseFinderViewContoller: NISessionDelegate {
 
         // Consult helper function to decide whether or not to retry.
         if shouldRetry(deviceID) {
-            sendDataToAccessory(Data([MessageId.stop.rawValue]), deviceID)
+//            sendDataToAccessory(Data([MessageId.stop.rawValue]), deviceID)
             sendDataToAccessory(Data([MessageId.initialize.rawValue]), deviceID)
         }
     }

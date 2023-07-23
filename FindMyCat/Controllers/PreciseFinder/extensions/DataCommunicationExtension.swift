@@ -107,6 +107,8 @@ extension PreciseFinderViewContoller {
             logger.info("Set not implemented in this version")
         case .iOSNotify:
             logger.info("Notification not implemented in this version")
+        case .playSound:
+            logger.info("Accessory should not send 'playSound'")
         }
     }
 
