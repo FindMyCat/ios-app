@@ -61,9 +61,9 @@ extension PreciseFinderViewContoller: NISessionDelegate {
         if let updatedDevice = BLEDataCommunicationChannel.shared.getDeviceFromUniqueID(deviceID) {
             // set updated values
             updatedDevice.uwbLocation?.distance = distance
-            arrowImgView.isHidden = false
-            searchingLabel.isHidden = true
             if let direction = accessory.direction {
+                arrowImgView.isHidden = false
+                searchingLabel.isHidden = true
                 updatedDevice.uwbLocation?.direction = direction
                 updatedDevice.uwbLocation?.noUpdate  = false
             }
