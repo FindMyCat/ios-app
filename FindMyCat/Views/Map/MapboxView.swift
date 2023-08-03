@@ -12,6 +12,7 @@ import MapKit
 class MapboxView: UIView, CLLocationManagerDelegate {
     internal var mapView: MapView!
     private var locationManager: CLLocationManager!
+    private var isMapfirstLoad = true
 
     // fetch mapbox api key from info.plist
     private var apiKey: String {
@@ -99,18 +100,35 @@ class MapboxView: UIView, CLLocationManagerDelegate {
     public func updatePositions(positions: [Position]) {
         // If more than one positions, we calculate camera for the polygon
         if let newCamera = calculateCameraForPositions(positions: positions) {
-            mapView.camera.ease(to: newCamera, duration: 0.3) { [weak self] _ in
-                self?.mapView.viewAnnotations.removeAll()
-                self?.addAnnotations(positions: positions)
+
+            if isMapfirstLoad {
+                mapView.camera.ease(to: newCamera, duration: 0.3) { [weak self] _ in
+                    self?.mapView.viewAnnotations.removeAll()
+                    self?.addAnnotations(positions: positions)
+                }
+                isMapfirstLoad = false
+            } else {
+                mapView.viewAnnotations.removeAll()
+                addAnnotations(positions: positions)
             }
+
         } else if let position = positions.first {
             // One position, camera is on the coordinate as center
             let newCoordinate = CLLocationCoordinate2D(latitude: position.latitude, longitude: position.longitude)
 
-            mapView.camera.ease(to: CameraOptions(center: newCoordinate, zoom: 10), duration: 0.3) { [weak self] _ in
-                self?.mapView.viewAnnotations.removeAll()
-                self?.addAnnotations(positions: positions)
+            mapView.viewAnnotations.removeAll()
+            addAnnotations(positions: positions)
+            if isMapfirstLoad {
+                mapView.camera.ease(to: CameraOptions(center: newCoordinate, zoom: 10), duration: 0.3) { [weak self] _ in
+                    self?.mapView.viewAnnotations.removeAll()
+                    self?.addAnnotations(positions: positions)
+                }
+                isMapfirstLoad = false
+            } else {
+                mapView.viewAnnotations.removeAll()
+                addAnnotations(positions: positions)
             }
+
         } else {
             mapView.viewAnnotations.removeAll()
         }
