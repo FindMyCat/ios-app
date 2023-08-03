@@ -487,4 +487,33 @@ extension DeviceBottomDrawerController: DeviceCellDelegate {
 
         parentVc.present(vc, animated: true)
     }
+
+    func activateLostMode() {
+
+        guard selectedDeviceIndex != nil else {return}
+
+        let selectedDevice = SharedData.getDevices()[selectedDeviceIndex!]
+        let selectedDeviceUniqueBLEId = Int(selectedDevice.uniqueId)!
+
+        HologramAPIManager.shared.fetchDevice(name: String(selectedDeviceUniqueBLEId), orgId: 57606) {
+            result in
+
+            switch result {
+            case .success(let hologramDevice):
+                // Set devices in shared data so it's acceccible to all consuming classes.
+                print(hologramDevice.id)
+
+                // Send UDP message to device port for lost mode activation
+                HologramAPIManager.shared.sendCloudMessageToDevice(deviceId: hologramDevice.id, message: "activate") {
+                    result in
+
+                    debugPrint(result)
+                }
+
+            case .failure(let error):
+                self.logger.error("Could not fetch Hologram device info from REST endpoint \(error)")
+            }
+        }
+
+    }
 }

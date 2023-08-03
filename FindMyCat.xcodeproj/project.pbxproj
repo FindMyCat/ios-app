@@ -51,6 +51,8 @@
 		367763892A4E173F0096FF1F /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367763882A4E173F0096FF1F /* Constants.swift */; };
 		3677638B2A4E1EDA0096FF1F /* MapMarkerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3677638A2A4E1EDA0096FF1F /* MapMarkerView.swift */; };
 		3681E8862A54C1EE003392F9 /* FittedSheets in Frameworks */ = {isa = PBXBuildFile; productRef = 3681E8852A54C1EE003392F9 /* FittedSheets */; };
+		36BF8EB42A7C111F00141F5B /* HologramAPIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36BF8EB32A7C111F00141F5B /* HologramAPIManager.swift */; };
+		36BF8EB62A7C11D900141F5B /* HologramDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36BF8EB52A7C11D900141F5B /* HologramDevice.swift */; };
 		36CC30882A4E95A400E8FCCA /* DeviceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36CC30872A4E95A400E8FCCA /* DeviceTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
@@ -96,6 +98,8 @@
 		365E538E2A49005800AD6AE8 /* WebsocketPayloadWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsocketPayloadWrapper.swift; sourceTree = "<group>"; };
 		367763882A4E173F0096FF1F /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		3677638A2A4E1EDA0096FF1F /* MapMarkerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapMarkerView.swift; sourceTree = "<group>"; };
+		36BF8EB32A7C111F00141F5B /* HologramAPIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HologramAPIManager.swift; sourceTree = "<group>"; };
+		36BF8EB52A7C11D900141F5B /* HologramDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HologramDevice.swift; sourceTree = "<group>"; };
 		36CC30872A4E95A400E8FCCA /* DeviceTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceTableViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -245,6 +249,7 @@
 				365E53852A48EC9900AD6AE8 /* SharedData.swift */,
 				365E538C2A48FD3200AD6AE8 /* Positions.swift */,
 				365E538E2A49005800AD6AE8 /* WebsocketPayloadWrapper.swift */,
+				36BF8EB52A7C11D900141F5B /* HologramDevice.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -280,6 +285,7 @@
 				365E537C2A48AFD300AD6AE8 /* util */,
 				365E53772A48AF6300AD6AE8 /* TraccarAPIManager.swift */,
 				365E538A2A48EF5600AD6AE8 /* WebSocketManager.swift */,
+				36BF8EB32A7C111F00141F5B /* HologramAPIManager.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -418,8 +424,10 @@
 				365E53502A47648700AD6AE8 /* AppDelegate.swift in Sources */,
 				365E53742A478F6F00AD6AE8 /* Devices.swift in Sources */,
 				367763892A4E173F0096FF1F /* Constants.swift in Sources */,
+				36BF8EB62A7C11D900141F5B /* HologramDevice.swift in Sources */,
 				365E53522A47648700AD6AE8 /* SceneDelegate.swift in Sources */,
 				36392F0E2A5C7EE100DE866C /* DateTimeUtil.swift in Sources */,
+				36BF8EB42A7C111F00141F5B /* HologramAPIManager.swift in Sources */,
 				365E538D2A48FD3200AD6AE8 /* Positions.swift in Sources */,
 				3677638B2A4E1EDA0096FF1F /* MapMarkerView.swift in Sources */,
 				36392F102A5DBD2F00DE866C /* ScanningAnimationView.swift in Sources */,

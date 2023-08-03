@@ -25,6 +25,7 @@ class Button: UIButton {
 
 protocol DeviceCellDelegate: AnyObject {
     func launchPreciseFindScreen()
+    func activateLostMode()
 }
 
 class DeviceTableViewCell: UITableViewCell {
@@ -41,10 +42,12 @@ class DeviceTableViewCell: UITableViewCell {
     let expandedStateBatteryPercentage = UILabel()
     let findButton = Button()
     let soundButton = Button()
+    let lostModeButton = Button()
 
     // Colors
     let grayColor = CGColor(red: 44/255, green: 44/255, blue: 46/255, alpha: 1)
     let blueColor = UIColor(red: 10/255, green: 132/255, blue: 255/255, alpha: 1)
+    let redColor = UIColor(red: 255/255, green: 10/255, blue: 10/255, alpha: 1)
 
     // Constants
     let buttonSize = UIButton.Configuration.Size.large
@@ -78,6 +81,7 @@ class DeviceTableViewCell: UITableViewCell {
 //        configureBatteryPercentageLabel()
         configureFindButton()
         configurePlaySoundButton()
+        configureLostModeButton()
 
         configureLastSeenLabel()
 
@@ -244,6 +248,33 @@ class DeviceTableViewCell: UITableViewCell {
         delegate?.launchPreciseFindScreen()
     }
 
+    private func configureLostModeButton() {
+        lostModeButton.tintColor = redColor
+
+        lostModeButton.configuration = UIButton.Configuration.tinted()
+        lostModeButton.configuration?.cornerStyle = .medium
+
+        lostModeButton.layer.cornerRadius = 8.0
+        lostModeButton.configuration?.buttonSize = buttonSize
+
+        contentView.addSubview(lostModeButton)
+
+        lostModeButton.setTitle("Lost", for: .normal)
+        lostModeButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 200)
+
+        lostModeButton.translatesAutoresizingMaskIntoConstraints = false
+
+        lostModeButton.addTarget(self, action: #selector(self.activateLostMode), for: .touchUpInside)
+
+        NSLayoutConstraint.activate([
+            lostModeButton.leadingAnchor.constraint(equalTo: soundButton.trailingAnchor, constant: 16),
+            lostModeButton.bottomAnchor.constraint(equalTo: soundButton.bottomAnchor)
+        ])
+    }
+
+    @objc private func activateLostMode() {
+        delegate?.activateLostMode()
+    }
     // MARK: - Public Methods
 
     func setBatteryPercentage(percentage: Double) {
