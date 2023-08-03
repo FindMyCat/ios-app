@@ -119,7 +119,7 @@ class MapboxView: UIView, CLLocationManagerDelegate {
             mapView.viewAnnotations.removeAll()
             addAnnotations(positions: positions)
             if isMapfirstLoad {
-                mapView.camera.ease(to: CameraOptions(center: newCoordinate, zoom: 10), duration: 0.3) { [weak self] _ in
+                mapView.camera.ease(to: CameraOptions(center: newCoordinate, zoom: 14), duration: 0.5) { [weak self] _ in
                     self?.mapView.viewAnnotations.removeAll()
                     self?.addAnnotations(positions: positions)
                 }
@@ -142,16 +142,11 @@ class MapboxView: UIView, CLLocationManagerDelegate {
 
     // MARK: - Private Functions
     private func calculateCameraForPositions(positions: [Position]) -> CameraOptions? {
-        guard positions.count > 1 || locationManager.location?.coordinate != nil  else {
+        guard positions.count > 1 else {
             return nil
         }
 
         var coordinates = positions.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
-        let userLocation = locationManager.location?.coordinate
-
-        if userLocation != nil {
-            coordinates.append(userLocation!)
-        }
 
         let polygon = Geometry.polygon(Polygon([coordinates]))
         return mapView.mapboxMap.camera(for: polygon, padding: .init(top: 150, left: 100, bottom: 400, right: 100), bearing: 0, pitch: 0)
