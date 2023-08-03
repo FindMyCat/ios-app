@@ -31,6 +31,20 @@ class HologramAPIManager {
         }
       }
 
+    var orgId: Int {
+        get {
+
+          guard let filePath = Bundle.main.path(forResource: "Info", ofType: "plist") else {
+            fatalError("Couldn't find file 'Info.plist'.")
+          }
+
+          let plist = NSDictionary(contentsOfFile: filePath)
+          guard let value = plist?.object(forKey: "HologramOrgId") as? Int else {
+            fatalError("Couldn't find key 'HologramOrgId' in 'Info.plist'.")
+          }
+          return value
+        }
+    }
     private init() {
         CookieHandlerUtil.shared.restoreCookies()
         self.session = Session()
