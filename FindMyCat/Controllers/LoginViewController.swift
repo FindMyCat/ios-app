@@ -1,9 +1,10 @@
 import UIKit
 import Foundation
+import CocoaTextField
 
 class LoginViewController: UIViewController {
-    private var usernameTextField: UITextField!
-    private var passwordTextField: UITextField!
+    private var usernameTextField: CocoaTextField!
+    private var passwordTextField: CocoaTextField!
     private var loginButton: UIButton!
 
     override func viewDidLoad() {
@@ -13,26 +14,70 @@ class LoginViewController: UIViewController {
         view.backgroundColor = .white
 
         // Create and configure the username text field
-        usernameTextField = UITextField(frame: CGRect(x: 50, y: 100, width: 200, height: 30))
+        usernameTextField = CocoaTextField()
         usernameTextField.placeholder = "Username"
-        usernameTextField.borderStyle = .roundedRect
+        usernameTextField.inactiveHintColor = .systemGray3
+        usernameTextField.activeHintColor = .black
         usernameTextField.autocapitalizationType = .none
+        usernameTextField.focusedBackgroundColor = UIColor(red: 236/255, green: 239/255, blue: 239/255, alpha: 1)
+        usernameTextField.defaultBackgroundColor = UIColor(red: 250/255, green: 250/255, blue: 250/255, alpha: 1)
+        usernameTextField.borderColor = .black
+        usernameTextField.errorColor = UIColor(red: 231/255, green: 76/255, blue: 60/255, alpha: 0.7)
+        usernameTextField.borderWidth = 1
+        usernameTextField.cornerRadius = 11
         view.addSubview(usernameTextField)
 
+        usernameTextField.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            usernameTextField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            usernameTextField.widthAnchor.constraint(equalToConstant: 300),
+            usernameTextField.topAnchor.constraint(equalTo: view.topAnchor, constant: 80)
+
+        ])
+
         // Create and configure the password text field
-        passwordTextField = UITextField(frame: CGRect(x: 50, y: 150, width: 200, height: 30))
+        passwordTextField = CocoaTextField()
         passwordTextField.placeholder = "Password"
-        passwordTextField.borderStyle = .roundedRect
         passwordTextField.isSecureTextEntry = true
         passwordTextField.autocapitalizationType = .none
+        passwordTextField.inactiveHintColor = .systemGray3
+        passwordTextField.activeHintColor = .black
+        passwordTextField.autocapitalizationType = .none
+        passwordTextField.focusedBackgroundColor = UIColor(red: 236/255, green: 239/255, blue: 239/255, alpha: 1)
+        passwordTextField.defaultBackgroundColor = UIColor(red: 250/255, green: 250/255, blue: 250/255, alpha: 1)
+        passwordTextField.borderColor = .black
+        passwordTextField.errorColor = UIColor(red: 231/255, green: 76/255, blue: 60/255, alpha: 0.7)
+        passwordTextField.borderWidth = 1
+        passwordTextField.cornerRadius = 11
         view.addSubview(passwordTextField)
+
+        passwordTextField.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            passwordTextField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            passwordTextField.widthAnchor.constraint(equalToConstant: 300),
+            passwordTextField.topAnchor.constraint(equalTo: usernameTextField.bottomAnchor, constant: 30)
+
+        ])
 
         // Create and configure the login button
         loginButton = UIButton(type: .system)
-        loginButton.frame = CGRect(x: 50, y: 200, width: 200, height: 30)
+        var configuration = UIButton.Configuration.tinted()
+        configuration.cornerStyle = .large
+        configuration.buttonSize = .large
+
+        view.addSubview(loginButton)
+        loginButton.configuration = configuration
+
+        loginButton.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            loginButton.topAnchor.constraint(equalTo: passwordTextField.bottomAnchor, constant: 30),
+            loginButton.centerXAnchor.constraint(equalTo: passwordTextField.centerXAnchor)
+        ])
+
         loginButton.setTitle("Login", for: .normal)
         loginButton.addTarget(self, action: #selector(loginButtonTapped), for: .touchUpInside)
-        view.addSubview(loginButton)
+
     }
 
     @objc private func loginButtonTapped() {

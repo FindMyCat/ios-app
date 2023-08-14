@@ -18,6 +18,9 @@ class ViewController: UIViewController {
     }
 
     private func showMainOrLoginScreen() {
+
+        self.showLoginScreen()
+        return
         TraccarAPIManager.shared.getSession {
             response in
 
