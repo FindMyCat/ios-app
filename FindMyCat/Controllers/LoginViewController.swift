@@ -6,6 +6,7 @@ class LoginViewController: UIViewController {
     private var usernameTextField: CocoaTextField!
     private var passwordTextField: CocoaTextField!
     private var appIconImage: UIImageView!
+    private var loginTagLine: UILabel!
 
     private var loginButton: UIButton!
 
@@ -30,6 +31,19 @@ class LoginViewController: UIViewController {
             appIconImage.heightAnchor.constraint(equalToConstant: appIconImageSize)
         ])
 
+        loginTagLine = UILabel()
+
+        view.addSubview(loginTagLine)
+
+        loginTagLine.text = "👋 Welcome, Please login."
+        loginTagLine.font = .boldSystemFont(ofSize: 20)
+
+        loginTagLine.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            loginTagLine.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            loginTagLine.topAnchor.constraint(equalTo: appIconImage.bottomAnchor, constant: 40)
+        ])
         // Create and configure the username text field
         usernameTextField = CocoaTextField()
         usernameTextField.placeholder = "Username"
@@ -48,7 +62,7 @@ class LoginViewController: UIViewController {
         NSLayoutConstraint.activate([
             usernameTextField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             usernameTextField.widthAnchor.constraint(equalToConstant: 300),
-            usernameTextField.topAnchor.constraint(equalTo: appIconImage.bottomAnchor, constant: 80)
+            usernameTextField.topAnchor.constraint(equalTo: loginTagLine.bottomAnchor, constant: 40)
 
         ])
 
