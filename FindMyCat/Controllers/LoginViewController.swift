@@ -10,8 +10,16 @@ class LoginViewController: UIViewController {
 
     private var loginButton: UIButton!
 
+    // Variables for Keyboard view frame control
+    private var originalFrame: CGRect?
+    private var isKeyboardShowing = false
+    private var keyboardHeight: CGFloat = 0.0
+
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        // Register for keyboard notifications
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillChangeFrame(_:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
 
         // Configure the view
         view.backgroundColor = .white
@@ -141,5 +149,31 @@ class LoginViewController: UIViewController {
         let alert = UIAlertController(title: "Login Failed", message: "Invalid username or password", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
+    }
+
+    @objc private func keyboardWillChangeFrame(_ notification: Notification) {
+        guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+
+        if keyboardFrame.origin.y >= UIScreen.main.bounds.size.height {
+            // Keyboard is hidden
+            isKeyboardShowing = false
+            keyboardHeight = 0.0
+        } else {
+            // Keyboard is visible
+            isKeyboardShowing = true
+            keyboardHeight = keyboardFrame.size.height
+        }
+
+        adjustViewForKeyboard()
+    }
+
+    private func adjustViewForKeyboard() {
+        if isKeyboardShowing {
+            // Move the view up by the keyboard height
+            view.frame.origin.y = -1.8 * keyboardHeight / 3
+        } else {
+            // Reset the view position
+            view.frame.origin.y = 0
+        }
     }
 }
