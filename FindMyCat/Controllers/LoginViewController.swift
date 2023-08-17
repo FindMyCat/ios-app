@@ -5,6 +5,8 @@ import CocoaTextField
 class LoginViewController: UIViewController {
     private var usernameTextField: CocoaTextField!
     private var passwordTextField: CocoaTextField!
+    private var appIconImage: UIImageView!
+
     private var loginButton: UIButton!
 
     override func viewDidLoad() {
@@ -12,6 +14,21 @@ class LoginViewController: UIViewController {
 
         // Configure the view
         view.backgroundColor = .white
+
+        appIconImage = UIImageView()
+        appIconImage.image = UIImage(named: "AppIcon")
+
+        view.addSubview(appIconImage)
+
+        appIconImage.translatesAutoresizingMaskIntoConstraints = false
+
+        let appIconImageSize = CGFloat(150)
+        NSLayoutConstraint.activate([
+            appIconImage.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            appIconImage.topAnchor.constraint(equalTo: view.topAnchor, constant: 100),
+            appIconImage.widthAnchor.constraint(equalToConstant: appIconImageSize),
+            appIconImage.heightAnchor.constraint(equalToConstant: appIconImageSize)
+        ])
 
         // Create and configure the username text field
         usernameTextField = CocoaTextField()
@@ -31,7 +48,7 @@ class LoginViewController: UIViewController {
         NSLayoutConstraint.activate([
             usernameTextField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             usernameTextField.widthAnchor.constraint(equalToConstant: 300),
-            usernameTextField.topAnchor.constraint(equalTo: view.topAnchor, constant: 80)
+            usernameTextField.topAnchor.constraint(equalTo: appIconImage.bottomAnchor, constant: 80)
 
         ])
 

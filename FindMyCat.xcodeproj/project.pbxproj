@@ -599,11 +599,16 @@
 				DEVELOPMENT_TEAM = X5B22ZQ5A9;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FindMyCat/Info.plist;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Bluetooth is used to communicate with the tracker when it's nearby you.";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Bluetooth is used to communicate with the tracker when it's nearby you.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Camera is used for the Presice Find feature.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Needs location to show this iPhone's location relative to your lovely pet.";
+				INFOPLIST_KEY_NSNearbyInteractionAllowOnceUsageDescription = "Nearby Interaction is used for the Precise Find feature.";
+				INFOPLIST_KEY_NSNearbyInteractionUsageDescription = "Nearby Interaction is used for the Precise Find feature.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -630,11 +635,16 @@
 				DEVELOPMENT_TEAM = X5B22ZQ5A9;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FindMyCat/Info.plist;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Bluetooth is used to communicate with the tracker when it's nearby you.";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Bluetooth is used to communicate with the tracker when it's nearby you.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Camera is used for the Presice Find feature.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Needs location to show this iPhone's location relative to your lovely pet.";
+				INFOPLIST_KEY_NSNearbyInteractionAllowOnceUsageDescription = "Nearby Interaction is used for the Precise Find feature.";
+				INFOPLIST_KEY_NSNearbyInteractionUsageDescription = "Nearby Interaction is used for the Precise Find feature.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
