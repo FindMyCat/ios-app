@@ -54,7 +54,6 @@
 		36BF8EB42A7C111F00141F5B /* HologramAPIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36BF8EB32A7C111F00141F5B /* HologramAPIManager.swift */; };
 		36BF8EB62A7C11D900141F5B /* HologramDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36BF8EB52A7C11D900141F5B /* HologramDevice.swift */; };
 		36CC30882A4E95A400E8FCCA /* DeviceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36CC30872A4E95A400E8FCCA /* DeviceTableViewCell.swift */; };
-		36FF092D2A9955FB002D947C /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 36FF092C2A9955FB002D947C /* Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -381,7 +380,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				36FF092D2A9955FB002D947C /* Info.plist in Resources */,
 				365E535C2A47648900AD6AE8 /* LaunchScreen.storyboard in Resources */,
 				365E53592A47648900AD6AE8 /* Assets.xcassets in Resources */,
 				365E53572A47648700AD6AE8 /* Main.storyboard in Resources */,
@@ -601,12 +599,6 @@
 				DEVELOPMENT_TEAM = X5B22ZQ5A9;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FindMyCat/Info.plist;
-				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Bluetooth is used to communicate with the tracker when it's nearby you.";
-				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Bluetooth is used to communicate with the tracker when it's nearby you.";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Camera is used for the Presice Find feature.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Needs location to show this iPhone's location relative to your lovely pet.";
-				INFOPLIST_KEY_NSNearbyInteractionAllowOnceUsageDescription = "Nearby Interaction is used for the Precise Find feature.";
-				INFOPLIST_KEY_NSNearbyInteractionUsageDescription = "Nearby Interaction is used for the Precise Find feature.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -637,12 +629,6 @@
 				DEVELOPMENT_TEAM = X5B22ZQ5A9;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FindMyCat/Info.plist;
-				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Bluetooth is used to communicate with the tracker when it's nearby you.";
-				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Bluetooth is used to communicate with the tracker when it's nearby you.";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Camera is used for the Presice Find feature.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Needs location to show this iPhone's location relative to your lovely pet.";
-				INFOPLIST_KEY_NSNearbyInteractionAllowOnceUsageDescription = "Nearby Interaction is used for the Precise Find feature.";
-				INFOPLIST_KEY_NSNearbyInteractionUsageDescription = "Nearby Interaction is used for the Precise Find feature.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
