@@ -38,7 +38,6 @@
 		365E53692A476AE800AD6AE8 /* MapboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E53682A476AE800AD6AE8 /* MapboxView.swift */; };
 		365E536E2A476D3C00AD6AE8 /* DeviceBottomDrawerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E536D2A476D3C00AD6AE8 /* DeviceBottomDrawerViewController.swift */; };
 		365E53742A478F6F00AD6AE8 /* Devices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E53732A478F6F00AD6AE8 /* Devices.swift */; };
-		365E53782A48AF6300AD6AE8 /* TraccarAPIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E53772A48AF6300AD6AE8 /* TraccarAPIManager.swift */; };
 		365E537B2A48AFC700AD6AE8 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 365E537A2A48AFC700AD6AE8 /* Alamofire */; };
 		365E537E2A48AFDF00AD6AE8 /* CookieHandlerUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E537D2A48AFDF00AD6AE8 /* CookieHandlerUtil.swift */; };
 		365E53822A48B54A00AD6AE8 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E53812A48B54A00AD6AE8 /* LoginViewController.swift */; };
@@ -87,7 +86,6 @@
 		365E53682A476AE800AD6AE8 /* MapboxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapboxView.swift; sourceTree = "<group>"; };
 		365E536D2A476D3C00AD6AE8 /* DeviceBottomDrawerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceBottomDrawerViewController.swift; sourceTree = "<group>"; };
 		365E53732A478F6F00AD6AE8 /* Devices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Devices.swift; sourceTree = "<group>"; };
-		365E53772A48AF6300AD6AE8 /* TraccarAPIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraccarAPIManager.swift; sourceTree = "<group>"; };
 		365E537D2A48AFDF00AD6AE8 /* CookieHandlerUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieHandlerUtil.swift; sourceTree = "<group>"; };
 		365E53812A48B54A00AD6AE8 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		365E53832A48B73300AD6AE8 /* HomeScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreenViewController.swift; sourceTree = "<group>"; };
@@ -283,7 +281,6 @@
 			isa = PBXGroup;
 			children = (
 				365E537C2A48AFD300AD6AE8 /* util */,
-				365E53772A48AF6300AD6AE8 /* TraccarAPIManager.swift */,
 				365E538A2A48EF5600AD6AE8 /* WebSocketManager.swift */,
 				36BF8EB32A7C111F00141F5B /* HologramAPIManager.swift */,
 			);
@@ -449,7 +446,6 @@
 				36392F202A5FADB400DE866C /* DismissableSheet.swift in Sources */,
 				362DC0062A59291F0079ECDB /* PreciseFindableDevice.swift in Sources */,
 				36392F1C2A5FA1D500DE866C /* AvatarEmojiView.swift in Sources */,
-				365E53782A48AF6300AD6AE8 /* TraccarAPIManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
