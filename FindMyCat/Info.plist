@@ -1,67 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<!--
-   Info.plist
-   FindMyCat
-
-   Created by Sahas Chitlange on 8/25/23.
-   Copyright (c) 2023 ___ORGANIZATIONNAME___. All rights reserved.
--->
 <plist version="1.0">
 <dict>
-   <key>NSLocationWhenInUseUsageDescription</key>
-   <string>Needs location to show this iPhone&apos;s location relative to your lovely pet.</string>
-   <key>NSBluetoothAlwaysUsageDescription</key>
-   <string>Bluetooth is used to communicate with the tracker when it&apos;s nearby you.</string>
-   <key>NSBluetoothPeripheralUsageDescription</key>
-   <string>Bluetooth is used to communicate with the tracker when it&apos;s nearby you.</string>
-   <key>NSCameraUsageDescription</key>
-   <string>Camera is used for the Presice Find feature.</string>
-   <key>NSNearbyInteractionAllowOnceUsageDescription</key>
-   <string>Nearby Interaction is used for the Precise Find feature.</string>
-   <key>NSNearbyInteractionUsageDescription</key>
-   <string>Nearby Interaction is used for the Precise Find feature.</string>
-   <!-- Hologram Configuration -->
-   <key>HologramAPIKey</key>
-   <string>your-hologram-key</string>
-   <key>HologramOrgId</key>
-   <integer>9999</integer> 
-   <!-- Mapbox Config -->
-   <key>MBXAccessToken</key>
-   <string>your-mapbox-access-token</string>
-   <key>NSAppTransportSecurity</key>
-   <dict>
-      <key>NSExceptionDomains</key>
-      <dict>
-         <key>your-findmycat-cloud-hostname</key>
-         <dict>
-            <key>NSIncludesSubdomains</key>
-            <true/>
-            <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
-            <true/>
-            <key>NSTemporaryExceptionMinimumTLSVersion</key>
-            <string>TLSv1.1</string>
-         </dict>
-      </dict>
-   </dict>
-   <key>UIApplicationSceneManifest</key>
-   <dict>
-      <key>UIApplicationSupportsMultipleScenes</key>
-      <false/>
-      <key>UISceneConfigurations</key>
-      <dict>
-         <key>UIWindowSceneSessionRoleApplication</key>
-         <array>
-            <dict>
-               <key>UISceneConfigurationName</key>
-               <string>Default Configuration</string>
-               <key>UISceneDelegateClassName</key>
-               <string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
-               <key>UISceneStoryboardFile</key>
-               <string>Main</string>
-            </dict>
-         </array>
-      </dict>
-   </dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Needs location to show this iPhone&apos;s location relative to your lovely pet.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Bluetooth is used to communicate with the tracker when it&apos;s nearby you.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Bluetooth is used to communicate with the tracker when it&apos;s nearby you.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Camera is used for the Presice Find feature.</string>
+	<key>NSNearbyInteractionAllowOnceUsageDescription</key>
+	<string>Nearby Interaction is used for the Precise Find feature.</string>
+	<key>NSNearbyInteractionUsageDescription</key>
+	<string>Nearby Interaction is used for the Precise Find feature.</string>
+	<key>HologramAPIKey</key>
+	<string>your-hologram-key</string>
+	<key>HologramOrgId</key>
+	<integer>9999</integer>
+	<key>MBXAccessToken</key>
+	<string>your-mapbox-access-token</string>
+	<key>FindMyCat-Cloud-Hostname</key>
+	<string>your-findmycat-cloud-hostname</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>your-findmycat-cloud-hostname</key>
+			<dict>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSTemporaryExceptionMinimumTLSVersion</key>
+				<string>TLSv1.1</string>
+			</dict>
+		</dict>
+	</dict>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>UIWindowSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneConfigurationName</key>
+					<string>Default Configuration</string>
+					<key>UISceneDelegateClassName</key>
+					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
+					<key>UISceneStoryboardFile</key>
+					<string>Main</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
 </dict>
 </plist>
