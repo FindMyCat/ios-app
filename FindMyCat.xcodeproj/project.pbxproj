@@ -53,6 +53,7 @@
 		36BF8EB42A7C111F00141F5B /* HologramAPIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36BF8EB32A7C111F00141F5B /* HologramAPIManager.swift */; };
 		36BF8EB62A7C11D900141F5B /* HologramDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36BF8EB52A7C11D900141F5B /* HologramDevice.swift */; };
 		36CC30882A4E95A400E8FCCA /* DeviceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36CC30872A4E95A400E8FCCA /* DeviceTableViewCell.swift */; };
+		36FF092F2A995E13002D947C /* TraccarAPIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36FF092E2A995E13002D947C /* TraccarAPIManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -99,6 +100,7 @@
 		36BF8EB52A7C11D900141F5B /* HologramDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HologramDevice.swift; sourceTree = "<group>"; };
 		36CC30872A4E95A400E8FCCA /* DeviceTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceTableViewCell.swift; sourceTree = "<group>"; };
 		36FF092C2A9955FB002D947C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		36FF092E2A995E13002D947C /* TraccarAPIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraccarAPIManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -283,6 +285,7 @@
 				365E537C2A48AFD300AD6AE8 /* util */,
 				365E538A2A48EF5600AD6AE8 /* WebSocketManager.swift */,
 				36BF8EB32A7C111F00141F5B /* HologramAPIManager.swift */,
+				36FF092E2A995E13002D947C /* TraccarAPIManager.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -443,6 +446,7 @@
 				365E53822A48B54A00AD6AE8 /* LoginViewController.swift in Sources */,
 				365E53842A48B73300AD6AE8 /* HomeScreenViewController.swift in Sources */,
 				36392F1A2A5FA0E600DE866C /* AddEditDeviceViewController.swift in Sources */,
+				36FF092F2A995E13002D947C /* TraccarAPIManager.swift in Sources */,
 				36392F202A5FADB400DE866C /* DismissableSheet.swift in Sources */,
 				362DC0062A59291F0079ECDB /* PreciseFindableDevice.swift in Sources */,
 				36392F1C2A5FA1D500DE866C /* AvatarEmojiView.swift in Sources */,
