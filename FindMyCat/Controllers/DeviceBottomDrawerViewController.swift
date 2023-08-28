@@ -501,7 +501,7 @@ extension DeviceBottomDrawerController: DeviceCellDelegate {
             switch result {
             case .success(let hologramDevice):
                 // Send UDP message to device for lost mode activation
-                HologramAPIManager.shared.sendCloudMessageToDevice(deviceId: hologramDevice.id, message: "activate") {
+                HologramAPIManager.shared.sendCloudMessageToDevice(deviceId: hologramDevice.id, message: "lost") {
                     result in
 
                     debugPrint(result)
