@@ -25,7 +25,40 @@ class Button: UIButton {
 
 protocol DeviceCellDelegate: AnyObject {
     func launchPreciseFindScreen()
-    func activateLostMode()
+    func activateLostMode(currentMode: String)
+}
+
+class ButtonWithProgressBar: UIButton {
+
+    let progressBarLayer = CALayer()
+    private let borderThickness: CGFloat = 1.0
+
+    func setProgressBar(percent: Double) {
+
+        progressBarLayer.backgroundColor = UIColor.black.withAlphaComponent(0.1).cgColor
+        progressBarLayer.frame = CGRect(x: 0, y: 0, width: frame.width * CGFloat(percent), height: frame.height)
+
+        layer.addSublayer(progressBarLayer)
+
+        self.clipsToBounds = true
+
+        setNeedsLayout()
+        setNeedsDisplay()
+    }
+
+    let feedbackGenerator = UIImpactFeedbackGenerator(style: .medium)
+
+    override var isHighlighted: Bool {
+          didSet {
+              UIView.animate(withDuration: 0.15) {
+                  self.transform = self.isHighlighted ? CGAffineTransform(scaleX: 0.95, y: 0.95) : .identity
+                  self.alpha = self.isHighlighted ? 0.8 : 1.0
+              }
+              feedbackGenerator.prepare()
+
+              feedbackGenerator.impactOccurred(intensity: 1)
+          }
+      }
 }
 
 class DeviceTableViewCell: UITableViewCell {
@@ -42,7 +75,12 @@ class DeviceTableViewCell: UITableViewCell {
     let expandedStateBatteryPercentage = UILabel()
     let findButton = Button()
     let soundButton = Button()
-    let lostModeButton = Button()
+    let pingOrlostModeButton = ButtonWithProgressBar()
+    var currentMode: String = "ping" {
+        didSet {
+            updateUIForCurrentMode()
+        }
+    }
 
     // Colors
     let grayColor = CGColor(red: 44/255, green: 44/255, blue: 46/255, alpha: 1)
@@ -248,32 +286,47 @@ class DeviceTableViewCell: UITableViewCell {
         delegate?.launchPreciseFindScreen()
     }
 
+    func updateUIForCurrentMode() {
+        if currentMode == "ping" {
+            pingOrlostModeButton.tintColor = UIColor.systemOrange
+        } else {
+            // Red color for Lost Mode
+            pingOrlostModeButton.tintColor = redColor
+        }
+        pingOrlostModeButton.setTitle(currentMode.capitalized, for: .normal)
+    }
+
     private func configureLostModeButton() {
-        lostModeButton.tintColor = redColor
+        if currentMode == "ping" {
+            pingOrlostModeButton.tintColor = UIColor.systemOrange
+        } else {
+            // Red color for Lost Mode
+            pingOrlostModeButton.tintColor = redColor
+        }
 
-        lostModeButton.configuration = UIButton.Configuration.tinted()
-        lostModeButton.configuration?.cornerStyle = .medium
+        pingOrlostModeButton.configuration = UIButton.Configuration.tinted()
+        pingOrlostModeButton.configuration?.cornerStyle = .medium
 
-        lostModeButton.layer.cornerRadius = 8.0
-        lostModeButton.configuration?.buttonSize = buttonSize
+        pingOrlostModeButton.layer.cornerRadius = 8.0
+        pingOrlostModeButton.configuration?.buttonSize = buttonSize
 
-        contentView.addSubview(lostModeButton)
+        contentView.addSubview(pingOrlostModeButton)
 
-        lostModeButton.setTitle("Lost", for: .normal)
-        lostModeButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 200)
+        pingOrlostModeButton.setTitle(currentMode.capitalized, for: .normal)
+        pingOrlostModeButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 200)
 
-        lostModeButton.translatesAutoresizingMaskIntoConstraints = false
+        pingOrlostModeButton.translatesAutoresizingMaskIntoConstraints = false
 
-        lostModeButton.addTarget(self, action: #selector(self.activateLostMode), for: .touchUpInside)
+        pingOrlostModeButton.addTarget(self, action: #selector(self.activateLostMode), for: .touchUpInside)
 
         NSLayoutConstraint.activate([
-            lostModeButton.leadingAnchor.constraint(equalTo: soundButton.trailingAnchor, constant: 16),
-            lostModeButton.bottomAnchor.constraint(equalTo: soundButton.bottomAnchor)
+            pingOrlostModeButton.leadingAnchor.constraint(equalTo: soundButton.trailingAnchor, constant: 16),
+            pingOrlostModeButton.bottomAnchor.constraint(equalTo: soundButton.bottomAnchor)
         ])
     }
 
     @objc private func activateLostMode() {
-        delegate?.activateLostMode()
+        delegate?.activateLostMode(currentMode: currentMode)
     }
     // MARK: - Public Methods
 

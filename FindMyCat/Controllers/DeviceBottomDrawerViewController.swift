@@ -29,6 +29,41 @@ class DeviceBottomDrawerController:
 
     private var selectedDeviceIndex: Int?
 
+    var currentMode: String = "ping" {
+        didSet {
+            reloadTableDataCellByCell()
+        }
+    }
+
+    var selectedDeviceLocationFetchProgressBarTimer: Timer?
+    var selectedDeviceLocationFetchProgressBarPercent: CGFloat = 0
+
+    func updateProgressOnLocationFetchButtonTimer() {
+        selectedDeviceLocationFetchProgressBarTimer = Timer.scheduledTimer(timeInterval: 4.0, target: self, selector: #selector(updateselectedDeviceLocationFetchProgressBarPercent), userInfo: nil, repeats: true)
+    }
+
+    @objc func updateselectedDeviceLocationFetchProgressBarPercent() {
+        if selectedDeviceLocationFetchProgressBarPercent < 1.0 {
+            selectedDeviceLocationFetchProgressBarPercent += 0.04
+            reloadTableDataCellByCell()
+        } else {
+            selectedDeviceLocationFetchProgressBarPercent = 0
+            selectedDeviceLocationFetchProgressBarTimer?.invalidate()
+            reloadTableDataCellByCell()
+        }
+    }
+
+    @objc func longPressButtonAction(_ sender: UILongPressGestureRecognizer) {
+        if sender.state == .began {
+            // Long press has started
+            print("Long press started")
+            currentMode = currentMode == "ping" ? "lost" : "ping"
+        } else if sender.state == .ended {
+            // Long press has ended
+            print("Long press ended")
+        }
+    }
+
     // Timer to refresh table cell data
     private var tableReloadTimer: Timer?
     private var tableIndexToRemove: Int?
@@ -283,6 +318,12 @@ class DeviceBottomDrawerController:
         cell.lastSeenLabel.isHidden = true
         cell.deviceAddressLabel.isHidden = true
         cell.batteryIcon.isHidden = true
+        cell.pingOrlostModeButton.setProgressBar(percent: selectedDeviceLocationFetchProgressBarPercent)
+
+        let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(longPressButtonAction(_:)))
+        cell.pingOrlostModeButton.addGestureRecognizer(longPressRecognizer)
+
+        cell.currentMode = currentMode
 
         if let targetPosition = positions.first(where: { $0.deviceId == cellDevice.id }) {
             getAddressFromPosition(position: targetPosition) { [weak cell] address in
@@ -488,8 +529,9 @@ extension DeviceBottomDrawerController: DeviceCellDelegate {
         parentVc.present(vc, animated: true)
     }
 
-    func activateLostMode() {
+    func activateLostMode(currentMode: String) {
 
+        updateProgressOnLocationFetchButtonTimer()
         guard selectedDeviceIndex != nil else {return}
 
         let selectedDevice = SharedData.getDevices()[selectedDeviceIndex!]
@@ -501,7 +543,7 @@ extension DeviceBottomDrawerController: DeviceCellDelegate {
             switch result {
             case .success(let hologramDevice):
                 // Send UDP message to device for lost mode activation
-                HologramAPIManager.shared.sendCloudMessageToDevice(deviceId: hologramDevice.id, message: "lost") {
+                HologramAPIManager.shared.sendCloudMessageToDevice(deviceId: hologramDevice.id, message: currentMode) {
                     result in
 
                     debugPrint(result)
