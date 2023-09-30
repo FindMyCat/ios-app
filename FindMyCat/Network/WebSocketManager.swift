@@ -14,7 +14,19 @@ class WebSocketManager: WebSocketDelegate {
 
     let logger = Logger(subsystem: "Network", category: String(describing: WebSocketManager.self))
 
-    let urlString = "ws://ec2-18-191-185-127.us-east-2.compute.amazonaws.com:8082/api/socket"
+    private var host: String {
+        get {
+          guard let filePath = Bundle.main.path(forResource: "Info", ofType: "plist") else {
+            fatalError("Couldn't find file 'Info.plist'.")
+          }
+
+          let plist = NSDictionary(contentsOfFile: filePath)
+          guard let value = plist?.object(forKey: "FindMyCat-Cloud-Hostname") as? String else {
+            fatalError("Couldn't find key 'FindMyCat-Cloud-Hostname' in 'Info.plist'.")
+          }
+          return value
+        }
+      }
 
     private var socket: WebSocket?
     private var cancellables = Set<AnyCancellable>()
@@ -27,6 +39,7 @@ class WebSocketManager: WebSocketDelegate {
     }
 
     func connect() {
+        let urlString = "ws://\(host)/api/socket"
         let url = URL(string: urlString)!
         var request = URLRequest(url: url)
         request.timeoutInterval = 5

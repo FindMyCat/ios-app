@@ -28,7 +28,7 @@ class TraccarAPIManager {
     }
 
     func fetchDevices(completion: @escaping (Result<[Device], Error>) -> Void) {
-        let apiUrl = "http://\(host)/api/devices"
+        let apiUrl = "https://\(host)/api/devices"
         session.request(apiUrl).responseDecodable(of: [Device].self) { response in
             switch response.result {
             case .success(let devices):
@@ -40,7 +40,7 @@ class TraccarAPIManager {
     }
 
     func fetchPositions(completion: @escaping (Result<[Position], Error>) -> Void) {
-        let apiUrl = "http://\(host)/api/positions"
+        let apiUrl = "https://\(host)/api/positions"
         session.request(apiUrl).responseDecodable(of: [Position].self) { response in
             switch response.result {
             case .success(let positions):
@@ -57,7 +57,7 @@ class TraccarAPIManager {
     }
 
     func getSession(completion: @escaping (Result<Data?, Error>) -> Void) {
-        let url = "http://\(host)/api/session"
+        let url = "https://\(host)/api/session"
         let method = HTTPMethod.get
 
         session
@@ -74,8 +74,7 @@ class TraccarAPIManager {
     }
 
     func createDevice(name: String, uniqueId: String, emoji: String, completion: @escaping (Result<Data?, Error>) -> Void) {
-        // TODO: Use HTTPS when in production.
-        let url = "http://\(host)/api/devices"
+        let url = "https://\(host)/api/devices"
 
         let parameters = ["name": name, "uniqueId": uniqueId, "attributes": ["emoji": emoji]] as [String: Any]
 
@@ -101,8 +100,7 @@ class TraccarAPIManager {
     }
 
     func updateDevice(name: String, id: Int, uniqueId: String, emoji: String, completion: @escaping (Result<Data?, Error>) -> Void) {
-        // TODO: Use HTTPS when in production.
-        let url = "http://\(host)/api/devices/\(id)"
+        let url = "https://\(host)/api/devices/\(id)"
 
         let parameters = ["name": name, "id": id, "uniqueId": uniqueId, "attributes": ["emoji": emoji]] as [String: Any]
 
@@ -126,7 +124,7 @@ class TraccarAPIManager {
     }
 
     func deleteDevice(id: Int, completion: @escaping (Result<Data?, Error>) -> Void) {
-        let url = "http://\(host)/api/devices/\(id)"
+        let url = "https://\(host)/api/devices/\(id)"
 
         let method = HTTPMethod.delete
 
@@ -156,8 +154,7 @@ class TraccarAPIManager {
     }
 
     func createSession(username: String, password: String, completion: @escaping (Result<Data?, Error>) -> Void) {
-        // TODO: Use HTTPS when in production.
-        let url = "http://\(host)/api/session"
+        let url = "https://\(host)/api/session"
 
         let headers: HTTPHeaders = [
             .accept("application/json"),
