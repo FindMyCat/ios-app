@@ -39,7 +39,7 @@ class WebSocketManager: WebSocketDelegate {
     }
 
     func connect() {
-        let urlString = "ws://\(host)/api/socket"
+        let urlString = "wss://\(host)/api/socket"
         let url = URL(string: urlString)!
         var request = URLRequest(url: url)
         request.timeoutInterval = 5
