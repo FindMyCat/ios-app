@@ -2,26 +2,26 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Needs location to show this iPhone&apos;s location relative to your lovely pet.</string>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>Bluetooth is used to communicate with the tracker when it&apos;s nearby you.</string>
-	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>Bluetooth is used to communicate with the tracker when it&apos;s nearby you.</string>
-	<key>NSCameraUsageDescription</key>
-	<string>Camera is used for the Presice Find feature.</string>
-	<key>NSNearbyInteractionAllowOnceUsageDescription</key>
-	<string>Nearby Interaction is used for the Precise Find feature.</string>
-	<key>NSNearbyInteractionUsageDescription</key>
-	<string>Nearby Interaction is used for the Precise Find feature.</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Needs location to show this iPhone&apos;s location relative to your lovely pet.</string>
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>Bluetooth is used to communicate with the tracker when it&apos;s nearby you.</string>
+    <key>NSBluetoothPeripheralUsageDescription</key>
+    <string>Bluetooth is used to communicate with the tracker when it&apos;s nearby you.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>Camera is used for the Presice Find feature.</string>
+    <key>NSNearbyInteractionAllowOnceUsageDescription</key>
+    <string>Nearby Interaction is used for the Precise Find feature.</string>
+    <key>NSNearbyInteractionUsageDescription</key>
+    <string>Nearby Interaction is used for the Precise Find feature.</string>
+	<key>FindMyCat-Cloud-Hostname</key>
+	<string>your-findmycat-cloud-hostname</string>
 	<key>HologramAPIKey</key>
 	<string>your-hologram-key</string>
 	<key>HologramOrgId</key>
 	<integer>9999</integer>
 	<key>MBXAccessToken</key>
 	<string>your-mapbox-access-token</string>
-	<key>FindMyCat-Cloud-Hostname</key>
-	<string>your-findmycat-cloud-hostname</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>

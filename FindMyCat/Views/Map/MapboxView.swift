@@ -55,13 +55,11 @@ class MapboxView: UIView, CLLocationManagerDelegate {
     // MARK: - Setup
 
     private func setupMapView() {
-        let myResourceOptions = ResourceOptions(accessToken: apiKey)
-
         let userLocation = locationManager.location?.coordinate
         let screenSize: CGRect = UIScreen.main.bounds
         let myCameraOptions = CameraOptions(center: userLocation, padding: UIEdgeInsets(top: 0, left: 0, bottom: (screenSize.height * 30 / 100), right: 0), zoom: 15)
 
-        let myMapInitOptions = MapInitOptions(resourceOptions: myResourceOptions, cameraOptions: myCameraOptions)
+        let myMapInitOptions = MapInitOptions(cameraOptions: myCameraOptions)
         mapView = MapView(frame: bounds, mapInitOptions: myMapInitOptions)
         mapView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 
