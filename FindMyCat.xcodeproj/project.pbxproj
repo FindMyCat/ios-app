@@ -53,6 +53,7 @@
 		36BF8EB42A7C111F00141F5B /* HologramAPIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36BF8EB32A7C111F00141F5B /* HologramAPIManager.swift */; };
 		36BF8EB62A7C11D900141F5B /* HologramDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36BF8EB52A7C11D900141F5B /* HologramDevice.swift */; };
 		36CC30882A4E95A400E8FCCA /* DeviceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36CC30872A4E95A400E8FCCA /* DeviceTableViewCell.swift */; };
+		36FE12262E1072BE00133429 /* Readme.md in Resources */ = {isa = PBXBuildFile; fileRef = 36FE12252E1072B900133429 /* Readme.md */; };
 		36FF09312A995EB3002D947C /* TraccarAPIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36FF09302A995EB3002D947C /* TraccarAPIManager.swift */; };
 /* End PBXBuildFile section */
 
@@ -99,6 +100,7 @@
 		36BF8EB32A7C111F00141F5B /* HologramAPIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HologramAPIManager.swift; sourceTree = "<group>"; };
 		36BF8EB52A7C11D900141F5B /* HologramDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HologramDevice.swift; sourceTree = "<group>"; };
 		36CC30872A4E95A400E8FCCA /* DeviceTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceTableViewCell.swift; sourceTree = "<group>"; };
+		36FE12252E1072B900133429 /* Readme.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
 		36FF092C2A9955FB002D947C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		36FF09302A995EB3002D947C /* TraccarAPIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraccarAPIManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -223,6 +225,7 @@
 		365E534E2A47648700AD6AE8 /* FindMyCat */ = {
 			isa = PBXGroup;
 			children = (
+				36FE12252E1072B900133429 /* Readme.md */,
 				363EC8062A57E4BA0059E1CA /* Utils */,
 				36562C022A54DB4000D95C4C /* Bluetooth */,
 				365E53752A48AF4600AD6AE8 /* Network */,
@@ -382,6 +385,7 @@
 			files = (
 				365E535C2A47648900AD6AE8 /* LaunchScreen.storyboard in Resources */,
 				365E53592A47648900AD6AE8 /* Assets.xcassets in Resources */,
+				36FE12262E1072BE00133429 /* Readme.md in Resources */,
 				365E53572A47648700AD6AE8 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -594,11 +598,19 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = X5B22ZQ5A9;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FindMyCat/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FindMyCat;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Bluetooth is used to communicate with the tracker when it's nearby you.";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Bluetooth is used to communicate with the tracker when it's nearby you.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Camera is used for the Presice Find feature.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Needs location to show this iPhone's location relative to your lovely pet.";
+				INFOPLIST_KEY_NSNearbyInteractionAllowOnceUsageDescription = "Nearby Interaction is used for the Precise Find feature.";
+				INFOPLIST_KEY_NSNearbyInteractionUsageDescription = "Nearby Interaction is used for the Precise Find feature.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -610,6 +622,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = ChitlangeSahas.FindMyCat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -624,11 +637,19 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = X5B22ZQ5A9;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FindMyCat/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FindMyCat;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Bluetooth is used to communicate with the tracker when it's nearby you.";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Bluetooth is used to communicate with the tracker when it's nearby you.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Camera is used for the Presice Find feature.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Needs location to show this iPhone's location relative to your lovely pet.";
+				INFOPLIST_KEY_NSNearbyInteractionAllowOnceUsageDescription = "Nearby Interaction is used for the Precise Find feature.";
+				INFOPLIST_KEY_NSNearbyInteractionUsageDescription = "Nearby Interaction is used for the Precise Find feature.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -640,6 +661,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = ChitlangeSahas.FindMyCat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
