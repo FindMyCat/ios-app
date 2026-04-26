@@ -108,8 +108,8 @@ class PreciseFinderViewContoller: UIViewController {
         bleReadoutLabel.numberOfLines = 0
         bleReadoutLabel.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            bleReadoutLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            bleReadoutLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            bleReadoutLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
+            bleReadoutLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
             bleReadoutLabel.bottomAnchor.constraint(equalTo: distanceLabel.topAnchor, constant: -12)
         ])
     }
@@ -134,7 +134,7 @@ class PreciseFinderViewContoller: UIViewController {
                 arrowImgView.isHidden = true
             }
         } else {
-            bleReadoutLabel.text = "BLE: not in range"
+            bleReadoutLabel.text = "Not in range"
         }
     }
 
