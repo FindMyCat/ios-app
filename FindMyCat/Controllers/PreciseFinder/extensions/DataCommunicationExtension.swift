@@ -22,6 +22,10 @@ extension PreciseFinderViewContoller {
         BLEDataCommunicationChannel.shared.accessoryDisconnectedHandler = accessoryDisconnected
         BLEDataCommunicationChannel.shared.accessoryDataHandler = accessorySharedData
 
+        NotificationCenter.default.addObserver(self, selector: #selector(preciseFindableDevicesUpdated), name: Notification.Name(Constants.PreciseFindableDevicesUpdatedNotificationName), object: nil)
+
+        updateBLEReadout()
+
         logger.info("Connecting to Accessory")
         connectToAccessoryUntilSuccess(deviceUniqueBLEId, maxRetries: 10, retryDelay: 1)
     }
@@ -35,6 +39,14 @@ extension PreciseFinderViewContoller {
         BLEDataCommunicationChannel.shared.accessoryConnectedHandler = nil
         BLEDataCommunicationChannel.shared.accessoryDisconnectedHandler = nil
         BLEDataCommunicationChannel.shared.accessoryDataHandler = nil
+
+        NotificationCenter.default.removeObserver(self, name: Notification.Name(Constants.PreciseFindableDevicesUpdatedNotificationName), object: nil)
+    }
+
+    @objc private func preciseFindableDevicesUpdated() {
+        DispatchQueue.main.async {
+            self.updateBLEReadout()
+        }
     }
 
     // MARK: - Data channel event handlers
@@ -66,6 +78,13 @@ extension PreciseFinderViewContoller {
         referenceDict[deviceID]?.invalidate()
         // Remove the NI Session and Location values related to the device ID
         referenceDict.removeValue(forKey: deviceID)
+
+        if deviceID == deviceUniqueBLEId {
+            DispatchQueue.main.async {
+                self.isUWBDistanceAvailable = false
+                self.distanceLabel.text = nil
+            }
+        }
 
         accessoryUpdate()
     }

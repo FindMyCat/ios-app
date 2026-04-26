@@ -203,6 +203,10 @@ class BLEDataCommunicationChannel: NSObject {
         }
     }
 
+    func requestRSSI(_ uniqueID: Int) {
+        getDeviceFromUniqueID(uniqueID)?.blePeripheral.readRSSI()
+    }
+
     func sendData(_ data: Data, _ uniqueID: Int) throws {
         let str = String(format: "Sending Data to device %d", uniqueID)
         logger.info("\(str)")
@@ -337,8 +341,9 @@ extension BLEDataCommunicationChannel: CBCentralManagerDelegate {
         // Check if peripheral is already discovered
         if let preciseFindableDevice = getDeviceFromUniqueID(peripheral.hashValue) {
 
-            // if yes, update the timestamp
+            // if yes, update the timestamp and RSSI
             preciseFindableDevice.bleTimestamp = timeStamp
+            preciseFindableDevice.bleRSSI = RSSI.intValue
 
             return
         }
@@ -348,7 +353,8 @@ extension BLEDataCommunicationChannel: CBCentralManagerDelegate {
         preciseFindableDevices.append(PreciseFindableDevice(peripheral: peripheral,
                                         uniqueID: peripheral.hashValue,
                                         peripheralName: name ?? "Unknown",
-                                        timeStamp: timeStamp))
+                                        timeStamp: timeStamp,
+                                        rssi: RSSI.intValue))
 
         if let newPeripheral = preciseFindableDevices.last {
             let nameToPrint = newPeripheral?.blePeripheralName
@@ -412,6 +418,15 @@ extension BLEDataCommunicationChannel: CBCentralManagerDelegate {
 
 // An extention to implement `CBPeripheralDelegate` methods.
 extension BLEDataCommunicationChannel: CBPeripheralDelegate {
+
+    func peripheral(_ peripheral: CBPeripheral, didReadRSSI RSSI: NSNumber, error: Error?) {
+        guard error == nil else { return }
+        if let device = getDeviceFromUniqueID(peripheral.hashValue) {
+            device.bleRSSI = RSSI.intValue
+            let timeStamp = Int64((Date().timeIntervalSince1970 * 1000.0).rounded())
+            device.bleTimestamp = timeStamp
+        }
+    }
 
     // Reacts to peripheral services invalidation.
     func peripheral(_ peripheral: CBPeripheral, didModifyServices invalidatedServices: [CBService]) {

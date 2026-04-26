@@ -108,6 +108,8 @@ extension PreciseFinderViewContoller: NISessionDelegate {
             azimuth = Int(uwbUtilManager.rad2deg(Double(azimuthCheck)))
         }
 
+        isUWBDistanceAvailable = true
+        lastUWBDistanceTimestamp = Date()
         distanceLabel.text = String(format: "%.1f ft", convertMetersToFeet(meters: distance!))
 
         // Update  arrow
@@ -132,6 +134,14 @@ extension PreciseFinderViewContoller: NISessionDelegate {
 
         // Get the deviceID associated to the NISession
         let deviceID = deviceIDFromSession(session)
+
+        isUWBDistanceAvailable = false
+        lastUWBDistanceTimestamp = nil
+        DispatchQueue.main.async { self.distanceLabel.text = nil }
+
+        if let device = BLEDataCommunicationChannel.shared.getDeviceFromUniqueID(deviceID) {
+            device.blePeripheralStatus = statusConnected
+        }
 
         // Consult helper function to decide whether or not to retry.
         if shouldRetry(deviceID) {

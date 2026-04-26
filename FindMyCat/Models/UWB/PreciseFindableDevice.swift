@@ -27,15 +27,17 @@ class PreciseFindableDevice {
     var blePeripheralName: String            // Name to display
     var blePeripheralStatus: String?         // Status to display
     var bleTimestamp: Int64                  // Last time that the device adverstised
+    var bleRSSI: Int                         // Last known signal strength
     var uwbLocation: UWBLocation?
 
-    init(peripheral: CBPeripheral, uniqueID: Int, peripheralName: String, timeStamp: Int64 ) {
+    init(peripheral: CBPeripheral, uniqueID: Int, peripheralName: String, timeStamp: Int64, rssi: Int = 0) {
 
         self.blePeripheral = peripheral
         self.bleUniqueID = uniqueID
         self.blePeripheralName = peripheralName
         self.blePeripheralStatus = statusDiscovered
         self.bleTimestamp = timeStamp
+        self.bleRSSI = rssi
         self.uwbLocation = UWBLocation(distance: 0,
                                     direction: SIMD3<Float>(x: 0, y: 0, z: 0), elevation: NINearbyObject.VerticalDirectionEstimate.unknown.rawValue,
                                     noUpdate: false)

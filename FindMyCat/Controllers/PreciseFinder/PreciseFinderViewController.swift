@@ -29,6 +29,8 @@ class PreciseFinderViewContoller: UIViewController {
     private let circle = UIView()
 
     internal let searchingLabel = UILabel()
+    private let bleReadoutLabel = UILabel()
+    private var bleReadoutTimer: Timer?
 
     let viewLayerColor = UIColor.white
 
@@ -43,6 +45,8 @@ class PreciseFinderViewContoller: UIViewController {
     internal var accessoryDiscoveryTokenToNameMap = [NIDiscoveryToken: String]()
     internal var accessoryConfig: NINearbyAccessoryConfiguration?
     internal var NIAlgorithmHasConverged = false
+    internal var isUWBDistanceAvailable = false
+    internal var lastUWBDistanceTimestamp: Date?
 
     // MARK: - Util managers
     let uwbUtilManager = UWBUtils()
@@ -68,9 +72,13 @@ class PreciseFinderViewContoller: UIViewController {
         setupSubviews()
 
         configureDataChannel()
+
+        bleReadoutTimer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(refreshBLEReadout), userInfo: nil, repeats: true)
     }
 
     deinit {
+        bleReadoutTimer?.invalidate()
+
         // Remove the observer when the view controller is deallocated
         NotificationCenter.default.removeObserver(self,
                                                   name: UIApplication.willResignActiveNotification,
@@ -90,6 +98,44 @@ class PreciseFinderViewContoller: UIViewController {
         setupDistanceLabel()
         setupCircleAroundArrow()
         addSearchingLabel()
+        setupBLEReadout()
+    }
+
+    private func setupBLEReadout() {
+        view.addSubview(bleReadoutLabel)
+        bleReadoutLabel.font = .monospacedSystemFont(ofSize: 11, weight: .regular)
+        bleReadoutLabel.textColor = viewLayerColor.withAlphaComponent(0.6)
+        bleReadoutLabel.numberOfLines = 0
+        bleReadoutLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            bleReadoutLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            bleReadoutLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            bleReadoutLabel.bottomAnchor.constraint(equalTo: distanceLabel.topAnchor, constant: -12)
+        ])
+    }
+
+    @objc private func refreshBLEReadout() {
+        BLEDataCommunicationChannel.shared.requestRSSI(deviceUniqueBLEId)
+        if isUWBDistanceAvailable, let last = lastUWBDistanceTimestamp, Date().timeIntervalSince(last) > 2.0 {
+            isUWBDistanceAvailable = false
+            lastUWBDistanceTimestamp = nil
+        }
+        updateBLEReadout()
+    }
+
+    internal func updateBLEReadout() {
+        if let device = BLEDataCommunicationChannel.shared.getDeviceFromUniqueID(deviceUniqueBLEId) {
+            let now = Int64((Date().timeIntervalSince1970 * 1000.0).rounded())
+            let isStale = now - device.bleTimestamp > 3000
+            let rssiText = isStale ? "--" : "\(device.bleRSSI) dBm"
+            bleReadoutLabel.text = "\(rssiText)  [\(device.blePeripheralStatus ?? "?")]"
+            if !isUWBDistanceAvailable {
+                distanceLabel.text = "Far"
+                arrowImgView.isHidden = true
+            }
+        } else {
+            bleReadoutLabel.text = "BLE: not in range"
+        }
     }
 
     func addSearchingLabel() {
