@@ -213,6 +213,16 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
                 }
             }
         } else {
+            #if DEBUG
+            let bypassLogin = true
+            if bypassLogin {
+                let localDevice = Device(name: deviceName, id: 0, uniqueId: deviceUniqueId)
+                localDevice.attributes = Device.Attributes(emoji: emoji.isEmpty ? nil : emoji)
+                SharedData.addLocalDevice(localDevice)
+                self.navigationController?.dismiss(animated: true)
+                return
+            }
+            #endif
             TraccarAPIManager.shared.createDevice(name: deviceName, uniqueId: deviceUniqueId, emoji: emoji) {
                 response in
                 switch response {

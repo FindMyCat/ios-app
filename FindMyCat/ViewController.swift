@@ -18,6 +18,13 @@ class ViewController: UIViewController {
     }
 
     private func showMainOrLoginScreen() {
+        #if DEBUG
+        let bypassLogin = true
+        if bypassLogin {
+            showMainScreen()
+            return
+        }
+        #endif
 
         TraccarAPIManager.shared.getSession {
             response in

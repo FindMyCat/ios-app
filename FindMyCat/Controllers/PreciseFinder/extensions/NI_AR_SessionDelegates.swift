@@ -66,10 +66,9 @@ extension PreciseFinderViewContoller: NISessionDelegate {
                 searchingLabel.isHidden = true
                 updatedDevice.uwbLocation?.direction = direction
                 updatedDevice.uwbLocation?.noUpdate  = false
-            }
-            // TODO: For IPhone 14 only
-            else if NIAlgorithmHasConverged {
-                guard let horizontalAngle = accessory.horizontalAngle else {return}
+            } else if let horizontalAngle = accessory.horizontalAngle {
+                arrowImgView.isHidden = false
+                searchingLabel.isHidden = true
                 updatedDevice.uwbLocation?.direction = uwbUtilManager.getDirectionFromHorizontalAngle(rad: horizontalAngle)
                 updatedDevice.uwbLocation?.elevation = accessory.verticalDirectionEstimate.rawValue
                 updatedDevice.uwbLocation?.noUpdate  = false

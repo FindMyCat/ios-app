@@ -60,6 +60,10 @@ class SharedData {
         return self.devices
     }
 
+    public static func addLocalDevice(_ device: Device) {
+        devices.append(device)
+    }
+
     public static func getDevicesCount() -> Int {
         return self.devices.count
     }
