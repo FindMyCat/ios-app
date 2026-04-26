@@ -36,21 +36,27 @@ extension PreciseFinderViewContoller: NISessionDelegate {
 
     func session(_ session: NISession, didUpdateAlgorithmConvergence convergence: NIAlgorithmConvergence, for object: NINearbyObject?) {
         logger.log("Convergence Status: \(String(describing: convergence.status))")
-        // TODO: To Refactor delete to only know converged or not
-
-        guard let accessory = object else { return}
 
         switch convergence.status {
         case .converged:
-            logger.log("Converged")
             NIAlgorithmHasConverged = true
-        case .notConverged([NIAlgorithmConvergenceStatus.Reason.insufficientLighting]):
-            logger.log("More light required")
+            DispatchQueue.main.async {
+                self.searchingLabel.text = "Searching..."
+            }
+        case .notConverged(let reasons):
             NIAlgorithmHasConverged = false
-        default:
-            logger.log("Try moving in a different direction...")
+            DispatchQueue.main.async {
+                self.searchingLabel.text = self.convergenceHint(for: reasons)
+            }
+        @unknown default:
+            break
         }
+    }
 
+    private func convergenceHint(for reasons: [NIAlgorithmConvergenceStatus.Reason]) -> String {
+        if reasons.isEmpty { return "Searching..." }
+        if reasons.contains(.insufficientLighting) { return "Need more light" }
+        return "Move around"
     }
     func session(_ session: NISession, didUpdate nearbyObjects: [NINearbyObject]) {
         guard let accessory = nearbyObjects.first else { return }
