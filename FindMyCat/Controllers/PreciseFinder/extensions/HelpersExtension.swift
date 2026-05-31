@@ -27,14 +27,16 @@ extension PreciseFinderViewContoller {
         var retries = 0
 
         func connectWithDelay() {
+            if connectRetriesCancelled { return }
             do {
                 try BLEDataCommunicationChannel.shared.connectPeripheral(deviceID)
             } catch {
                 logger.error("Failed to connect to accessory: \(error)")
+                BLEDataCommunicationChannel.shared.resumeScanning()
                 retries += 1
-                // Retry after delay
                 if retries < maxRetries {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + retryDelay) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + retryDelay) { [weak self] in
+                        guard let self = self, !self.connectRetriesCancelled else { return }
                         connectWithDelay()
                     }
                 }

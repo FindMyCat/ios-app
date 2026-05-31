@@ -63,6 +63,8 @@ extension PreciseFinderViewContoller {
     }
 
     internal func accessoryConnected(deviceID: Int) {
+        BLEDataCommunicationChannel.shared.pauseScanning()
+
         // Create a NISession for the new device
         referenceDict[deviceID] = NISession()
         referenceDict[deviceID]?.delegate = self

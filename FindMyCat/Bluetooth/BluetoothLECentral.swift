@@ -215,7 +215,9 @@ class BLEDataCommunicationChannel: NSObject {
     }
 
     func requestRSSI(_ uniqueID: Int) {
-        getDeviceFromUniqueID(uniqueID)?.blePeripheral.readRSSI()
+        guard let peripheral = getDeviceFromUniqueID(uniqueID)?.blePeripheral,
+              peripheral.state == .connected else { return }
+        peripheral.readRSSI()
     }
 
     func sendData(_ data: Data, _ uniqueID: Int) throws {

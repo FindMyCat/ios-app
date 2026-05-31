@@ -47,6 +47,7 @@ class PreciseFinderViewContoller: UIViewController {
     internal var NIAlgorithmHasConverged = false
     internal var isUWBDistanceAvailable = false
     internal var lastUWBDistanceTimestamp: Date?
+    internal var connectRetriesCancelled = false
 
     internal let proximityHapticMedium = UIImpactFeedbackGenerator(style: .medium)
     internal let proximityHapticHeavy = UIImpactFeedbackGenerator(style: .heavy)
@@ -326,6 +327,7 @@ class PreciseFinderViewContoller: UIViewController {
     }
 
     @objc private func cancelButtonPressed() {
+        connectRetriesCancelled = true
         sendDataToAccessory(Data([MessageId.stop.rawValue]), deviceUniqueBLEId)
 
         for (_, session) in referenceDict {
