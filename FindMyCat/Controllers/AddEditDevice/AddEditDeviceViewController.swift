@@ -151,6 +151,8 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
         uniqueIdReadOnlyTextField.cornerRadius = 11
 
         uniqueIdReadOnlyTextField.returnKeyType = .done
+        uniqueIdReadOnlyTextField.isUserInteractionEnabled = false
+        uniqueIdReadOnlyTextField.textColor = .systemGray
 
         sheetView.addSubview(uniqueIdReadOnlyTextField)
 
