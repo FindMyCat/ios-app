@@ -171,6 +171,17 @@ class BLEDataCommunicationChannel: NSObject {
         centralManager.stopScan()
     }
 
+    func pauseScanning() {
+        centralManager.stopScan()
+        logger.info("Scanning paused for active NI session.")
+    }
+
+    func resumeScanning() {
+        if centralManager.state == .poweredOn {
+            startScan()
+        }
+    }
+
     func connectPeripheral(_ uniqueID: Int) throws {
 
         if let deviceToConnect = getDeviceFromUniqueID(uniqueID) {

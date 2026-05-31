@@ -73,6 +73,8 @@ class PreciseFinderViewContoller: UIViewController {
 
         configureDataChannel()
 
+        BLEDataCommunicationChannel.shared.pauseScanning()
+
         bleReadoutTimer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(refreshBLEReadout), userInfo: nil, repeats: true)
     }
 
@@ -86,6 +88,8 @@ class PreciseFinderViewContoller: UIViewController {
 
         // Pause the ARSession before it gets deallocated
         pauseARSession()
+
+        BLEDataCommunicationChannel.shared.resumeScanning()
     }
 
     // MARK: - Setup subviews
@@ -259,10 +263,16 @@ class PreciseFinderViewContoller: UIViewController {
         soundButton.tintColor = viewLayerColor
         soundButton.translatesAutoresizingMaskIntoConstraints = false
 
+        soundButton.addTarget(self, action: #selector(soundButtonPressed), for: .touchUpInside)
+
         NSLayoutConstraint.activate([
             soundButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -30),
             soundButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30)
         ])
+    }
+
+    @objc private func soundButtonPressed() {
+        sendDataToAccessory(Data([MessageId.playSound.rawValue]), deviceUniqueBLEId)
     }
 
     func setupDistanceLabel() {
@@ -307,7 +317,13 @@ class PreciseFinderViewContoller: UIViewController {
     }
 
     @objc private func cancelButtonPressed() {
-        // cleanup -- stop the data channel and disconnect from Device.
+        sendDataToAccessory(Data([MessageId.stop.rawValue]), deviceUniqueBLEId)
+
+        for (_, session) in referenceDict {
+            session.invalidate()
+        }
+        referenceDict.removeAll()
+
         deinitDataCommunicationChannel()
         disconnectFromAccessory(deviceUniqueBLEId)
         dismiss(animated: true, completion: nil)
