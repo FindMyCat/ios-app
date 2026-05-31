@@ -110,7 +110,22 @@ extension PreciseFinderViewContoller: NISessionDelegate {
 
         isUWBDistanceAvailable = true
         lastUWBDistanceTimestamp = Date()
-        distanceLabel.text = String(format: "%.1f ft", convertMetersToFeet(meters: distance!))
+        let distanceFt = convertMetersToFeet(meters: distance!)
+        distanceLabel.text = String(format: "%.1f ft", distanceFt)
+
+        if distanceFt < proximityHapticThresholdFt {
+            let clamped = max(proximityHapticFloorFt, min(distanceFt, proximityHapticThresholdFt))
+            let tLinear = TimeInterval((clamped - proximityHapticFloorFt) / (proximityHapticThresholdFt - proximityHapticFloorFt))
+            let tCurved = log(1 + 9 * tLinear) / log(10)
+            let interval = proximityHapticIntervalNear + (proximityHapticIntervalFar - proximityHapticIntervalNear) * tCurved
+            let now = Date()
+            if lastProximityHapticAt == nil || now.timeIntervalSince(lastProximityHapticAt!) >= interval {
+                let generator = distanceFt <= proximityHapticHeavyBelowFt ? proximityHapticHeavy : proximityHapticMedium
+                generator.impactOccurred()
+                generator.prepare()
+                lastProximityHapticAt = now
+            }
+        }
 
         // Update  arrow
         let radians: CGFloat = CGFloat(azimuth) * (.pi / 180)

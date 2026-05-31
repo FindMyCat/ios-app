@@ -48,6 +48,15 @@ class PreciseFinderViewContoller: UIViewController {
     internal var isUWBDistanceAvailable = false
     internal var lastUWBDistanceTimestamp: Date?
 
+    internal let proximityHapticMedium = UIImpactFeedbackGenerator(style: .medium)
+    internal let proximityHapticHeavy = UIImpactFeedbackGenerator(style: .heavy)
+    internal var lastProximityHapticAt: Date?
+    internal let proximityHapticThresholdFt: Float = 6.0
+    internal let proximityHapticHeavyBelowFt: Float = 3.0
+    internal let proximityHapticFloorFt: Float = 0.5
+    internal let proximityHapticIntervalFar: TimeInterval = 0.6
+    internal let proximityHapticIntervalNear: TimeInterval = 0.05
+
     // MARK: - Util managers
     let uwbUtilManager = UWBUtils()
 
