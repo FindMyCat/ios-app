@@ -30,6 +30,8 @@ class SharedData {
     private let webSocketManager = WebSocketManager()
     private var cancellables = Set<AnyCancellable>()
 
+    private static let localDevicesKey = "LocalDebugDevices"
+
     // MARK: Initialize function
     private init() {
         // Initialize WebSocket connection and handle incoming data updates
@@ -38,6 +40,7 @@ class SharedData {
 
         // Sequentially exeute API calls and finally register websockets.
         fetchDevicesFromRestAPI {
+            SharedData.mergeInPersistedLocalDevices()
             self.fetchPositionsFromRestAPI {
                 self.configureWebsocket {
                    // Fetched complete.
@@ -62,6 +65,26 @@ class SharedData {
 
     public static func addLocalDevice(_ device: Device) {
         devices.append(device)
+        persistLocalDevices()
+    }
+
+    private static func loadPersistedLocalDevices() -> [Device] {
+        guard let data = UserDefaults.standard.data(forKey: localDevicesKey) else { return [] }
+        return (try? JSONDecoder().decode([Device].self, from: data)) ?? []
+    }
+
+    private static func persistLocalDevices() {
+        let locals = devices.filter { $0.id == 0 }
+        if let data = try? JSONEncoder().encode(locals) {
+            UserDefaults.standard.set(data, forKey: localDevicesKey)
+        }
+    }
+
+    private static func mergeInPersistedLocalDevices() {
+        let locals = loadPersistedLocalDevices()
+        for local in locals where !devices.contains(where: { $0.uniqueId == local.uniqueId }) {
+            devices.append(local)
+        }
     }
 
     public static func getDevicesCount() -> Int {
