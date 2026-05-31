@@ -82,10 +82,11 @@ class ScanDevicesViewController: UIViewController {
                 let device = ScannedDeviceView(frame: CGRect(x: 0, y: 0, width: circleSize, height: circleSize))
 
                 if let bleUniqueID = scannedDevice?.bleUniqueID {
-                    device.numberLabel.text = String(bleUniqueID)
+                    let name = scannedDevice?.blePeripheralName ?? ""
+                    device.numberLabel.text = name.isEmpty ? "Unknown device" : name
                     device.tag = bleUniqueID
                 } else {
-                    device.numberLabel.text = "unknown"
+                    device.numberLabel.text = "Unknown device"
                 }
 
                 let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap))

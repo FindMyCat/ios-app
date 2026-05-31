@@ -119,7 +119,7 @@ class BLEDataCommunicationChannel: NSObject {
         logger.info("Scanning stopped.")
     }
 
-    // Clear peripherals in qorvoDevices[] if not responding for more than one second
+    // Clear peripherals in qorvoDevices[] if not responding for more than 10 seconds
     @objc func timerHandler() {
         var index = 0
 
@@ -129,8 +129,8 @@ class BLEDataCommunicationChannel: NSObject {
                 // Get current timestamp
                 let timeStamp = Int64((Date().timeIntervalSince1970 * 1000.0).rounded())
 
-                // Remove device if timestamp is bigger than 5000 msec
-                if timeStamp > (preciseFindableDevice!.bleTimestamp + 5000) {
+                // Remove device if timestamp is bigger than 10000 msec
+                if timeStamp > (preciseFindableDevice!.bleTimestamp + 10000) {
                     let deviceID = preciseFindableDevice?.bleUniqueID
 
                     logger.info("Device \(preciseFindableDevice?.blePeripheralName ?? "Unknown") timed-out removed at index \(index)")
@@ -349,6 +349,14 @@ extension BLEDataCommunicationChannel: CBCentralManagerDelegate {
 
         let timeStamp = Int64((Date().timeIntervalSince1970 * 1000.0).rounded())
 
+        guard let manuf = advertisementData[CBAdvertisementDataManufacturerDataKey] as? Data,
+              manuf.count >= Constants.FMCAdvManufPrefix.count,
+              Array(manuf.prefix(Constants.FMCAdvManufPrefix.count)) == Constants.FMCAdvManufPrefix else {
+            return
+        }
+
+        let advertisedName = (advertisementData[CBAdvertisementDataLocalNameKey] as? String) ?? peripheral.name
+
         // Check if peripheral is already discovered
         if let preciseFindableDevice = getDeviceFromUniqueID(peripheral.hashValue) {
 
@@ -356,14 +364,19 @@ extension BLEDataCommunicationChannel: CBCentralManagerDelegate {
             preciseFindableDevice.bleTimestamp = timeStamp
             preciseFindableDevice.bleRSSI = RSSI.intValue
 
+            // sticky-update name: once we see a real name, keep it; never overwrite with empty
+            if let newName = advertisedName, !newName.isEmpty,
+               preciseFindableDevice.blePeripheralName.isEmpty || preciseFindableDevice.blePeripheralName == "Unknown" {
+                preciseFindableDevice.blePeripheralName = newName
+            }
+
             return
         }
 
         // If not discovered, include peripheral to preciseFindableDevices
-        let name = advertisementData[CBAdvertisementDataLocalNameKey] as? String
         preciseFindableDevices.append(PreciseFindableDevice(peripheral: peripheral,
                                         uniqueID: peripheral.hashValue,
-                                        peripheralName: name ?? "Unknown",
+                                        peripheralName: advertisedName ?? "Unknown",
                                         timeStamp: timeStamp,
                                         rssi: RSSI.intValue))
 
