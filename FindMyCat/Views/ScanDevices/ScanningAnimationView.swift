@@ -15,6 +15,9 @@ class ScanningAnimationView: UIView {
     let strokeColor = UIColor.gray
 
     private var animationTimer: Timer?
+    private let hapticGenerator = UIImpactFeedbackGenerator(style: .heavy)
+    private let pulseDuration: CFTimeInterval = 0.7
+    private let hapticEveryNPulses = 2
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -49,6 +52,7 @@ class ScanningAnimationView: UIView {
     }
 
     func startAnimation() {
+
         let centerX = bounds.width / 2
         let centerY = (4 * bounds.height) / 5
         let spread = 100
@@ -84,10 +88,28 @@ class ScanningAnimationView: UIView {
         let animation = CAAnimationGroup()
         animation.animations = [scaleAnim, opacityAnim]
         animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
-        animation.duration = CFTimeInterval(1)
+        animation.duration = pulseDuration
 
         animation.repeatCount = .infinity
         rippleShape.add(animation, forKey: "rippleEffect")
+
+        hapticGenerator.prepare()
+        animationTimer?.invalidate()
+        self.hapticGenerator.impactOccurred()
+        self.hapticGenerator.prepare()
+        animationTimer = Timer.scheduledTimer(withTimeInterval: pulseDuration * Double(hapticEveryNPulses), repeats: true) { [weak self] _ in
+            self?.hapticGenerator.impactOccurred()
+            self?.hapticGenerator.prepare()
+        }
+    }
+
+    func stopAnimation() {
+        animationTimer?.invalidate()
+        animationTimer = nil
+    }
+
+    deinit {
+        animationTimer?.invalidate()
     }
 }
 

@@ -7,9 +7,9 @@
 
 import Foundation
 
-class Device: Decodable {
+class Device: Codable {
 
-    struct Attributes: Decodable {
+    struct Attributes: Codable {
         var emoji: String?
     }
 

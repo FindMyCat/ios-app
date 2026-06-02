@@ -20,4 +20,7 @@ struct Constants {
 
     // Confirmation Messages
     static let RemoveDeviceConfirmationMessage = "Are you sure you want to remove the device from your account?"
+
+    // BLE advertising filter (must match embedded fmc_adv_magic.h)
+    static let FMCAdvManufPrefix: [UInt8] = [0xFF, 0xFF, 0x46, 0x4D, 0x43]
 }

@@ -26,6 +26,7 @@ class Button: UIButton {
 protocol DeviceCellDelegate: AnyObject {
     func launchPreciseFindScreen()
     func activateLostMode(currentMode: String)
+    func playSound()
 }
 
 class ButtonWithProgressBar: UIButton {
@@ -247,10 +248,16 @@ class DeviceTableViewCell: UITableViewCell {
 
         soundButton.translatesAutoresizingMaskIntoConstraints = false
 
+        soundButton.addTarget(self, action: #selector(self.playSoundTapped), for: .touchUpInside)
+
         NSLayoutConstraint.activate([
             soundButton.leadingAnchor.constraint(equalTo: findButton.trailingAnchor, constant: 16),
             soundButton.bottomAnchor.constraint(equalTo: findButton.bottomAnchor)
         ])
+    }
+
+    @objc private func playSoundTapped() {
+        delegate?.playSound()
     }
 
     private func configureFindButton() {

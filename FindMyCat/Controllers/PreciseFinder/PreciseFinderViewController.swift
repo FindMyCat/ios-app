@@ -47,6 +47,16 @@ class PreciseFinderViewContoller: UIViewController {
     internal var NIAlgorithmHasConverged = false
     internal var isUWBDistanceAvailable = false
     internal var lastUWBDistanceTimestamp: Date?
+    internal var connectRetriesCancelled = false
+
+    internal let proximityHapticMedium = UIImpactFeedbackGenerator(style: .medium)
+    internal let proximityHapticHeavy = UIImpactFeedbackGenerator(style: .heavy)
+    internal var lastProximityHapticAt: Date?
+    internal let proximityHapticThresholdFt: Float = 6.0
+    internal let proximityHapticHeavyBelowFt: Float = 3.0
+    internal let proximityHapticFloorFt: Float = 0.5
+    internal let proximityHapticIntervalFar: TimeInterval = 0.6
+    internal let proximityHapticIntervalNear: TimeInterval = 0.05
 
     // MARK: - Util managers
     let uwbUtilManager = UWBUtils()
@@ -73,6 +83,8 @@ class PreciseFinderViewContoller: UIViewController {
 
         configureDataChannel()
 
+        BLEDataCommunicationChannel.shared.pauseScanning()
+
         bleReadoutTimer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(refreshBLEReadout), userInfo: nil, repeats: true)
     }
 
@@ -86,6 +98,8 @@ class PreciseFinderViewContoller: UIViewController {
 
         // Pause the ARSession before it gets deallocated
         pauseARSession()
+
+        BLEDataCommunicationChannel.shared.resumeScanning()
     }
 
     // MARK: - Setup subviews
@@ -259,10 +273,16 @@ class PreciseFinderViewContoller: UIViewController {
         soundButton.tintColor = viewLayerColor
         soundButton.translatesAutoresizingMaskIntoConstraints = false
 
+        soundButton.addTarget(self, action: #selector(soundButtonPressed), for: .touchUpInside)
+
         NSLayoutConstraint.activate([
             soundButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -30),
             soundButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30)
         ])
+    }
+
+    @objc private func soundButtonPressed() {
+        sendDataToAccessory(Data([MessageId.playSound.rawValue]), deviceUniqueBLEId)
     }
 
     func setupDistanceLabel() {
@@ -307,7 +327,14 @@ class PreciseFinderViewContoller: UIViewController {
     }
 
     @objc private func cancelButtonPressed() {
-        // cleanup -- stop the data channel and disconnect from Device.
+        connectRetriesCancelled = true
+        sendDataToAccessory(Data([MessageId.stop.rawValue]), deviceUniqueBLEId)
+
+        for (_, session) in referenceDict {
+            session.invalidate()
+        }
+        referenceDict.removeAll()
+
         deinitDataCommunicationChannel()
         disconnectFromAccessory(deviceUniqueBLEId)
         dismiss(animated: true, completion: nil)

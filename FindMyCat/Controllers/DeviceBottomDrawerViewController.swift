@@ -529,6 +529,17 @@ extension DeviceBottomDrawerController: DeviceCellDelegate {
         parentVc.present(vc, animated: true)
     }
 
+    func playSound() {
+        guard selectedDeviceIndex != nil else { return }
+        let selectedDevice = SharedData.getDevices()[selectedDeviceIndex!]
+        guard let selectedDeviceUniqueBLEId = Int(selectedDevice.uniqueId) else { return }
+        do {
+            try BLEDataCommunicationChannel.shared.sendData(Data([MessageId.playSound.rawValue]), selectedDeviceUniqueBLEId)
+        } catch {
+            logger.error("Failed to send playSound: \(error.localizedDescription)")
+        }
+    }
+
     func activateLostMode(currentMode: String) {
 
         updateProgressOnLocationFetchButtonTimer()
