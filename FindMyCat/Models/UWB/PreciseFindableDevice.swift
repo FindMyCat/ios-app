@@ -22,6 +22,7 @@ class PreciseFindableDevice {
     var blePeripheral: CBPeripheral         // BLE Peripheral instance
     var rxCharacteristic: CBCharacteristic? // Characteristics to be used when receiving data
     var txCharacteristic: CBCharacteristic? // Characteristics to be used when sending data
+    var configCharacteristic: CBCharacteristic? // Writes host/port config to the nRF9151 via the nRF52
 
     var bleUniqueID: Int
     var blePeripheralName: String            // Name to display

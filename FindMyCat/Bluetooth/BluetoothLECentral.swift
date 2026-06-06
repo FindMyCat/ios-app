@@ -67,6 +67,7 @@ struct QorvoNIService {
     static let scCharacteristicUUID = CBUUID(string: "2E93941C-6A61-11ED-A1EB-0242AC120002")
     static let rxCharacteristicUUID = CBUUID(string: "2E93998A-6A61-11ED-A1EB-0242AC120002")
     static let txCharacteristicUUID = CBUUID(string: "2E939AF2-6A61-11ED-A1EB-0242AC120002")
+    static let configCharacteristicUUID = CBUUID(string: "2E939B00-6A61-11ED-A1EB-0242AC120002")
 }
 
 enum BluetoothLECentralError: Error {
@@ -198,6 +199,17 @@ class BLEDataCommunicationChannel: NSObject {
         }
     }
 
+    /// Idempotent connect: initiates a connection only if the device is known and
+    /// currently disconnected. Safe to call repeatedly (e.g. from a retry timer)
+    /// while waiting for the tag to be discovered.
+    func ensureConnected(_ uniqueID: Int) {
+        guard let device = getDeviceFromUniqueID(uniqueID) else { return }
+        if device.blePeripheral.state == .disconnected {
+            device.blePeripheralStatus = statusConnected
+            centralManager.connect(device.blePeripheral, options: nil)
+        }
+    }
+
     func disconnectPeripheral(_ uniqueID: Int) throws {
 
         if let deviceToDisconnect = getDeviceFromUniqueID(uniqueID) {
@@ -229,6 +241,33 @@ class BLEDataCommunicationChannel: NSObject {
         } else {
             throw BluetoothLECentralError.noPeripheral
         }
+    }
+
+    /// Push host/port config to the tag's nRF9151 (via the nRF52 config characteristic).
+    /// Payload: [port_lo][port_hi][host UTF-8].
+    func sendConfig(host: String, port: UInt16, _ uniqueID: Int) throws {
+        let device = getDeviceFromUniqueID(uniqueID)
+
+        guard let peripheral = device?.blePeripheral else {
+            logger.error("sendConfig: no peripheral for \(uniqueID)")
+            throw BluetoothLECentralError.noPeripheral
+        }
+        guard peripheral.state == .connected else {
+            logger.error("sendConfig: device \(uniqueID) not connected (state \(peripheral.state.rawValue)) - connect to the tag first")
+            throw BluetoothLECentralError.noPeripheral
+        }
+        guard let configCharacteristic = device?.configCharacteristic else {
+            logger.error("sendConfig: config characteristic not discovered for \(uniqueID)")
+            throw BluetoothLECentralError.noPeripheral
+        }
+
+        var payload = Data()
+        payload.append(UInt8(port & 0xFF))
+        payload.append(UInt8((port >> 8) & 0xFF))
+        payload.append(contentsOf: Array(host.utf8))
+
+        logger.info("sendConfig: writing \(payload.count) bytes to \(uniqueID): host=\(host) port=\(port)")
+        peripheral.writeValue(payload, for: configCharacteristic, type: .withResponse)
     }
 
     // MARK: - Helper Methods.
@@ -481,7 +520,8 @@ extension BLEDataCommunicationChannel: CBPeripheralDelegate {
             peripheral.discoverCharacteristics([TransferService.rxCharacteristicUUID,
                                                 TransferService.txCharacteristicUUID,
                                                 QorvoNIService.rxCharacteristicUUID,
-                                                QorvoNIService.txCharacteristicUUID], for: service)
+                                                QorvoNIService.txCharacteristicUUID,
+                                                QorvoNIService.configCharacteristicUUID], for: service)
         }
     }
 
@@ -527,6 +567,14 @@ extension BLEDataCommunicationChannel: CBPeripheralDelegate {
             peripheral.setNotifyValue(true, for: characteristic)
         }
 
+        // Assign Config Characteristic (host/port -> nRF9151) to the device structure
+        for characteristic in serviceCharacteristics where characteristic.uuid == QorvoNIService.configCharacteristicUUID {
+            preciseFindableDevice?.configCharacteristic = characteristic
+            logger.info("discovered config characteristic: \(characteristic)")
+            // Read the current config so the edit screen can prefill host/port.
+            peripheral.readValue(for: characteristic)
+        }
+
         // Wait for the peripheral to send data.
         if let didConnectHandler = accessoryConnectedHandler {
             didConnectHandler(peripheral.hashValue)
@@ -543,6 +591,22 @@ extension BLEDataCommunicationChannel: CBPeripheralDelegate {
             return
         }
         guard let characteristicData = characteristic.value else { return }
+
+        // Config read-back: [port_lo][port_hi][host UTF-8]. Routed to the edit screen.
+        if characteristic.uuid == QorvoNIService.configCharacteristicUUID {
+            var port: UInt16 = 0
+            var host = ""
+            if characteristicData.count >= 2 {
+                port = UInt16(characteristicData[0]) | (UInt16(characteristicData[1]) << 8)
+                if characteristicData.count > 2 {
+                    host = String(decoding: characteristicData[2...], as: UTF8.self)
+                }
+            }
+            logger.info("Read config: host=\(host) port=\(port)")
+            NotificationCenter.default.post(name: Notification.Name(Constants.ConfigReadNotificationName),
+                                            object: nil, userInfo: ["host": host, "port": port])
+            return
+        }
 
         let str = characteristicData.map { String(format: "0x%02x, ", $0) }.joined()
         logger.info("Received \(characteristicData.count) bytes: \(str)")
