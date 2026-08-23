@@ -353,9 +353,12 @@ class DeviceBottomDrawerController:
                     }
 
                     // Set the battery percentage
-                    cell.setBatteryPercentage(percentage: targetPosition.attributes.batteryLevel)
-
-                    cell.batteryIcon.isHidden = false
+                    if let batteryLevel = targetPosition.attributes?.batteryLevel {
+                        cell.setBatteryPercentage(percentage: batteryLevel)
+                        cell.batteryIcon.isHidden = false
+                    } else {
+                        cell.batteryIcon.isHidden = true
+                    }
 
                 }
             }
@@ -393,6 +396,11 @@ class DeviceBottomDrawerController:
 
         tableView.endUpdates()
 
+        var userInfo: [String: Any] = [:]
+        if let selectedDeviceIndex = selectedDeviceIndex {
+            userInfo["deviceId"] = SharedData.getDevices()[selectedDeviceIndex].id
+        }
+        NotificationCenter.default.post(name: Notification.Name(Constants.DeviceSelectedNotificationName), object: nil, userInfo: userInfo)
     }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

@@ -30,10 +30,14 @@ class TraccarAPIManager {
     func fetchDevices(completion: @escaping (Result<[Device], Error>) -> Void) {
         let apiUrl = "https://\(host)/api/devices"
         session.request(apiUrl).responseDecodable(of: [Device].self) { response in
+            let status = response.response?.statusCode ?? -1
+            let body = response.data.flatMap { String(data: $0, encoding: .utf8) } ?? "<no body>"
+            self.logger.log("GET /api/devices status \(status) body: \(body.prefix(500))")
             switch response.result {
             case .success(let devices):
                 completion(.success(devices))
             case .failure(let error):
+                self.logger.error("GET /api/devices failed: \(error)")
                 completion(.failure(error))
             }
         }
@@ -42,10 +46,14 @@ class TraccarAPIManager {
     func fetchPositions(completion: @escaping (Result<[Position], Error>) -> Void) {
         let apiUrl = "https://\(host)/api/positions"
         session.request(apiUrl).responseDecodable(of: [Position].self) { response in
+            let status = response.response?.statusCode ?? -1
+            let body = response.data.flatMap { String(data: $0, encoding: .utf8) } ?? "<no body>"
+            self.logger.log("GET /api/positions status \(status) body: \(body.prefix(1000))")
             switch response.result {
             case .success(let positions):
                 completion(.success(positions))
             case .failure(let error):
+                self.logger.error("GET /api/positions failed: \(error)")
                 completion(.failure(error))
             }
         }

@@ -71,6 +71,7 @@ class MapboxView: UIView, CLLocationManagerDelegate {
     private func addObserverForNotifications() {
         NotificationCenter.default.addObserver(self, selector: #selector(devicesUpdated(_:)), name: Notification.Name(Constants.DevicesUpdatedNotificationName), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(positionsUpdated(_:)), name: Notification.Name(Constants.PositionsUpdatedNotificationName), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(deviceSelected(_:)), name: Notification.Name(Constants.DeviceSelectedNotificationName), object: nil)
     }
 
     // MARK: - Location Manager Delegate
@@ -90,7 +91,27 @@ class MapboxView: UIView, CLLocationManagerDelegate {
 
     @objc private func positionsUpdated(_ notification: Notification) {
         // Update UI using the updated positions array
-        updatePositions(positions: SharedData.getPositions())
+        let positions = SharedData.getPositions()
+        print("MapboxView positionsUpdated: \(positions.count) positions, mapView ready: \(mapView != nil)")
+        guard mapView != nil else {
+            print("MapboxView positionsUpdated: mapView not ready yet, skipping update")
+            return
+        }
+        updatePositions(positions: positions)
+    }
+
+    @objc private func deviceSelected(_ notification: Notification) {
+        guard let deviceId = notification.userInfo?["deviceId"] as? Int else {
+            if let camera = calculateCameraForPositions(positions: SharedData.getPositions()) {
+                mapView.camera.ease(to: camera, duration: 0.6)
+            }
+            return
+        }
+
+        guard let position = SharedData.getPositions().first(where: { $0.deviceId == deviceId }) else { return }
+
+        let coordinate = CLLocationCoordinate2D(latitude: position.latitude, longitude: position.longitude)
+        mapView.camera.ease(to: CameraOptions(center: coordinate, padding: UIEdgeInsets(top: 0, left: 0, bottom: bounds.height * 0.35, right: 0), zoom: 16), duration: 0.6)
     }
 
     // MARK: - Public Functions

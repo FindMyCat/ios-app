@@ -104,6 +104,7 @@ class SharedData {
             switch result {
             case .success(let devices):
                 // Set devices in shared data so it's acceccible to all consuming classes.
+                self.logger.log("fetched \(devices.count) devices from REST API")
                 SharedData.devices = devices
             case .failure(let error):
                 self.logger.error("Could not fetch Devices from REST endpoint \(error)")
@@ -120,6 +121,7 @@ class SharedData {
             switch result {
             case .success(let positions):
                 // Set devices in shared data so it's acceccible to all consuming classes.
+                self.logger.log("fetched \(positions.count) positions from REST API: \(positions.map { "device \($0.deviceId) @ \($0.latitude),\($0.longitude)" }.joined(separator: " | "))")
                 SharedData.positions = positions
             case .failure(let error):
                 self.logger.error("Could not fetch Devices from REST endpoint \(error)")
@@ -147,6 +149,8 @@ class SharedData {
             let decoder = JSONDecoder()
             let payloadWrapper = try decoder.decode(PayloadWrapper.self, from: jsonData)
 
+            logger.log("websocket payload decoded: \(payloadWrapper.devices?.count ?? 0) devices, \(payloadWrapper.positions?.count ?? 0) positions")
+
             if let devices = payloadWrapper.devices {
 //              // Update existing devices and append new devices
                 for newDevice in devices {
@@ -160,6 +164,7 @@ class SharedData {
                 }
             } else if let positions = payloadWrapper.positions {
                 for newPosition in positions {
+                    logger.log("websocket position: device \(newPosition.deviceId) @ \(newPosition.latitude),\(newPosition.longitude) fixTime \(newPosition.fixTime)")
                     if let index = SharedData.positions.firstIndex(where: { $0.deviceId == newPosition.deviceId }) {
                         // Device with the same ID exists, update it
                         SharedData.positions[index] = newPosition
@@ -170,7 +175,7 @@ class SharedData {
                 }
             }
         } catch {
-            logger.error("Error decoding JSON: \(error)")
+            logger.error("Error decoding JSON: \(error) raw: \(jsonString.prefix(1000))")
         }
 
     }
