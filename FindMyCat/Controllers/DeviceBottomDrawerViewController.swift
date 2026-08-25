@@ -37,6 +37,20 @@ class DeviceBottomDrawerController:
 
     var cachedAddressesByDeviceId: [Int: (latitude: Double, longitude: Double, address: String?)] = [:]
 
+    private let failedPingFeedbackGenerator = UINotificationFeedbackGenerator()
+
+    private static let acknowledgedFailedPingIdsKey = "AcknowledgedFailedPingIds"
+
+    var alreadyAcknowledgedFailedPingIds: Set<Int> {
+        get {
+            let stored = UserDefaults.standard.array(forKey: Self.acknowledgedFailedPingIdsKey) as? [Int] ?? []
+            return Set(stored)
+        }
+        set {
+            UserDefaults.standard.set(Array(newValue), forKey: Self.acknowledgedFailedPingIdsKey)
+        }
+    }
+
     var selectedDevicePingElapsedRedrawTimer: Timer?
 
     func startSelectedDevicePingElapsedRedrawTimer() {
@@ -108,6 +122,7 @@ class DeviceBottomDrawerController:
         NotificationCenter.default.addObserver(self, selector: #selector(devicesUpdated(_:)), name: Notification.Name(Constants.DevicesUpdatedNotificationName), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(positionsUpdated(_:)), name: Notification.Name(Constants.PositionsUpdatedNotificationName), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(pingsInFlightUpdated(_:)), name: Notification.Name(Constants.PingsInFlightUpdatedNotificationName), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(deviceStatusUpdated(_:)), name: Notification.Name(Constants.DeviceStatusUpdatedNotificationName), object: nil)
 
         configureSheetController()
 
@@ -171,6 +186,58 @@ class DeviceBottomDrawerController:
 
     @objc private func pingsInFlightUpdated(_ notification: Notification) {
         reloadTableDataCellByCell()
+    }
+
+    @objc private func deviceStatusUpdated(_ notification: Notification) {
+        guard let deviceStatuses = notification.userInfo?["deviceStatuses"] as? [Int: DeviceStatus] else { return }
+
+        for (_, deviceStatus) in deviceStatuses where deviceStatus.status.lowercased() == "fail" {
+            guard !alreadyAcknowledgedFailedPingIds.contains(deviceStatus.id) else { continue }
+            presentFailedPingAlert(for: deviceStatus)
+        }
+    }
+
+    private func presentFailedPingAlert(for deviceStatus: DeviceStatus) {
+        guard parentVc.presentedViewController == nil else { return }
+
+        let deviceName = SharedData.getDevices().first(where: { $0.id == deviceStatus.deviceId })?.name ?? "The collar"
+
+        var message = "\(deviceName) heard the ping but could not get a location fix."
+        if let searchedFor = deviceStatus.elapsedSeconds.map(formattedSearchDuration) {
+            message += " GPS searched for \(searchedFor)."
+        }
+
+        if let failureReason = readableFailureReason(from: deviceStatus) {
+            message += "\n\nReason: \(failureReason)"
+        }
+
+        let alertController = UIAlertController(title: "No fix", message: message, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
+            self?.alreadyAcknowledgedFailedPingIds.insert(deviceStatus.id)
+        })
+
+        failedPingFeedbackGenerator.prepare()
+        failedPingFeedbackGenerator.notificationOccurred(.warning)
+
+        parentVc.present(alertController, animated: true, completion: nil)
+    }
+
+    private func formattedSearchDuration(_ seconds: Double) -> String {
+        let wholeSeconds = Int(seconds.rounded())
+        if wholeSeconds < 60 {
+            return "\(wholeSeconds)s"
+        }
+        return "\(wholeSeconds / 60)m \(wholeSeconds % 60)s"
+    }
+
+    private func readableFailureReason(from deviceStatus: DeviceStatus) -> String? {
+        guard let reason = deviceStatus.reason?.trimmingCharacters(in: .whitespaces),
+              !reason.isEmpty,
+              reason.lowercased() != "undefined",
+              reason.lowercased() != "null" else {
+            return nil
+        }
+        return reason
     }
 
     func reloadTableDataCellByCell() {

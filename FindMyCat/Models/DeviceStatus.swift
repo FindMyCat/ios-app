@@ -8,6 +8,7 @@
 import Foundation
 
 struct DeviceStatus {
+    let id: Int
     let deviceId: Int
     let command: String
     let status: String
@@ -29,6 +30,7 @@ struct DeviceStatusEnvelope: Decodable {
     }
 
     struct PositionAttributesOnly: Decodable {
+        let id: Int
         let deviceId: Int
         let attributes: Attributes?
     }
@@ -43,6 +45,7 @@ struct DeviceStatusEnvelope: Decodable {
                 return nil
             }
             return DeviceStatus(
+                id: position.id,
                 deviceId: position.deviceId,
                 command: command,
                 status: status,
