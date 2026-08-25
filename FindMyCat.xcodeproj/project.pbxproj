@@ -46,6 +46,7 @@
 		365E53892A48EF0200AD6AE8 /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = 365E53882A48EF0200AD6AE8 /* Starscream */; };
 		365E538B2A48EF5600AD6AE8 /* WebSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E538A2A48EF5600AD6AE8 /* WebSocketManager.swift */; };
 		365E538D2A48FD3200AD6AE8 /* Positions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E538C2A48FD3200AD6AE8 /* Positions.swift */; };
+		36DA0002DEC1CE57A7050002 /* DeviceStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36DA0001DEC1CE57A7050001 /* DeviceStatus.swift */; };
 		365E538F2A49005800AD6AE8 /* WebsocketPayloadWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E538E2A49005800AD6AE8 /* WebsocketPayloadWrapper.swift */; };
 		367763892A4E173F0096FF1F /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367763882A4E173F0096FF1F /* Constants.swift */; };
 		3677638B2A4E1EDA0096FF1F /* MapMarkerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3677638A2A4E1EDA0096FF1F /* MapMarkerView.swift */; };
@@ -94,6 +95,7 @@
 		365E53852A48EC9900AD6AE8 /* SharedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedData.swift; sourceTree = "<group>"; };
 		365E538A2A48EF5600AD6AE8 /* WebSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebSocketManager.swift; sourceTree = "<group>"; };
 		365E538C2A48FD3200AD6AE8 /* Positions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Positions.swift; sourceTree = "<group>"; };
+		36DA0001DEC1CE57A7050001 /* DeviceStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceStatus.swift; sourceTree = "<group>"; };
 		365E538E2A49005800AD6AE8 /* WebsocketPayloadWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsocketPayloadWrapper.swift; sourceTree = "<group>"; };
 		367763882A4E173F0096FF1F /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		3677638A2A4E1EDA0096FF1F /* MapMarkerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapMarkerView.swift; sourceTree = "<group>"; };
@@ -251,6 +253,7 @@
 				365E53732A478F6F00AD6AE8 /* Devices.swift */,
 				365E53852A48EC9900AD6AE8 /* SharedData.swift */,
 				365E538C2A48FD3200AD6AE8 /* Positions.swift */,
+				36DA0001DEC1CE57A7050001 /* DeviceStatus.swift */,
 				365E538E2A49005800AD6AE8 /* WebsocketPayloadWrapper.swift */,
 				36BF8EB52A7C11D900141F5B /* HologramDevice.swift */,
 			);
@@ -433,6 +436,7 @@
 				36392F0E2A5C7EE100DE866C /* DateTimeUtil.swift in Sources */,
 				36BF8EB42A7C111F00141F5B /* HologramAPIManager.swift in Sources */,
 				365E538D2A48FD3200AD6AE8 /* Positions.swift in Sources */,
+				36DA0002DEC1CE57A7050002 /* DeviceStatus.swift in Sources */,
 				3677638B2A4E1EDA0096FF1F /* MapMarkerView.swift in Sources */,
 				36392F102A5DBD2F00DE866C /* ScanningAnimationView.swift in Sources */,
 				36562C0C2A56778A00D95C4C /* PreciseFinderViewController.swift in Sources */,
@@ -626,6 +630,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -665,6 +670,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

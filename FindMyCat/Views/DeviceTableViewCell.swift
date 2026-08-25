@@ -31,20 +31,33 @@ protocol DeviceCellDelegate: AnyObject {
 
 class ButtonWithProgressBar: UIButton {
 
-    let progressBarLayer = CALayer()
-    private let borderThickness: CGFloat = 1.0
+    let buttonWidthDuringPinging = 115.0
+    private var buttonWidthDuringPingingConstraint: NSLayoutConstraint?
 
-    func setProgressBar(percent: Double) {
+    func setPingInFlight(since sentAt: Date?, idleTitle: String) {
+        guard let sentAt = sentAt else {
+            buttonWidthDuringPingingConstraint?.isActive = false
+            configuration?.showsActivityIndicator = false
+            configuration?.title = idleTitle
+            isEnabled = true
+            return
+        }
 
-        progressBarLayer.backgroundColor = UIColor.black.withAlphaComponent(0.1).cgColor
-        progressBarLayer.frame = CGRect(x: 0, y: 0, width: frame.width * CGFloat(percent), height: frame.height)
+        if buttonWidthDuringPingingConstraint == nil {
+            buttonWidthDuringPingingConstraint = widthAnchor.constraint(equalToConstant: buttonWidthDuringPinging)
+        }
+        buttonWidthDuringPingingConstraint?.isActive = true
 
-        layer.addSublayer(progressBarLayer)
+        configuration?.showsActivityIndicator = true
+        configuration?.imagePadding = 8
+        configuration?.title = ButtonWithProgressBar.elapsedTitle(since: sentAt)
+        isEnabled = false
+        layoutIfNeeded()
+    }
 
-        self.clipsToBounds = true
-
-        setNeedsLayout()
-        setNeedsDisplay()
+    static func elapsedTitle(since sentAt: Date) -> String {
+        let elapsed = Int(Date().timeIntervalSince(sentAt))
+        return String(format: "%d:%02d", elapsed / 60, elapsed % 60)
     }
 
     let feedbackGenerator = UIImpactFeedbackGenerator(style: .medium)
@@ -91,6 +104,7 @@ class DeviceTableViewCell: UITableViewCell {
     // Constants
     let buttonSize = UIButton.Configuration.Size.large
     let profilePictureSize = 40.0
+    let spacingBetweenExpandedStateButtons = 12.0
 
     // Delegate
     weak var delegate: DeviceCellDelegate?
@@ -251,7 +265,7 @@ class DeviceTableViewCell: UITableViewCell {
         soundButton.addTarget(self, action: #selector(self.playSoundTapped), for: .touchUpInside)
 
         NSLayoutConstraint.activate([
-            soundButton.leadingAnchor.constraint(equalTo: findButton.trailingAnchor, constant: 16),
+            soundButton.leadingAnchor.constraint(equalTo: findButton.trailingAnchor, constant: spacingBetweenExpandedStateButtons),
             soundButton.bottomAnchor.constraint(equalTo: findButton.bottomAnchor)
         ])
     }
@@ -300,7 +314,9 @@ class DeviceTableViewCell: UITableViewCell {
             // Red color for Lost Mode
             pingOrlostModeButton.tintColor = redColor
         }
-        pingOrlostModeButton.setTitle(currentMode.capitalized, for: .normal)
+        if pingOrlostModeButton.configuration?.showsActivityIndicator != true {
+            pingOrlostModeButton.configuration?.title = currentMode.capitalized
+        }
     }
 
     private func configureLostModeButton() {
@@ -319,15 +335,14 @@ class DeviceTableViewCell: UITableViewCell {
 
         contentView.addSubview(pingOrlostModeButton)
 
-        pingOrlostModeButton.setTitle(currentMode.capitalized, for: .normal)
-        pingOrlostModeButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 200)
+        pingOrlostModeButton.configuration?.title = currentMode.capitalized
 
         pingOrlostModeButton.translatesAutoresizingMaskIntoConstraints = false
 
         pingOrlostModeButton.addTarget(self, action: #selector(self.activateLostMode), for: .touchUpInside)
 
         NSLayoutConstraint.activate([
-            pingOrlostModeButton.leadingAnchor.constraint(equalTo: soundButton.trailingAnchor, constant: 16),
+            pingOrlostModeButton.leadingAnchor.constraint(equalTo: soundButton.trailingAnchor, constant: spacingBetweenExpandedStateButtons),
             pingOrlostModeButton.bottomAnchor.constraint(equalTo: soundButton.bottomAnchor)
         ])
     }

@@ -25,6 +25,18 @@ class SharedData {
             NotificationCenter.default.post(name: Notification.Name(Constants.PositionsUpdatedNotificationName), object: nil, userInfo: userInfo)
         }
     }
+    private static var deviceStatuses: [Int: DeviceStatus] = [:] {
+        didSet {
+            let userInfo = ["deviceStatuses": deviceStatuses]
+            NotificationCenter.default.post(name: Notification.Name(Constants.DeviceStatusUpdatedNotificationName), object: nil, userInfo: userInfo)
+        }
+    }
+    private static var pingsInFlight: [Int: Date] = [:] {
+        didSet {
+            let userInfo = ["pingsInFlight": pingsInFlight]
+            NotificationCenter.default.post(name: Notification.Name(Constants.PingsInFlightUpdatedNotificationName), object: nil, userInfo: userInfo)
+        }
+    }
 
     // Websockets
     private let webSocketManager = WebSocketManager()
@@ -95,6 +107,18 @@ class SharedData {
         return self.positions
     }
 
+    public static func getDeviceStatus(forDeviceId deviceId: Int) -> DeviceStatus? {
+        return deviceStatuses[deviceId]
+    }
+
+    public static func markPingSent(forDeviceId deviceId: Int) {
+        pingsInFlight[deviceId] = Date()
+    }
+
+    public static func pingSentAt(forDeviceId deviceId: Int) -> Date? {
+        return pingsInFlight[deviceId]
+    }
+
     // MARK: Network handlers
     private func fetchDevicesFromRestAPI(completion: @escaping () -> Void) {
         logger.log("fetching devices from REST API")
@@ -104,7 +128,6 @@ class SharedData {
             switch result {
             case .success(let devices):
                 // Set devices in shared data so it's acceccible to all consuming classes.
-                self.logger.log("fetched \(devices.count) devices from REST API")
                 SharedData.devices = devices
             case .failure(let error):
                 self.logger.error("Could not fetch Devices from REST endpoint \(error)")
@@ -121,7 +144,6 @@ class SharedData {
             switch result {
             case .success(let positions):
                 // Set devices in shared data so it's acceccible to all consuming classes.
-                self.logger.log("fetched \(positions.count) positions from REST API: \(positions.map { "device \($0.deviceId) @ \($0.latitude),\($0.longitude)" }.joined(separator: " | "))")
                 SharedData.positions = positions
             case .failure(let error):
                 self.logger.error("Could not fetch Devices from REST endpoint \(error)")
@@ -149,8 +171,6 @@ class SharedData {
             let decoder = JSONDecoder()
             let payloadWrapper = try decoder.decode(PayloadWrapper.self, from: jsonData)
 
-            logger.log("websocket payload decoded: \(payloadWrapper.devices?.count ?? 0) devices, \(payloadWrapper.positions?.count ?? 0) positions")
-
             if let devices = payloadWrapper.devices {
 //              // Update existing devices and append new devices
                 for newDevice in devices {
@@ -163,8 +183,17 @@ class SharedData {
                     }
                 }
             } else if let positions = payloadWrapper.positions {
-                for newPosition in positions {
-                    logger.log("websocket position: device \(newPosition.deviceId) @ \(newPosition.latitude),\(newPosition.longitude) fixTime \(newPosition.fixTime)")
+                let statuses = (try? decoder.decode(DeviceStatusEnvelope.self, from: jsonData))?
+                    .extractStatuses() ?? []
+                let statusDeviceIds = Set(statuses.map { $0.deviceId })
+
+                for deviceStatus in statuses {
+                    logger.log("device status: device \(deviceStatus.deviceId) command=\(deviceStatus.command) status=\(deviceStatus.status) reason=\(deviceStatus.reason ?? "-")")
+                    SharedData.deviceStatuses[deviceStatus.deviceId] = deviceStatus
+                    SharedData.pingsInFlight[deviceStatus.deviceId] = nil
+                }
+
+                for newPosition in positions where !statusDeviceIds.contains(newPosition.deviceId) {
                     if let index = SharedData.positions.firstIndex(where: { $0.deviceId == newPosition.deviceId }) {
                         // Device with the same ID exists, update it
                         SharedData.positions[index] = newPosition
@@ -172,10 +201,11 @@ class SharedData {
                         // Device does not exist, append it
                         SharedData.positions.append(newPosition)
                     }
+                    SharedData.pingsInFlight[newPosition.deviceId] = nil
                 }
             }
         } catch {
-            logger.error("Error decoding JSON: \(error) raw: \(jsonString.prefix(1000))")
+            logger.error("Error decoding JSON: \(error)")
         }
 
     }

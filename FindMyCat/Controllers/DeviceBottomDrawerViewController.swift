@@ -35,21 +35,37 @@ class DeviceBottomDrawerController:
         }
     }
 
-    var selectedDeviceLocationFetchProgressBarTimer: Timer?
-    var selectedDeviceLocationFetchProgressBarPercent: CGFloat = 0
+    var cachedAddressesByDeviceId: [Int: (latitude: Double, longitude: Double, address: String?)] = [:]
 
-    func updateProgressOnLocationFetchButtonTimer() {
-        selectedDeviceLocationFetchProgressBarTimer = Timer.scheduledTimer(timeInterval: 4.0, target: self, selector: #selector(updateselectedDeviceLocationFetchProgressBarPercent), userInfo: nil, repeats: true)
+    var selectedDevicePingElapsedRedrawTimer: Timer?
+
+    func startSelectedDevicePingElapsedRedrawTimer() {
+        guard selectedDevicePingElapsedRedrawTimer == nil else { return }
+        let selectedDevicePingElapsedTimer = Timer(timeInterval: 1.0, target: self, selector: #selector(redrawSelectedDevicePingElapsedTitles), userInfo: nil, repeats: true)
+        RunLoop.current.add(selectedDevicePingElapsedTimer, forMode: .common)
+        selectedDevicePingElapsedRedrawTimer = selectedDevicePingElapsedTimer
     }
 
-    @objc func updateselectedDeviceLocationFetchProgressBarPercent() {
-        if selectedDeviceLocationFetchProgressBarPercent < 1.0 {
-            selectedDeviceLocationFetchProgressBarPercent += 0.04
-            reloadTableDataCellByCell()
-        } else {
-            selectedDeviceLocationFetchProgressBarPercent = 0
-            selectedDeviceLocationFetchProgressBarTimer?.invalidate()
-            reloadTableDataCellByCell()
+    func stopSelectedDevicePingElapsedRedrawTimer() {
+        selectedDevicePingElapsedRedrawTimer?.invalidate()
+        selectedDevicePingElapsedRedrawTimer = nil
+    }
+
+    @objc func redrawSelectedDevicePingElapsedTitles() {
+        let devices = SharedData.getDevices()
+        var anyDeviceHasPingInFlight = false
+
+        for (row, device) in devices.enumerated() {
+            guard let pingSentAt = SharedData.pingSentAt(forDeviceId: device.id) else { continue }
+            anyDeviceHasPingInFlight = true
+
+            let indexPath = IndexPath(row: row, section: 0)
+            guard let cell = tableView.cellForRow(at: indexPath) as? DeviceTableViewCell else { continue }
+            cell.pingOrlostModeButton.setPingInFlight(since: pingSentAt, idleTitle: currentMode.capitalized)
+        }
+
+        if !anyDeviceHasPingInFlight {
+            stopSelectedDevicePingElapsedRedrawTimer()
         }
     }
 
@@ -91,6 +107,7 @@ class DeviceBottomDrawerController:
         view.isUserInteractionEnabled = false
         NotificationCenter.default.addObserver(self, selector: #selector(devicesUpdated(_:)), name: Notification.Name(Constants.DevicesUpdatedNotificationName), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(positionsUpdated(_:)), name: Notification.Name(Constants.PositionsUpdatedNotificationName), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(pingsInFlightUpdated(_:)), name: Notification.Name(Constants.PingsInFlightUpdatedNotificationName), object: nil)
 
         configureSheetController()
 
@@ -152,13 +169,17 @@ class DeviceBottomDrawerController:
         reloadTableDataCellByCell()
     }
 
+    @objc private func pingsInFlightUpdated(_ notification: Notification) {
+        reloadTableDataCellByCell()
+    }
+
     func reloadTableDataCellByCell() {
         let sectionIndex = 0
         let totalRows = tableView.numberOfRows(inSection: sectionIndex)
 
         for row in 0..<totalRows {
             let indexPath = IndexPath(row: row, section: sectionIndex)
-            tableView.reloadRows(at: [indexPath], with: .fade)
+            tableView.reloadRows(at: [indexPath], with: .none)
         }
     }
 
@@ -318,7 +339,7 @@ class DeviceBottomDrawerController:
         cell.lastSeenLabel.isHidden = true
         cell.deviceAddressLabel.isHidden = true
         cell.batteryIcon.isHidden = true
-        cell.pingOrlostModeButton.setProgressBar(percent: selectedDeviceLocationFetchProgressBarPercent)
+        cell.pingOrlostModeButton.setPingInFlight(since: SharedData.pingSentAt(forDeviceId: cellDevice.id), idleTitle: currentMode.capitalized)
 
         let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(longPressButtonAction(_:)))
         cell.pingOrlostModeButton.addGestureRecognizer(longPressRecognizer)
@@ -326,40 +347,51 @@ class DeviceBottomDrawerController:
         cell.currentMode = currentMode
 
         if let targetPosition = positions.first(where: { $0.deviceId == cellDevice.id }) {
-            getAddressFromPosition(position: targetPosition) { [weak cell] address in
+
+            let renderPositionDetailsOnCell: (String?) -> Void = { [weak cell] address in
                 guard let cell = cell else {
                     return // Cell is no longer available
                 }
 
-                let currentIndexPath = tableView.indexPath(for: cell)
+                cell.deviceAddressLabel.text = address ?? Constants.AddressUnavailable
 
-                // Ensure the captured cell is still at the same index path
-                if currentIndexPath == indexPath {
-                    if address == nil {
-                        cell.deviceAddressLabel.text = Constants.AddressUnavailable
-                    } else {
-                        cell.deviceAddressLabel.text = address
+                // Replace Address with Offline if lastUpdate is nil (never recieved update)
+                if cellDevice.lastUpdate != nil {
+                    let lastPositionFixedAt = DateTimeUtil.relativeTime(dateString: targetPosition.fixTime)
+
+                    cell.deviceAddressLabel.isHidden = false
+                    cell.dotSeparatorView.isHidden = false
+
+                    cell.lastSeenLabel.text = lastPositionFixedAt
+                    cell.lastSeenLabel.isHidden = false
+                }
+
+                // Set the battery percentage
+                if let batteryLevel = targetPosition.attributes?.batteryLevel {
+                    cell.setBatteryPercentage(percentage: batteryLevel)
+                    cell.batteryIcon.isHidden = false
+                } else {
+                    cell.batteryIcon.isHidden = true
+                }
+            }
+
+            let cachedAddress = cachedAddressesByDeviceId[cellDevice.id]
+            if let cachedAddress = cachedAddress,
+               cachedAddress.latitude == targetPosition.latitude,
+               cachedAddress.longitude == targetPosition.longitude {
+                renderPositionDetailsOnCell(cachedAddress.address)
+            } else {
+                getAddressFromPosition(position: targetPosition) { [weak self, weak cell] address in
+                    guard let self = self, let cell = cell else {
+                        return // Cell is no longer available
                     }
 
-                    // Replace Address with Offline if lastUpdate is nil (never recieved update)
-                    if cellDevice.lastUpdate != nil {
-                        let lastSeen = DateTimeUtil.relativeTime(dateString: cellDevice.lastUpdate!)
+                    self.cachedAddressesByDeviceId[cellDevice.id] = (targetPosition.latitude, targetPosition.longitude, address)
 
-                        cell.deviceAddressLabel.isHidden = false
-                        cell.dotSeparatorView.isHidden = false
-
-                        cell.lastSeenLabel.text = lastSeen
-                        cell.lastSeenLabel.isHidden = false
+                    // Ensure the captured cell is still at the same index path
+                    if tableView.indexPath(for: cell) == indexPath {
+                        renderPositionDetailsOnCell(address)
                     }
-
-                    // Set the battery percentage
-                    if let batteryLevel = targetPosition.attributes?.batteryLevel {
-                        cell.setBatteryPercentage(percentage: batteryLevel)
-                        cell.batteryIcon.isHidden = false
-                    } else {
-                        cell.batteryIcon.isHidden = true
-                    }
-
                 }
             }
         } else if cellDevice.lastUpdate == nil {
@@ -471,6 +503,7 @@ class DeviceBottomDrawerController:
             if let error = error {
                 self.logger.error("Reverse geocoding error: \(error.localizedDescription)")
                 completion(nil)
+                return
             }
 
             if let placemark = placemarks?.first {
@@ -512,11 +545,19 @@ class DeviceBottomDrawerController:
 
         // Create a new timer and schedule it to repeat at the desired interval
         tableReloadTimer = Timer.scheduledTimer(timeInterval: 20, target: self, selector: #selector(tableReloadTimerAction), userInfo: nil, repeats: true)
+
+        let anyDeviceHasPingInFlight = SharedData.getDevices().contains { device in
+            SharedData.pingSentAt(forDeviceId: device.id) != nil
+        }
+        if anyDeviceHasPingInFlight {
+            startSelectedDevicePingElapsedRedrawTimer()
+        }
     }
 
     private func stopTimer() {
         tableReloadTimer?.invalidate()
         tableReloadTimer = nil
+        stopSelectedDevicePingElapsedRedrawTimer()
     }
 
 }
@@ -550,11 +591,11 @@ extension DeviceBottomDrawerController: DeviceCellDelegate {
 
     func activateLostMode(currentMode: String) {
 
-        updateProgressOnLocationFetchButtonTimer()
         guard selectedDeviceIndex != nil else {return}
 
         let selectedDevice = SharedData.getDevices()[selectedDeviceIndex!]
         let selectedDeviceUniqueBLEId = Int(selectedDevice.uniqueId)!
+        let selectedDeviceTraccarId = selectedDevice.id
 
         HologramAPIManager.shared.fetchDevice(name: String(selectedDeviceUniqueBLEId), orgId: HologramAPIManager.shared.orgId) {
             result in
@@ -565,7 +606,16 @@ extension DeviceBottomDrawerController: DeviceCellDelegate {
                 HologramAPIManager.shared.sendCloudMessageToDevice(deviceId: hologramDevice.id, message: currentMode) {
                     result in
 
-                    debugPrint(result)
+                    switch result {
+                    case .success:
+                        DispatchQueue.main.async {
+                            SharedData.markPingSent(forDeviceId: selectedDeviceTraccarId)
+                            self.startSelectedDevicePingElapsedRedrawTimer()
+                            self.reloadTableDataCellByCell()
+                        }
+                    case .failure(let error):
+                        self.logger.error("Could not queue command with Hologram \(error)")
+                    }
                 }
 
             case .failure(let error):
