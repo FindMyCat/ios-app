@@ -243,9 +243,9 @@ class BLEDataCommunicationChannel: NSObject {
         }
     }
 
-    /// Push host/port config to the tag's nRF9151 (via the nRF52 config characteristic).
-    /// Payload: [port_lo][port_hi][host UTF-8].
-    func sendConfig(host: String, port: UInt16, _ uniqueID: Int) throws {
+    /// Push host/port/device id config to the tag's nRF9151 (via the nRF52 config characteristic).
+    /// Payload: [port_lo][port_hi][host_len][host UTF-8][device_id UTF-8].
+    func sendConfig(host: String, port: UInt16, deviceId: String, _ uniqueID: Int) throws {
         let device = getDeviceFromUniqueID(uniqueID)
 
         guard let peripheral = device?.blePeripheral else {
@@ -264,9 +264,11 @@ class BLEDataCommunicationChannel: NSObject {
         var payload = Data()
         payload.append(UInt8(port & 0xFF))
         payload.append(UInt8((port >> 8) & 0xFF))
+        payload.append(UInt8(host.utf8.count))
         payload.append(contentsOf: Array(host.utf8))
+        payload.append(contentsOf: Array(deviceId.utf8))
 
-        logger.info("sendConfig: writing \(payload.count) bytes to \(uniqueID): host=\(host) port=\(port)")
+        logger.info("sendConfig: writing \(payload.count) bytes to \(uniqueID): host=\(host) port=\(port) deviceId=\(deviceId)")
         peripheral.writeValue(payload, for: configCharacteristic, type: .withResponse)
     }
 
@@ -592,19 +594,22 @@ extension BLEDataCommunicationChannel: CBPeripheralDelegate {
         }
         guard let characteristicData = characteristic.value else { return }
 
-        // Config read-back: [port_lo][port_hi][host UTF-8]. Routed to the edit screen.
+        // Config read-back: [port_lo][port_hi][host_len][host][device_id]. Routed to the edit screen.
         if characteristic.uuid == QorvoNIService.configCharacteristicUUID {
             var port: UInt16 = 0
             var host = ""
-            if characteristicData.count >= 2 {
+            var deviceId = ""
+            if characteristicData.count >= 3 {
                 port = UInt16(characteristicData[0]) | (UInt16(characteristicData[1]) << 8)
-                if characteristicData.count > 2 {
-                    host = String(decoding: characteristicData[2...], as: UTF8.self)
+                let hostLen = Int(characteristicData[2])
+                if characteristicData.count >= 3 + hostLen {
+                    host = String(decoding: characteristicData[3..<(3 + hostLen)], as: UTF8.self)
+                    deviceId = String(decoding: characteristicData[(3 + hostLen)...], as: UTF8.self)
                 }
             }
-            logger.info("Read config: host=\(host) port=\(port)")
+            logger.info("Read config: host=\(host) port=\(port) deviceId=\(deviceId)")
             NotificationCenter.default.post(name: Notification.Name(Constants.ConfigReadNotificationName),
-                                            object: nil, userInfo: ["host": host, "port": port])
+                                            object: nil, userInfo: ["host": host, "port": port, "deviceId": deviceId])
             return
         }
 

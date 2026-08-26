@@ -23,6 +23,7 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
 
     private var isInEditingMode = false
     private var deviceIdForEditing: Int!
+    private var bleUniqueID: Int?
 
     let submitButton = UIButton()
 
@@ -76,7 +77,7 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
         statusTimer?.invalidate()
         statusTimer = nil
 
-        if let bleId = Int(uniqueIdReadOnlyTextField.text ?? "") {
+        if let bleId = bleUniqueID {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 try? BLEDataCommunicationChannel.shared.disconnectPeripheral(bleId)
             }
@@ -92,7 +93,7 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
         let text: String
         let color: UIColor
 
-        if let bleId = Int(uniqueIdReadOnlyTextField.text ?? ""),
+        if let bleId = bleUniqueID,
            let device = BLEDataCommunicationChannel.shared.getDeviceFromUniqueID(bleId) {
             // Keep retrying until connected; device discovery can lag the screen opening.
             if device.blePeripheral.state == .disconnected {
@@ -119,9 +120,13 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
     @objc private func configRead(_ notification: Notification) {
         guard let host = notification.userInfo?["host"] as? String,
               let port = notification.userInfo?["port"] as? UInt16 else { return }
+        let reportedDeviceId = notification.userInfo?["deviceId"] as? String
         DispatchQueue.main.async {
             if !host.isEmpty { self.hostTextField.text = host }
             if port != 0 { self.portTextField.text = String(port) }
+            if !self.isInEditingMode, let deviceId = reportedDeviceId, !deviceId.isEmpty {
+                self.uniqueIdReadOnlyTextField.text = deviceId
+            }
         }
     }
 
@@ -130,11 +135,13 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
         avatarEmojiView.textField.text = emoji
         deviceNameTextField.text = name
         deviceIdForEditing = id
+        bleUniqueID = Int(uniqueId)
         super.init(nibName: nil, bundle: nil)
     }
 
     init(uniqueId: String) {
         uniqueIdReadOnlyTextField.text = uniqueId
+        bleUniqueID = Int(uniqueId)
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -331,8 +338,8 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
         // BLE uniqueID; no-op (throws) if the tag isn't currently connected.
         if let host = hostTextField.text, !host.isEmpty,
            let port = UInt16(portTextField.text ?? ""),
-           let bleId = Int(deviceUniqueId) {
-            try? BLEDataCommunicationChannel.shared.sendConfig(host: host, port: port, bleId)
+           let bleId = bleUniqueID {
+            try? BLEDataCommunicationChannel.shared.sendConfig(host: host, port: port, deviceId: deviceUniqueId, bleId)
         }
 
         if isInEditingMode {
