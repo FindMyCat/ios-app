@@ -159,20 +159,16 @@ class DeviceBottomDrawerController:
         let totalDevices = SharedData.getDevicesCount()
         let tableViewRows = tableView.numberOfRows(inSection: 0)
 
-        if totalDevices != tableViewRows {
-            if totalDevices > tableViewRows {
-                let rowsToAdd = totalDevices - tableViewRows
-                for index in 0..<rowsToAdd {
-                    let indexPath = IndexPath(row: index + (totalDevices - 1), section: 0)
-                    tableView.insertRows(at: [indexPath], with: .automatic)
-                }
-            }
-            if totalDevices < tableViewRows {
-                let rowsToRemove = tableViewRows - totalDevices
-                for _ in 0..<rowsToRemove {
-                    let indexPath = IndexPath(row: tableIndexToRemove!, section: 0)
-                    tableView.deleteRows(at: [indexPath], with: .left)
-                }
+        if totalDevices > tableViewRows {
+            let addedRowIndexPaths = (tableViewRows..<totalDevices).map { IndexPath(row: $0, section: 0) }
+            tableView.insertRows(at: addedRowIndexPaths, with: .automatic)
+        } else if totalDevices < tableViewRows {
+            if let rowToRemove = tableIndexToRemove, tableViewRows - totalDevices == 1, rowToRemove < tableViewRows {
+                tableView.deleteRows(at: [IndexPath(row: rowToRemove, section: 0)], with: .left)
+                tableIndexToRemove = nil
+            } else {
+                tableView.reloadData()
+                return
             }
         }
         // update cells one by one to reduce flickers
@@ -204,7 +200,13 @@ class DeviceBottomDrawerController:
 
         var message = "\(deviceName) heard the ping but could not get a location fix."
         if let searchedFor = deviceStatus.elapsedSeconds.map(formattedSearchDuration) {
-            message += " GPS searched for \(searchedFor)."
+            message += " GPS searched for \(searchedFor)"
+            if let satellitesTracked = deviceStatus.satellitesTracked {
+                message += " and tracked \(formattedSatelliteCount(satellitesTracked))"
+            }
+            message += "."
+        } else if let satellitesTracked = deviceStatus.satellitesTracked {
+            message += " GPS tracked \(formattedSatelliteCount(satellitesTracked))."
         }
 
         if let failureReason = readableFailureReason(from: deviceStatus) {
@@ -220,6 +222,11 @@ class DeviceBottomDrawerController:
         failedPingFeedbackGenerator.notificationOccurred(.warning)
 
         parentVc.present(alertController, animated: true, completion: nil)
+    }
+
+    private func formattedSatelliteCount(_ satellites: Double) -> String {
+        let wholeSatellites = Int(satellites.rounded())
+        return wholeSatellites == 1 ? "1 satellite" : "\(wholeSatellites) satellites"
     }
 
     private func formattedSearchDuration(_ seconds: Double) -> String {

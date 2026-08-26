@@ -16,6 +16,7 @@ struct DeviceStatus {
     let method: String?
     let elapsedSeconds: Double?
     let uptimeSeconds: Double?
+    let satellitesTracked: Double?
     let receivedAt: Date
 }
 
@@ -27,6 +28,7 @@ struct DeviceStatusEnvelope: Decodable {
         let method: String?
         let elapsed: Double?
         let uptime: Double?
+        let sat: Double?
     }
 
     struct PositionAttributesOnly: Decodable {
@@ -53,6 +55,7 @@ struct DeviceStatusEnvelope: Decodable {
                 method: attributes.method,
                 elapsedSeconds: attributes.elapsed,
                 uptimeSeconds: attributes.uptime,
+                satellitesTracked: attributes.sat,
                 receivedAt: receivedAt
             )
         }
