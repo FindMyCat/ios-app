@@ -91,13 +91,8 @@ class MapboxView: UIView, CLLocationManagerDelegate {
 
     @objc private func positionsUpdated(_ notification: Notification) {
         // Update UI using the updated positions array
-        let positions = SharedData.getPositions()
-        print("MapboxView positionsUpdated: \(positions.count) positions, mapView ready: \(mapView != nil)")
-        guard mapView != nil else {
-            print("MapboxView positionsUpdated: mapView not ready yet, skipping update")
-            return
-        }
-        updatePositions(positions: positions)
+        guard mapView != nil else { return }
+        updatePositions(positions: SharedData.getPositions())
     }
 
     @objc private func deviceSelected(_ notification: Notification) {

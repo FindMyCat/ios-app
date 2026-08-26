@@ -54,9 +54,8 @@ class WebSocketManager: WebSocketDelegate {
             for (field, value) in HTTPCookie.requestHeaderFields(with: cookies) {
                 request.setValue(value, forHTTPHeaderField: field)
             }
-            logger.log("connecting to \(urlString) with cookies: \(cookies.map { $0.name }.joined(separator: ", "))")
         } else {
-            logger.error("no session cookie available for websocket handshake, connecting to \(urlString) unauthenticated")
+            logger.error("no session cookie available for websocket handshake")
         }
 
         socket?.delegate = nil
@@ -95,7 +94,6 @@ class WebSocketManager: WebSocketDelegate {
           logger.log("disconnected \(reason) \(closeCode)")
           scheduleReconnect()
       case .text(let text):
-          logger.log("received text (\(text.count) chars): \(text.prefix(500))")
           subject.send(text)
       case .binary(let data):
           logger.log("received data: \(data)")
