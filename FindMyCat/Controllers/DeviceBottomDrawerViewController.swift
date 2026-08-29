@@ -40,6 +40,7 @@ class DeviceBottomDrawerController:
     private let failedPingFeedbackGenerator = UINotificationFeedbackGenerator()
 
     private static let acknowledgedFailedPingIdsKey = "AcknowledgedFailedPingIds"
+    private static let playSoundHoldSeconds: TimeInterval = 5.0
 
     var alreadyAcknowledgedFailedPingIds: Set<Int> {
         get {
@@ -148,6 +149,8 @@ class DeviceBottomDrawerController:
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         startTimer()
+
+        BLEDataCommunicationChannel.shared.identifyCollars()
 
         tableView.reloadData()
     }
@@ -637,13 +640,20 @@ class DeviceBottomDrawerController:
 }
 
 extension DeviceBottomDrawerController: DeviceCellDelegate {
+    private func resolveBLEId(for device: Device) -> Int? {
+        if let identified = BLEDataCommunicationChannel.shared.getDeviceFromDeviceId(device.uniqueId) {
+            return identified.bleUniqueID
+        }
+        return Int(device.uniqueId)
+    }
+
     func launchPreciseFindScreen() {
 
         guard selectedDeviceIndex != nil else {return}
 
         let selectedDevice = SharedData.getDevices()[selectedDeviceIndex!]
         let selectedDeviceName = selectedDevice.name
-        let selectedDeviceUniqueBLEId = Int(selectedDevice.uniqueId)!
+        let selectedDeviceUniqueBLEId = resolveBLEId(for: selectedDevice) ?? 0
 
         let vc = PreciseFinderViewContoller(deviceDisplayName: selectedDeviceName, deviceUniqueBLEId: selectedDeviceUniqueBLEId)
 
@@ -655,11 +665,33 @@ extension DeviceBottomDrawerController: DeviceCellDelegate {
     func playSound() {
         guard selectedDeviceIndex != nil else { return }
         let selectedDevice = SharedData.getDevices()[selectedDeviceIndex!]
-        guard let selectedDeviceUniqueBLEId = Int(selectedDevice.uniqueId) else { return }
-        do {
-            try BLEDataCommunicationChannel.shared.sendData(Data([MessageId.playSound.rawValue]), selectedDeviceUniqueBLEId)
-        } catch {
-            logger.error("Failed to send playSound: \(error.localizedDescription)")
+        guard let selectedDeviceUniqueBLEId = resolveBLEId(for: selectedDevice) else { return }
+
+        BLEDataCommunicationChannel.shared.ensureConnected(selectedDeviceUniqueBLEId)
+        sendPlaySound(to: selectedDeviceUniqueBLEId, attemptsLeft: 8)
+    }
+
+    private func sendPlaySound(to bleId: Int, attemptsLeft: Int) {
+        guard attemptsLeft > 0 else {
+            logger.error("playSound gave up, \(bleId) never became ready")
+            return
+        }
+
+        if let device = BLEDataCommunicationChannel.shared.getDeviceFromUniqueID(bleId),
+           device.blePeripheral.state == .connected,
+           device.rxCharacteristic != nil {
+            try? BLEDataCommunicationChannel.shared.sendData(Data([MessageId.playSound.rawValue]), bleId)
+
+            // Release it, or Precise Find's connectPeripheral rejects a device that is
+            // no longer statusDiscovered.
+            DispatchQueue.main.asyncAfter(deadline: .now() + Self.playSoundHoldSeconds) {
+                try? BLEDataCommunicationChannel.shared.disconnectPeripheral(bleId)
+            }
+            return
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            self?.sendPlaySound(to: bleId, attemptsLeft: attemptsLeft - 1)
         }
     }
 
@@ -668,10 +700,9 @@ extension DeviceBottomDrawerController: DeviceCellDelegate {
         guard selectedDeviceIndex != nil else {return}
 
         let selectedDevice = SharedData.getDevices()[selectedDeviceIndex!]
-        let selectedDeviceUniqueBLEId = Int(selectedDevice.uniqueId)!
         let selectedDeviceTraccarId = selectedDevice.id
 
-        HologramAPIManager.shared.fetchDevice(name: String(selectedDeviceUniqueBLEId), orgId: HologramAPIManager.shared.orgId) {
+        HologramAPIManager.shared.fetchDevice(name: selectedDevice.uniqueId, orgId: HologramAPIManager.shared.orgId) {
             result in
 
             switch result {

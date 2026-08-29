@@ -25,6 +25,7 @@ class PreciseFindableDevice {
     var configCharacteristic: CBCharacteristic? // Writes host/port config to the nRF9151 via the nRF52
 
     var bleUniqueID: Int
+    var configuredDeviceId: String?          // Id the tag reports from its config characteristic
     var blePeripheralName: String            // Name to display
     var blePeripheralStatus: String?         // Status to display
     var bleTimestamp: Int64                  // Last time that the device adverstised

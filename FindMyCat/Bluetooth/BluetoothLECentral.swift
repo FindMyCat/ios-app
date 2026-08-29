@@ -149,6 +149,17 @@ class BLEDataCommunicationChannel: NSObject {
         }
     }
 
+    func getDeviceFromDeviceId(_ deviceId: String) -> PreciseFindableDevice? {
+        return preciseFindableDevices.first(where: { $0?.configuredDeviceId == deviceId }) ?? nil
+    }
+
+    func identifyCollars() {
+        for device in preciseFindableDevices where device?.configuredDeviceId == nil {
+            guard let uniqueID = device?.bleUniqueID else { continue }
+            try? connectPeripheral(uniqueID)
+        }
+    }
+
     func getDeviceFromUniqueID(_ uniqueID: Int) -> PreciseFindableDevice? {
 
         if let index = preciseFindableDevices.firstIndex(where: {$0?.bleUniqueID == uniqueID}) {
@@ -308,6 +319,12 @@ class BLEDataCommunicationChannel: NSObject {
 
         guard let transferCharacteristic = preciseFindableDevice?.rxCharacteristic
         else { return }
+
+        guard discoveredPeripheral.state == .connected else {
+            logger.error("write to \(uniqueID) dropped, peripheral is \(discoveredPeripheral.state.rawValue)")
+            ensureConnected(uniqueID)
+            return
+        }
 
         logger.info("Getting TX Characteristics from device \(uniqueID).")
 
@@ -608,6 +625,9 @@ extension BLEDataCommunicationChannel: CBPeripheralDelegate {
                 }
             }
             logger.info("Read config: host=\(host) port=\(port) deviceId=\(deviceId)")
+            if !deviceId.isEmpty {
+                getDeviceFromUniqueID(peripheral.hashValue)?.configuredDeviceId = deviceId
+            }
             NotificationCenter.default.post(name: Notification.Name(Constants.ConfigReadNotificationName),
                                             object: nil, userInfo: ["host": host, "port": port, "deviceId": deviceId])
             return
