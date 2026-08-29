@@ -668,12 +668,22 @@ extension DeviceBottomDrawerController: DeviceCellDelegate {
         guard let selectedDeviceUniqueBLEId = resolveBLEId(for: selectedDevice) else { return }
 
         BLEDataCommunicationChannel.shared.ensureConnected(selectedDeviceUniqueBLEId)
+        setSoundButtonBusy(true)
         sendPlaySound(to: selectedDeviceUniqueBLEId, attemptsLeft: 8)
+    }
+
+    private func setSoundButtonBusy(_ busy: Bool) {
+        guard let row = selectedDeviceIndex,
+              let cell = tableView.cellForRow(at: IndexPath(row: row, section: 0)) as? DeviceTableViewCell
+        else { return }
+
+        cell.soundButton.configuration?.showsActivityIndicator = busy
     }
 
     private func sendPlaySound(to bleId: Int, attemptsLeft: Int) {
         guard attemptsLeft > 0 else {
             logger.error("playSound gave up, \(bleId) never became ready")
+            setSoundButtonBusy(false)
             return
         }
 
@@ -681,6 +691,7 @@ extension DeviceBottomDrawerController: DeviceCellDelegate {
            device.blePeripheral.state == .connected,
            device.rxCharacteristic != nil {
             try? BLEDataCommunicationChannel.shared.sendData(Data([MessageId.playSound.rawValue]), bleId)
+            setSoundButtonBusy(false)
 
             // Release it, or Precise Find's connectPeripheral rejects a device that is
             // no longer statusDiscovered.

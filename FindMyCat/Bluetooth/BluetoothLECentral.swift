@@ -486,6 +486,12 @@ extension BLEDataCommunicationChannel: CBCentralManagerDelegate {
         // Finally, update the device status
         preciseFindableDevice!.blePeripheralStatus = statusDiscovered
 
+        // Characteristics belong to the connection that just ended. Writes to them are
+        // dropped silently, so clear them and let the next connection rediscover.
+        preciseFindableDevice!.rxCharacteristic = nil
+        preciseFindableDevice!.txCharacteristic = nil
+        preciseFindableDevice!.configCharacteristic = nil
+
         if let didDisconnectHandler = accessoryDisconnectedHandler {
             didDisconnectHandler(uniqueID)
         }
