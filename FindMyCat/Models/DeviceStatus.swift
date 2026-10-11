@@ -44,8 +44,6 @@ struct NetworkState: Decodable {
     let edrx_s: Double?
     /// lte_lc_lte_mode: 7 is LTE-M.
     let mode: Int?
-    /// The modem's first wake in this eDRX phase; windows repeat every edrx_s.
-    let wake_ms: Int64?
 }
 
 /// Which radio reaches the home station: "BLE", "LoRa" or "LTE".
