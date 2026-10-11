@@ -25,12 +25,15 @@ class SharedData {
             NotificationCenter.default.post(name: Notification.Name(Constants.PositionsUpdatedNotificationName), object: nil, userInfo: userInfo)
         }
     }
-    private static var deviceStatuses: [Int: DeviceStatus] = [:] {
+    private static var deviceStates: [Int: DeviceState] = [:] {
         didSet {
-            let userInfo = ["deviceStatuses": deviceStatuses]
+            let userInfo = ["deviceStates": deviceStates]
             NotificationCenter.default.post(name: Notification.Name(Constants.DeviceStatusUpdatedNotificationName), object: nil, userInfo: userInfo)
         }
     }
+    /// Polls device-status only while a ping waits for its answer.
+    private static var statePollTimer: Timer?
+    private static let statePollInterval: TimeInterval = 3
     private static var pingsInFlight: [Int: Date] = [:] {
         didSet {
             let userInfo = ["pingsInFlight": pingsInFlight]
@@ -53,6 +56,7 @@ class SharedData {
         // Sequentially exeute API calls and finally register websockets.
         fetchDevicesFromRestAPI {
             SharedData.mergeInPersistedLocalDevices()
+            SharedData.devices.forEach { SharedData.fetchState(forDeviceId: $0.id) }
             self.fetchPositionsFromRestAPI {
                 self.configureWebsocket {
                    // Fetched complete.
@@ -107,16 +111,56 @@ class SharedData {
         return self.positions
     }
 
-    public static func getDeviceStatus(forDeviceId deviceId: Int) -> DeviceStatus? {
-        return deviceStatuses[deviceId]
+    public static func getDeviceState(forDeviceId deviceId: Int) -> DeviceState? {
+        return deviceStates[deviceId]
     }
 
     public static func markPingSent(forDeviceId deviceId: Int) {
         pingsInFlight[deviceId] = Date()
+        startStatePolling()
     }
 
     public static func pingSentAt(forDeviceId deviceId: Int) -> Date? {
         return pingsInFlight[deviceId]
+    }
+
+    /// Latest eDRX cycle the collar reported, nil until its first network event.
+    public static func edrxSeconds(forDeviceId deviceId: Int) -> Double? {
+        return deviceStates[deviceId]?.network?.edrxSeconds
+    }
+
+    private static func startStatePolling() {
+        guard statePollTimer == nil else { return }
+
+        statePollTimer = Timer.scheduledTimer(withTimeInterval: statePollInterval, repeats: true) { timer in
+            guard !pingsInFlight.isEmpty else {
+                timer.invalidate()
+                statePollTimer = nil
+                return
+            }
+            pingsInFlight.keys.forEach { fetchState(forDeviceId: $0) }
+        }
+    }
+
+    private static func fetchState(forDeviceId deviceId: Int) {
+        guard deviceId != 0 else { return } // local debug devices have no server state
+
+        DeviceStatusAPIManager.shared.fetchDeviceState(deviceId: deviceId) { result in
+            switch result {
+            case .success(let state):
+                deviceStates[deviceId] = state
+
+                // A command result newer than the ping answers it.
+                if let sentAt = pingsInFlight[deviceId],
+                   let answeredAt = state.command?.receivedAt,
+                   answeredAt >= sentAt {
+                    pingsInFlight[deviceId] = nil
+                }
+            case .failure(let error):
+                Logger(subsystem: "Models", category: String(describing: SharedData.self))
+                    .error("Could not fetch device state for \(deviceId): \(error)")
+            }
+        }
     }
 
     // MARK: Network handlers
@@ -183,17 +227,7 @@ class SharedData {
                     }
                 }
             } else if let positions = payloadWrapper.positions {
-                let statuses = (try? decoder.decode(DeviceStatusEnvelope.self, from: jsonData))?
-                    .extractStatuses() ?? []
-                let statusDeviceIds = Set(statuses.map { $0.deviceId })
-
-                for deviceStatus in statuses {
-                    logger.log("device status: device \(deviceStatus.deviceId) command=\(deviceStatus.command) status=\(deviceStatus.status) reason=\(deviceStatus.reason ?? "-")")
-                    SharedData.deviceStatuses[deviceStatus.deviceId] = deviceStatus
-                    SharedData.pingsInFlight[deviceStatus.deviceId] = nil
-                }
-
-                for newPosition in positions where !statusDeviceIds.contains(newPosition.deviceId) {
+                for newPosition in positions {
                     if let index = SharedData.positions.firstIndex(where: { $0.deviceId == newPosition.deviceId }) {
                         // Device with the same ID exists, update it
                         SharedData.positions[index] = newPosition

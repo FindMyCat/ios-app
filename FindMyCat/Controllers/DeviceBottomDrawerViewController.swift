@@ -39,7 +39,7 @@ class DeviceBottomDrawerController:
 
     private let failedPingFeedbackGenerator = UINotificationFeedbackGenerator()
 
-    private static let acknowledgedFailedPingIdsKey = "AcknowledgedFailedPingIds"
+    private static let acknowledgedFailedPingIdsKey = "AcknowledgedFailedCommandEventIds"
     private static let playSoundHoldSeconds: TimeInterval = 5.0
 
     var alreadyAcknowledgedFailedPingIds: Set<Int> {
@@ -76,7 +76,8 @@ class DeviceBottomDrawerController:
 
             let indexPath = IndexPath(row: row, section: 0)
             guard let cell = tableView.cellForRow(at: indexPath) as? DeviceTableViewCell else { continue }
-            cell.pingOrlostModeButton.setPingInFlight(since: pingSentAt, idleTitle: currentMode.capitalized)
+            cell.pingOrlostModeButton.setPingInFlight(since: pingSentAt, idleTitle: currentMode.capitalized,
+                                                      edrxSeconds: SharedData.edrxSeconds(forDeviceId: device.id))
         }
 
         if !anyDeviceHasPingInFlight {
@@ -188,37 +189,38 @@ class DeviceBottomDrawerController:
     }
 
     @objc private func deviceStatusUpdated(_ notification: Notification) {
-        guard let deviceStatuses = notification.userInfo?["deviceStatuses"] as? [Int: DeviceStatus] else { return }
+        guard let deviceStates = notification.userInfo?["deviceStates"] as? [Int: DeviceState] else { return }
 
-        for (_, deviceStatus) in deviceStatuses where deviceStatus.status.lowercased() == "fail" {
-            guard !alreadyAcknowledgedFailedPingIds.contains(deviceStatus.id) else { continue }
-            presentFailedPingAlert(for: deviceStatus)
+        for (deviceId, state) in deviceStates {
+            guard let result = state.command, result.status.lowercased() == "fail",
+                  !alreadyAcknowledgedFailedPingIds.contains(result.id) else { continue }
+            presentFailedPingAlert(for: result, deviceId: deviceId)
         }
     }
 
-    private func presentFailedPingAlert(for deviceStatus: DeviceStatus) {
+    private func presentFailedPingAlert(for result: CommandResult, deviceId: Int) {
         guard parentVc.presentedViewController == nil else { return }
 
-        let deviceName = SharedData.getDevices().first(where: { $0.id == deviceStatus.deviceId })?.name ?? "The collar"
+        let deviceName = SharedData.getDevices().first(where: { $0.id == deviceId })?.name ?? "The collar"
 
         var message = "\(deviceName) heard the ping but could not get a location fix."
-        if let searchedFor = deviceStatus.elapsedSeconds.map(formattedSearchDuration) {
+        if let searchedFor = result.elapsedSeconds.map(formattedSearchDuration) {
             message += " GPS searched for \(searchedFor)"
-            if let satellitesTracked = deviceStatus.satellitesTracked {
+            if let satellitesTracked = result.satellites {
                 message += " and tracked \(formattedSatelliteCount(satellitesTracked))"
             }
             message += "."
-        } else if let satellitesTracked = deviceStatus.satellitesTracked {
+        } else if let satellitesTracked = result.satellites {
             message += " GPS tracked \(formattedSatelliteCount(satellitesTracked))."
         }
 
-        if let failureReason = readableFailureReason(from: deviceStatus) {
+        if let failureReason = readableFailureReason(from: result) {
             message += "\n\nReason: \(failureReason)"
         }
 
         let alertController = UIAlertController(title: "No fix", message: message, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
-            self?.alreadyAcknowledgedFailedPingIds.insert(deviceStatus.id)
+            self?.alreadyAcknowledgedFailedPingIds.insert(result.id)
         })
 
         failedPingFeedbackGenerator.prepare()
@@ -240,8 +242,8 @@ class DeviceBottomDrawerController:
         return "\(wholeSeconds / 60)m \(wholeSeconds % 60)s"
     }
 
-    private func readableFailureReason(from deviceStatus: DeviceStatus) -> String? {
-        guard let reason = deviceStatus.reason?.trimmingCharacters(in: .whitespaces),
+    private func readableFailureReason(from result: CommandResult) -> String? {
+        guard let reason = result.reason?.trimmingCharacters(in: .whitespaces),
               !reason.isEmpty,
               reason.lowercased() != "undefined",
               reason.lowercased() != "null" else {
@@ -416,7 +418,8 @@ class DeviceBottomDrawerController:
         cell.lastSeenLabel.isHidden = true
         cell.deviceAddressLabel.isHidden = true
         cell.batteryIcon.isHidden = true
-        cell.pingOrlostModeButton.setPingInFlight(since: SharedData.pingSentAt(forDeviceId: cellDevice.id), idleTitle: currentMode.capitalized)
+        cell.pingOrlostModeButton.setPingInFlight(since: SharedData.pingSentAt(forDeviceId: cellDevice.id), idleTitle: currentMode.capitalized,
+                                                  edrxSeconds: SharedData.edrxSeconds(forDeviceId: cellDevice.id))
 
         let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(longPressButtonAction(_:)))
         cell.pingOrlostModeButton.addGestureRecognizer(longPressRecognizer)
@@ -562,7 +565,15 @@ class DeviceBottomDrawerController:
         }
         editAction.image = UIImage(systemName: "pencil")
 
-        let configuration = UISwipeActionsConfiguration(actions: [deleteAction, editAction])
+        let statusAction = UIContextualAction(style: .normal, title: "Status") { _, _, completionHandler in
+            let vc = DeviceStatusViewController(deviceId: device.id, deviceName: device.name)
+            self.parentVc.present(UINavigationController(rootViewController: vc), animated: true)
+            completionHandler(true)
+        }
+        statusAction.image = UIImage(systemName: "waveform.path.ecg")
+        statusAction.backgroundColor = .systemIndigo
+
+        let configuration = UISwipeActionsConfiguration(actions: [deleteAction, editAction, statusAction])
 
         configuration.performsFirstActionWithFullSwipe = false
         return configuration

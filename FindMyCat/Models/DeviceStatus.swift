@@ -7,57 +7,60 @@
 
 import Foundation
 
-struct DeviceStatus {
+/// The collar's latest telemetry from the device-status service, one entry
+/// per event kind. A new kind is a new struct and field here.
+struct DeviceState: Decodable {
+    let command: CommandResult?
+    let network: NetworkState?
+    let radio: RadioState?
+
+    static let decoder: JSONDecoder = {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return decoder
+    }()
+}
+
+/// Result of the last ping or mode change.
+struct CommandResult: Decodable {
     let id: Int
-    let deviceId: Int
+    let receivedAt: Date
     let command: String
     let status: String
     let reason: String?
     let method: String?
+    let satellites: Double?
     let elapsedSeconds: Double?
+    let battery: Double?
     let uptimeSeconds: Double?
-    let satellitesTracked: Double?
-    let receivedAt: Date
+
+    private enum CodingKeys: String, CodingKey {
+        case id, receivedAt, command, status, reason, method, satellites, battery
+        case elapsedSeconds = "elapsed_s"
+        case uptimeSeconds = "uptime_s"
+    }
 }
 
-struct DeviceStatusEnvelope: Decodable {
-    struct Attributes: Decodable {
-        let command: String?
-        let status: String?
-        let reason: String?
-        let method: String?
-        let elapsed: Double?
-        let uptime: Double?
-        let sat: Double?
-    }
+/// The eDRX cycle granted on the last attach: the longest a command waits.
+struct NetworkState: Decodable {
+    let id: Int
+    let receivedAt: Date
+    let edrxSeconds: Double?
+    /// LTE mode the grant is for (lte_lc_lte_mode: 7 is LTE-M).
+    let mode: Int?
+    /// Unix ms the modem first woke in this eDRX phase; windows repeat every edrxSeconds.
+    let wakeMs: Int64?
 
-    struct PositionAttributesOnly: Decodable {
-        let id: Int
-        let deviceId: Int
-        let attributes: Attributes?
+    private enum CodingKeys: String, CodingKey {
+        case id, receivedAt, mode
+        case edrxSeconds = "edrx_s"
+        case wakeMs = "wake_ms"
     }
+}
 
-    let positions: [PositionAttributesOnly]?
-
-    func extractStatuses(receivedAt: Date = Date()) -> [DeviceStatus] {
-        (positions ?? []).compactMap { position in
-            guard let attributes = position.attributes,
-                  let command = attributes.command,
-                  let status = attributes.status else {
-                return nil
-            }
-            return DeviceStatus(
-                id: position.id,
-                deviceId: position.deviceId,
-                command: command,
-                status: status,
-                reason: attributes.reason,
-                method: attributes.method,
-                elapsedSeconds: attributes.elapsed,
-                uptimeSeconds: attributes.uptime,
-                satellitesTracked: attributes.sat,
-                receivedAt: receivedAt
-            )
-        }
-    }
+/// Which radio reaches the home station: "BLE", "LoRa" or "LTE".
+struct RadioState: Decodable {
+    let id: Int
+    let receivedAt: Date
+    let active: String
 }

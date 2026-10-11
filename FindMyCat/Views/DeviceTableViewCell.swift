@@ -34,7 +34,7 @@ class ButtonWithProgressBar: UIButton {
     let buttonWidthDuringPinging = 115.0
     private var buttonWidthDuringPingingConstraint: NSLayoutConstraint?
 
-    func setPingInFlight(since sentAt: Date?, idleTitle: String) {
+    func setPingInFlight(since sentAt: Date?, idleTitle: String, edrxSeconds: Double? = nil) {
         guard let sentAt = sentAt else {
             buttonWidthDuringPingingConstraint?.isActive = false
             configuration?.showsActivityIndicator = false
@@ -50,13 +50,21 @@ class ButtonWithProgressBar: UIButton {
 
         configuration?.showsActivityIndicator = true
         configuration?.imagePadding = 8
-        configuration?.title = ButtonWithProgressBar.elapsedTitle(since: sentAt)
+        configuration?.title = ButtonWithProgressBar.pingTitle(since: sentAt, edrxSeconds: edrxSeconds)
         isEnabled = false
         layoutIfNeeded()
     }
 
-    static func elapsedTitle(since sentAt: Date) -> String {
+    /// Counts down to the collar's worst-case paging window while one is due,
+    /// then counts up how long the ping has been out.
+    static func pingTitle(since sentAt: Date, edrxSeconds: Double?) -> String {
         let elapsed = Int(Date().timeIntervalSince(sentAt))
+
+        if let edrxSeconds, elapsed < Int(edrxSeconds.rounded(.up)) {
+            let remaining = Int(edrxSeconds.rounded(.up)) - elapsed
+            return String(format: "~%d:%02d", remaining / 60, remaining % 60)
+        }
+
         return String(format: "%d:%02d", elapsed / 60, elapsed % 60)
     }
 
