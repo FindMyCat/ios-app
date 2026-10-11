@@ -91,10 +91,9 @@ class DeviceTableViewCell: UITableViewCell {
     let emojiLabel = UILabel()
     let dotSeparatorView = UIView()
     let lastSeenLabel = UILabel()
-    let batteryIcon = UIImageView()
+    let batteryIcon = BatteryView()
 
     // Expanded state views
-    let expandedStateBatteryPercentage = UILabel()
     let findButton = Button()
     let soundButton = Button()
     let pingOrlostModeButton = ButtonWithProgressBar()
@@ -139,7 +138,6 @@ class DeviceTableViewCell: UITableViewCell {
         configureDeviceNameLabel()
         configureDeviceAddressLabel()
         configureBatteryIcon()
-//        configureBatteryPercentageLabel()
         configureFindButton()
         configurePlaySoundButton()
         configureLostModeButton()
@@ -234,28 +232,12 @@ class DeviceTableViewCell: UITableViewCell {
     }
 
     private func configureBatteryIcon() {
-        batteryIcon.tintColor = .black
         batteryIcon.translatesAutoresizingMaskIntoConstraints =  false
         contentView.addSubview(batteryIcon)
 
         NSLayoutConstraint.activate([
             batteryIcon.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             batteryIcon.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 23)])
-    }
-
-    private func configureBatteryPercentageLabel() {
-        contentView.addSubview(expandedStateBatteryPercentage)
-
-        expandedStateBatteryPercentage.font = UIFont.systemFont(ofSize: 13)
-        expandedStateBatteryPercentage.alpha = 0.3
-
-        expandedStateBatteryPercentage.translatesAutoresizingMaskIntoConstraints = false
-
-        NSLayoutConstraint.activate([
-            expandedStateBatteryPercentage.centerXAnchor.constraint(equalTo: batteryIcon.centerXAnchor),
-            expandedStateBatteryPercentage.centerYAnchor.constraint(equalTo: batteryIcon.centerYAnchor, constant: 40)
-
-        ])
     }
 
     private func configurePlaySoundButton() {
@@ -361,28 +343,57 @@ class DeviceTableViewCell: UITableViewCell {
     // MARK: - Public Methods
 
     func setBatteryPercentage(percentage: Double) {
-        expandedStateBatteryPercentage.text = "\(Int(percentage))"
-        let batteryIconImageConfig = UIImage.SymbolConfiguration(pointSize: 20)
-        let battPercentageRounded = roundBatteryPercentage(Int(percentage))
-        batteryIcon.image = UIImage(systemName: "battery.\(battPercentageRounded)", withConfiguration: batteryIconImageConfig)
+        batteryIcon.percentage = percentage
+    }
+}
+
+/// iOS 17 style battery: the fill reaches the body's edges, with the number
+/// drawn over it.
+class BatteryView: UIView {
+    var percentage: Double = 0 {
+        didSet { setNeedsDisplay() }
     }
 
-    // MARK: - Private Methods
+    private let bodySize = CGSize(width: 30, height: 16)
+    private let nubSize = CGSize(width: 2, height: 6)
 
-   private func roundBatteryPercentage(_ percentage: Int) -> Int {
-        let roundedValue: Int
-        switch percentage {
-        case 0...12:
-            roundedValue = 0
-        case 13...37:
-            roundedValue = 25
-        case 38...62:
-            roundedValue = 50
-        case 63...87:
-            roundedValue = 75
-        default:
-            roundedValue = 100
-        }
-        return roundedValue
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        isOpaque = false
+        backgroundColor = .clear
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override var intrinsicContentSize: CGSize {
+        CGSize(width: bodySize.width + 1 + nubSize.width, height: bodySize.height)
+    }
+
+    override func draw(_ rect: CGRect) {
+        let level = min(max(percentage, 0), 100) / 100
+        let body = UIBezierPath(roundedRect: CGRect(origin: .zero, size: bodySize), cornerRadius: 4.5)
+        let nub = UIBezierPath(
+            roundedRect: CGRect(x: bodySize.width + 1, y: (bodySize.height - nubSize.height) / 2,
+                                width: nubSize.width, height: nubSize.height),
+            byRoundingCorners: [.topRight, .bottomRight], cornerRadii: CGSize(width: 1, height: 1))
+
+        UIColor.systemGray3.setFill()
+        body.fill()
+        nub.fill()
+
+        body.addClip()
+        (percentage <= 20 ? UIColor.systemRed : UIColor.systemGreen).setFill()
+        UIRectFill(CGRect(x: 0, y: 0, width: bodySize.width * level, height: bodySize.height))
+
+        let text = "\(Int(percentage.rounded()))" as NSString
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: 12, weight: .bold),
+            .foregroundColor: UIColor.darkGray
+        ]
+        let size = text.size(withAttributes: attributes)
+        text.draw(at: CGPoint(x: (bodySize.width - size.width) / 2, y: (bodySize.height - size.height) / 2),
+                  withAttributes: attributes)
     }
 }

@@ -126,7 +126,7 @@ class SharedData {
 
     /// Latest eDRX cycle the collar reported, nil until its first network event.
     public static func edrxSeconds(forDeviceId deviceId: Int) -> Double? {
-        return deviceStates[deviceId]?.network?.edrxSeconds
+        return deviceStates[deviceId]?.network?.edrx_s
     }
 
     private static func startStatePolling() {
@@ -150,10 +150,11 @@ class SharedData {
             case .success(let state):
                 deviceStates[deviceId] = state
 
-                // A command result newer than the ping answers it.
+                // A command result newer than the ping answers it; "sent" is
+                // device-commands logging the send, not the collar answering.
                 if let sentAt = pingsInFlight[deviceId],
-                   let answeredAt = state.command?.receivedAt,
-                   answeredAt >= sentAt {
+                   let command = state.command, command.status != "sent",
+                   command.receivedAt >= sentAt {
                     pingsInFlight[deviceId] = nil
                 }
             case .failure(let error):

@@ -21,6 +21,9 @@ struct DeviceState: Decodable {
     }()
 }
 
+// Field names are the collar's own JSON keys, so nothing is mapped; a "_s"
+// suffix is a duration in seconds, "_ms" a Unix time in milliseconds.
+
 /// Result of the last ping or mode change.
 struct CommandResult: Decodable {
     let id: Int
@@ -30,32 +33,19 @@ struct CommandResult: Decodable {
     let reason: String?
     let method: String?
     let satellites: Double?
-    let elapsedSeconds: Double?
-    let battery: Double?
-    let uptimeSeconds: Double?
-
-    private enum CodingKeys: String, CodingKey {
-        case id, receivedAt, command, status, reason, method, satellites, battery
-        case elapsedSeconds = "elapsed_s"
-        case uptimeSeconds = "uptime_s"
-    }
+    let elapsed_s: Double?
+    let uptime_s: Double?
 }
 
 /// The eDRX cycle granted on the last attach: the longest a command waits.
 struct NetworkState: Decodable {
     let id: Int
     let receivedAt: Date
-    let edrxSeconds: Double?
-    /// LTE mode the grant is for (lte_lc_lte_mode: 7 is LTE-M).
+    let edrx_s: Double?
+    /// lte_lc_lte_mode: 7 is LTE-M.
     let mode: Int?
-    /// Unix ms the modem first woke in this eDRX phase; windows repeat every edrxSeconds.
-    let wakeMs: Int64?
-
-    private enum CodingKeys: String, CodingKey {
-        case id, receivedAt, mode
-        case edrxSeconds = "edrx_s"
-        case wakeMs = "wake_ms"
-    }
+    /// The modem's first wake in this eDRX phase; windows repeat every edrx_s.
+    let wake_ms: Int64?
 }
 
 /// Which radio reaches the home station: "BLE", "LoRa" or "LTE".

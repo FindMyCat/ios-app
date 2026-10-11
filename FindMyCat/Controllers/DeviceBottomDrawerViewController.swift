@@ -204,7 +204,7 @@ class DeviceBottomDrawerController:
         let deviceName = SharedData.getDevices().first(where: { $0.id == deviceId })?.name ?? "The collar"
 
         var message = "\(deviceName) heard the ping but could not get a location fix."
-        if let searchedFor = result.elapsedSeconds.map(formattedSearchDuration) {
+        if let searchedFor = result.elapsed_s.map(formattedSearchDuration) {
             message += " GPS searched for \(searchedFor)"
             if let satellitesTracked = result.satellites {
                 message += " and tracked \(formattedSatelliteCount(satellitesTracked))"
@@ -452,7 +452,7 @@ class DeviceBottomDrawerController:
                     cell.batteryIcon.isHidden = false
                 } else {
                     cell.batteryIcon.isHidden = true
-                }
+                            }
             }
 
             let cachedAddress = cachedAddressesByDeviceId[cellDevice.id]
@@ -724,31 +724,15 @@ extension DeviceBottomDrawerController: DeviceCellDelegate {
         let selectedDevice = SharedData.getDevices()[selectedDeviceIndex!]
         let selectedDeviceTraccarId = selectedDevice.id
 
-        HologramAPIManager.shared.fetchDevice(name: selectedDevice.uniqueId, orgId: HologramAPIManager.shared.orgId) {
-            result in
-
+        DeviceCommandsAPIManager.shared.send(currentMode, toDeviceId: selectedDeviceTraccarId) { result in
             switch result {
-            case .success(let hologramDevice):
-                // Send UDP message to device for lost mode activation
-                HologramAPIManager.shared.sendCloudMessageToDevice(deviceId: hologramDevice.id, message: currentMode) {
-                    result in
-
-                    switch result {
-                    case .success:
-                        DispatchQueue.main.async {
-                            SharedData.markPingSent(forDeviceId: selectedDeviceTraccarId)
-                            self.startSelectedDevicePingElapsedRedrawTimer()
-                            self.reloadTableDataCellByCell()
-                        }
-                    case .failure(let error):
-                        self.logger.error("Could not queue command with Hologram \(error)")
-                    }
-                }
-
+            case .success:
+                SharedData.markPingSent(forDeviceId: selectedDeviceTraccarId)
+                self.startSelectedDevicePingElapsedRedrawTimer()
+                self.reloadTableDataCellByCell()
             case .failure(let error):
-                self.logger.error("Could not fetch Hologram device info from REST endpoint \(error)")
+                self.logger.error("Could not send \(currentMode) to device \(selectedDeviceTraccarId): \(error)")
             }
         }
-
     }
 }

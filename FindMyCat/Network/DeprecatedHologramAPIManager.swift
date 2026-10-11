@@ -1,5 +1,6 @@
 //
-//  HologramAPIManager.swift
+//  DeprecatedHologramAPIManager.swift
+//  Unused: the app sends commands through the device-commands service now
 //  FindMyCat
 //
 //  Created by Sahas Chitlange on 8/3/23.
@@ -9,9 +10,9 @@ import Alamofire
 import Foundation
 import os.log
 
-class HologramAPIManager {
-    let logger = Logger(subsystem: "Network", category: String(describing: HologramAPIManager.self))
-    static let shared = HologramAPIManager()
+class DeprecatedHologramAPIManager {
+    let logger = Logger(subsystem: "Network", category: String(describing: DeprecatedHologramAPIManager.self))
+    static let shared = DeprecatedHologramAPIManager()
 
     let session: Session
 
@@ -50,7 +51,7 @@ class HologramAPIManager {
         self.session = Session()
     }
 
-    func fetchDevice(name: String, orgId: Int?, completion: @escaping (Result<HologramDevice, Error>) -> Void) {
+    func fetchDevice(name: String, orgId: Int?, completion: @escaping (Result<DeprecatedHologramDevice, Error>) -> Void) {
         let parameters = ["name": name, "orgid": orgId] as [String: Any]
         let user = "apikey" // Hologram rest API requires username as "apikey"
         let password = apiKey
@@ -60,7 +61,7 @@ class HologramAPIManager {
 
         let apiUrl = "https://\(host)/api/1/devices/"
         session.request(apiUrl, parameters: parameters, headers: headers)
-            .responseDecodable(of: HologramDevicesResponse.self) { response in
+            .responseDecodable(of: DeprecatedHologramDevicesResponse.self) { response in
                 debugPrint(response)
                 switch response.result {
                 case .success(let devicesResponse):

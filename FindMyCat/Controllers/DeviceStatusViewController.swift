@@ -53,11 +53,35 @@ class DeviceStatusViewController: UITableViewController {
         Mirror(reflecting: state).children.compactMap { child in
             guard let kind = child.label, let event = unwrap(child.value) else { return nil }
             let fields = Mirror(reflecting: event).children.compactMap { field -> (key: String, value: String)? in
-                guard let key = field.label else { return nil }
-                return (key, unwrap(field.value).map { "\($0)" } ?? "—")
+                guard let key = field.label, key != "id" else { return nil }
+                return (label(key), unwrap(field.value).map { format($0, key: key) } ?? "—")
             }
-            return (kind, fields)
+            return (kind.capitalized, fields)
         }
+    }
+
+    /// Field names end in their unit ("_s", "_ms"), so the unit decides the format.
+    private static let units = ["_ms", "_s"]
+
+    /// "edrx_s" -> "Edrx", "receivedAt" -> "Received at"
+    private static func label(_ key: String) -> String {
+        let name = units.first { key.hasSuffix($0) }.map { String(key.dropLast($0.count)) } ?? key
+        let words = name.replacingOccurrences(of: "([a-z])([A-Z])", with: "$1 $2", options: .regularExpression)
+            .replacingOccurrences(of: "_", with: " ").lowercased()
+        return words.prefix(1).uppercased() + words.dropFirst()
+    }
+
+    private static func format(_ value: Any, key: String) -> String {
+        if let date = value as? Date {
+            return date.formatted(date: .abbreviated, time: .standard) + " (" + date.formatted(.relative(presentation: .named)) + ")"
+        }
+        guard let number = (value as? NSNumber)?.doubleValue else { return "\(value)" }
+
+        if key.hasSuffix("_ms") { return format(Date(timeIntervalSince1970: number / 1000), key: "") }
+        if key.hasSuffix("_s") { return "\(number.formatted()) s" }
+        // lte_lc_lte_mode
+        if key == "mode" { return [0: "None", 7: "LTE-M", 9: "NB-IoT"][Int(number)] ?? "\(Int(number))" }
+        return number.formatted()
     }
 
     /// The wrapped value of an Optional, nil for .none; other values as is.
