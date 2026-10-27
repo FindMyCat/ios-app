@@ -33,8 +33,9 @@ struct CommandResult: Decodable {
     let reason: String?
     let method: String?
     let satellites: Double?
-    let elapsed_s: Double?
-    let uptime_s: Double?
+    /// Set by the server when it placed the WiFi scan ("ok").
+    let access_points: Int?
+    let accuracy_m: Double?
 }
 
 /// The eDRX cycle granted on the last attach: the longest a command waits.

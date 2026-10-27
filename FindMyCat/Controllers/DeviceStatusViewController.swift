@@ -60,8 +60,8 @@ class DeviceStatusViewController: UITableViewController {
         }
     }
 
-    /// Field names end in their unit ("_s", "_ms"), so the unit decides the format.
-    private static let units = ["_ms", "_s"]
+    /// Field names end in their unit ("_s", "_ms", "_m"), so the unit decides the format.
+    private static let units = ["_ms", "_s", "_m"]
 
     /// "edrx_s" -> "Edrx", "receivedAt" -> "Received at"
     private static func label(_ key: String) -> String {
@@ -79,6 +79,7 @@ class DeviceStatusViewController: UITableViewController {
 
         if key.hasSuffix("_ms") { return format(Date(timeIntervalSince1970: number / 1000), key: "") }
         if key.hasSuffix("_s") { return "\(number.formatted()) s" }
+        if key.hasSuffix("_m") { return "\(number.formatted()) m" }
         // lte_lc_lte_mode
         if key == "mode" { return [0: "None", 7: "LTE-M", 9: "NB-IoT"][Int(number)] ?? "\(Int(number))" }
         return number.formatted()

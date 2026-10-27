@@ -204,13 +204,7 @@ class DeviceBottomDrawerController:
         let deviceName = SharedData.getDevices().first(where: { $0.id == deviceId })?.name ?? "The collar"
 
         var message = "\(deviceName) heard the ping but could not get a location fix."
-        if let searchedFor = result.elapsed_s.map(formattedSearchDuration) {
-            message += " GPS searched for \(searchedFor)"
-            if let satellitesTracked = result.satellites {
-                message += " and tracked \(formattedSatelliteCount(satellitesTracked))"
-            }
-            message += "."
-        } else if let satellitesTracked = result.satellites {
+        if let satellitesTracked = result.satellites {
             message += " GPS tracked \(formattedSatelliteCount(satellitesTracked))."
         }
 
@@ -232,14 +226,6 @@ class DeviceBottomDrawerController:
     private func formattedSatelliteCount(_ satellites: Double) -> String {
         let wholeSatellites = Int(satellites.rounded())
         return wholeSatellites == 1 ? "1 satellite" : "\(wholeSatellites) satellites"
-    }
-
-    private func formattedSearchDuration(_ seconds: Double) -> String {
-        let wholeSeconds = Int(seconds.rounded())
-        if wholeSeconds < 60 {
-            return "\(wholeSeconds)s"
-        }
-        return "\(wholeSeconds / 60)m \(wholeSeconds % 60)s"
     }
 
     private func readableFailureReason(from result: CommandResult) -> String? {

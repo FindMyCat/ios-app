@@ -166,7 +166,35 @@ class MapboxView: UIView, CLLocationManagerDelegate {
         return mapView.mapboxMap.camera(for: polygon, padding: .init(top: 150, left: 100, bottom: 400, right: 100), bearing: 0, pitch: 0)
     }
 
+    /// A translucent circle of each position's accuracy radius, under the pins.
+    private func showAccuracy(positions: [Position]) {
+        guard mapView.mapboxMap.isStyleLoaded else { return }
+
+        let circles = FeatureCollection(features: positions.compactMap { position -> Feature? in
+            guard let accuracy = position.accuracy, accuracy > 0 else { return nil }
+            let center = CLLocationCoordinate2D(latitude: position.latitude, longitude: position.longitude)
+            return Feature(geometry: .polygon(Polygon(center: center, radius: accuracy, vertices: 64)))
+        })
+
+        let sourceId = "accuracy"
+        if mapView.mapboxMap.sourceExists(withId: sourceId) {
+            mapView.mapboxMap.updateGeoJSONSource(withId: sourceId, geoJSON: .featureCollection(circles))
+            return
+        }
+
+        var source = GeoJSONSource(id: sourceId)
+        source.data = .featureCollection(circles)
+        var layer = FillLayer(id: sourceId, source: sourceId)
+        layer.fillColor = .constant(StyleColor(.systemBlue))
+        layer.fillOpacity = .constant(0.15)
+        layer.fillOutlineColor = .constant(StyleColor(.systemBlue))
+        try? mapView.mapboxMap.addSource(source)
+        try? mapView.mapboxMap.addLayer(layer)
+    }
+
     private func addAnnotations(positions: [Position]) {
+        showAccuracy(positions: positions)
+
         for position in positions {
             let newCoordinate = CLLocationCoordinate2D(latitude: position.latitude, longitude: position.longitude)
             let options = ViewAnnotationOptions(
