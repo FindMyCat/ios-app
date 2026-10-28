@@ -18,6 +18,9 @@ class UpdateViewController: UIViewController {
     private let includeLTE: Bool
     private var startedAt = Date()
     private var dfuController: DFUServiceController?
+    private var dfuPeripheralID: UUID?
+    /// Covers the collar's 60 s watchdog if the new app stalls on its first boot.
+    private static let backTimeout: TimeInterval = 90
     private var lastChangeAt = Date()
     private var lastStep = ""
     private var pollTimer: Timer?
@@ -164,22 +167,29 @@ class UpdateViewController: UIViewController {
         pollTimer?.invalidate()
         BLEDataCommunicationChannel.shared.resumeScanning()
         show(step: step, detail: detail, progress: progress ?? collarView.progress)
+        closeButton.setTitle("Close", for: .normal)
         closeButton.isHidden = false
         isModalInPresentation = false
     }
 
+    /// Same lookup and 0.5 s retry as the add/edit screen: keeps searching until
+    /// the collar is discovered. The DFU library makes its own connection.
     private func updateBluetoothChip() {
-        let channel = BLEDataCommunicationChannel.shared
-        guard let device = channel.getDeviceFromDeviceId(uniqueId)
-                ?? Int(uniqueId).flatMap({ channel.getDeviceFromUniqueID($0) }) else {
-            if includeLTE {
-                sendCommand()
-            } else {
-                finish(step: "Collar not in Bluetooth range", detail: "Bring the phone next to the collar and try again.")
-            }
-            return
-        }
+        show(step: "Bluetooth chip: searching…", detail: "Bring the phone next to the collar.", progress: 0)
+        closeButton.setTitle("Cancel", for: .normal)
+        closeButton.isHidden = false
 
+        pollTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] timer in
+            guard let self, let bleId = Int(self.uniqueId),
+                  let device = BLEDataCommunicationChannel.shared.getDeviceFromUniqueID(bleId) else { return }
+            timer.invalidate()
+            self.closeButton.isHidden = true
+            self.downloadBluetoothFirmware(for: device)
+        }
+        pollTimer?.fire()
+    }
+
+    private func downloadBluetoothFirmware(for device: PreciseFindableDevice) {
         show(step: "Bluetooth chip: downloading…", detail: "Getting the latest Bluetooth firmware from the cloud.", progress: 0)
         DeviceCommandsAPIManager.shared.downloadFirmware("indoor_update.zip") { [weak self] result in
             guard let self else { return }
@@ -205,12 +215,44 @@ class UpdateViewController: UIViewController {
         BLEDataCommunicationChannel.shared.pauseScanning()
         try? BLEDataCommunicationChannel.shared.disconnectPeripheral(device.bleUniqueID)
 
+        dfuPeripheralID = device.blePeripheral.identifier
         let initiator = DFUServiceInitiator().with(firmware: firmware)
         initiator.delegate = self
         initiator.progressDelegate = self
         dfuController = initiator.start(targetWithIdentifier: device.blePeripheral.identifier)
         if dfuController == nil {
             finish(step: "Could not start the Bluetooth update", detail: "The collar isn't reachable over Bluetooth.")
+        }
+    }
+
+    /// The bootloader accepted the image; success only once the collar's own
+    /// advert (not DfuTarg) shows up again, i.e. the new app is running.
+    private func waitForCollarBack() {
+        show(step: "Bluetooth chip: restarting…", detail: "Waiting for the collar to come back.", progress: 1)
+        BLEDataCommunicationChannel.shared.resumeScanning()
+        let sentAt = Int64((Date().timeIntervalSince1970 * 1000).rounded())
+        let deadline = Date().addingTimeInterval(Self.backTimeout)
+
+        pollTimer?.invalidate()
+        pollTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] timer in
+            guard let self else { return }
+            let back = BLEDataCommunicationChannel.shared.preciseFindableDevices.contains {
+                $0?.blePeripheral.identifier == self.dfuPeripheralID && ($0?.bleTimestamp ?? 0) > sentAt
+            }
+            if back {
+                timer.invalidate()
+                if self.includeLTE {
+                    self.sendCommand()
+                } else {
+                    self.collarView.setLED(.blinkTwice(.systemBlue))
+                    self.finish(step: "✓ Bluetooth chip updated", detail: "The collar is back on the new firmware.", progress: 1)
+                }
+            } else if Date() > deadline {
+                timer.invalidate()
+                self.collarView.setLED(.steady(.systemRed))
+                self.finish(step: "Collar didn't come back",
+                            detail: "The update was installed but the collar hasn't shown up over Bluetooth. Check it's powered and nearby.")
+            }
         }
     }
 }
@@ -226,13 +268,7 @@ extension UpdateViewController: DFUServiceDelegate {
         case .starting, .validating:
             show(step: "Bluetooth chip: checking…", detail: "The collar verifies the signature.", progress: collarView.progress)
         case .completed:
-            BLEDataCommunicationChannel.shared.resumeScanning()
-            if includeLTE {
-                sendCommand()
-            } else {
-                collarView.setLED(.blinkTwice(.systemBlue))
-                finish(step: "✓ Bluetooth chip updated", detail: "The collar restarted into the new firmware.", progress: 1)
-            }
+            waitForCollarBack()
         case .aborted:
             collarView.setLED(.steady(.systemRed))
             finish(step: "Bluetooth update stopped",
