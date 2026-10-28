@@ -41,6 +41,7 @@
 		D5A7C0082E9A000100F1C0DE /* UpdateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A7C0072E9A000100F1C0DE /* UpdateViewController.swift */; };
 		365E53742A478F6F00AD6AE8 /* Devices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E53732A478F6F00AD6AE8 /* Devices.swift */; };
 		365E537B2A48AFC700AD6AE8 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 365E537A2A48AFC700AD6AE8 /* Alamofire */; };
+		D5A7C00F2E9A000100F1C0DE /* NordicDFU in Frameworks */ = {isa = PBXBuildFile; productRef = D5A7C00E2E9A000100F1C0DE /* NordicDFU */; };
 		365E537E2A48AFDF00AD6AE8 /* CookieHandlerUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E537D2A48AFDF00AD6AE8 /* CookieHandlerUtil.swift */; };
 		365E53822A48B54A00AD6AE8 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E53812A48B54A00AD6AE8 /* LoginViewController.swift */; };
 		365E53842A48B73300AD6AE8 /* HomeScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365E53832A48B73300AD6AE8 /* HomeScreenViewController.swift */; };
@@ -127,6 +128,7 @@
 				3681E8862A54C1EE003392F9 /* FittedSheets in Frameworks */,
 				36392F2A2A60CEC300DE866C /* CocoaTextField in Frameworks */,
 				365E537B2A48AFC700AD6AE8 /* Alamofire in Frameworks */,
+				D5A7C00F2E9A000100F1C0DE /* NordicDFU in Frameworks */,
 				36562C082A54DCAE00D95C4C /* NearbyInteraction.framework in Frameworks */,
 				365E53662A476A0C00AD6AE8 /* MapboxMaps in Frameworks */,
 				36562C0A2A54DCB400D95C4C /* CoreBluetooth.framework in Frameworks */,
@@ -351,6 +353,7 @@
 			packageProductDependencies = (
 				365E53652A476A0C00AD6AE8 /* MapboxMaps */,
 				365E537A2A48AFC700AD6AE8 /* Alamofire */,
+				D5A7C00E2E9A000100F1C0DE /* NordicDFU */,
 				365E53882A48EF0200AD6AE8 /* Starscream */,
 				3681E8852A54C1EE003392F9 /* FittedSheets */,
 				36392F292A60CEC300DE866C /* CocoaTextField */,
@@ -386,6 +389,7 @@
 			packageReferences = (
 				365E53642A476A0C00AD6AE8 /* XCRemoteSwiftPackageReference "mapbox-maps-ios" */,
 				365E53792A48AFC700AD6AE8 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				D5A7C00D2E9A000100F1C0DE /* XCRemoteSwiftPackageReference "IOS-DFU-Library" */,
 				365E53872A48EF0200AD6AE8 /* XCRemoteSwiftPackageReference "Starscream" */,
 				3681E8842A54C1EE003392F9 /* XCRemoteSwiftPackageReference "FittedSheets" */,
 				36392F282A60CEC300DE866C /* XCRemoteSwiftPackageReference "CocoaTextField" */,
@@ -749,6 +753,14 @@
 				kind = branch;
 			};
 		};
+		D5A7C00D2E9A000100F1C0DE /* XCRemoteSwiftPackageReference "IOS-DFU-Library" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/NordicSemiconductor/IOS-DFU-Library";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.16.0;
+			};
+		};
 		365E53872A48EF0200AD6AE8 /* XCRemoteSwiftPackageReference "Starscream" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/daltoniam/Starscream.git";
@@ -782,6 +794,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 365E53792A48AFC700AD6AE8 /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
+		};
+		D5A7C00E2E9A000100F1C0DE /* NordicDFU */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D5A7C00D2E9A000100F1C0DE /* XCRemoteSwiftPackageReference "IOS-DFU-Library" */;
+			productName = NordicDFU;
 		};
 		365E53882A48EF0200AD6AE8 /* Starscream */ = {
 			isa = XCSwiftPackageProductDependency;

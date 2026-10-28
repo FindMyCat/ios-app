@@ -44,4 +44,22 @@ class DeviceCommandsAPIManager {
                 }
             }
     }
+
+    /// Downloads a file uploaded with `make fw-upload`, e.g. indoor_update.zip.
+    func downloadFirmware(_ file: String, completion: @escaping (Result<URL, Error>) -> Void) {
+        let destination: DownloadRequest.Destination = { _, _ in
+            let url = FileManager.default.temporaryDirectory.appendingPathComponent(file)
+            return (url, [.removePreviousFile])
+        }
+        session.download("\(baseUrl)/firmware/\(file)", to: destination)
+            .validate()
+            .response { response in
+                switch response.result {
+                case .success(let url):
+                    completion(url.map { .success($0) } ?? .failure(AFError.responseValidationFailed(reason: .dataFileNil)))
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            }
+    }
 }

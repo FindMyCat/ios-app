@@ -3,15 +3,21 @@
 //  FindMyCat
 //
 
+import NordicDFU
 import UIKit
 
-/// Sends the update command and follows it to the end: download progress,
-/// the reboot, and the new firmware version checking in. It can't be swiped
-/// away; Close appears once the update finishes, fails or stalls.
+/// Updates both chips to the latest firmware. First the nRF52 over Bluetooth
+/// (skipped when the collar isn't in range), then the nRF91 over LTE: sends the
+/// update command and follows download progress, the reboot and the new
+/// version checking in. It can't be swiped away; Close appears once the update
+/// finishes, fails or stalls.
 class UpdateViewController: UIViewController {
     private let deviceId: Int
+    private let uniqueId: String
     private let deviceName: String
-    private let startedAt = Date()
+    private let includeLTE: Bool
+    private var startedAt = Date()
+    private var dfuController: DFUServiceController?
     private var lastChangeAt = Date()
     private var lastStep = ""
     private var pollTimer: Timer?
@@ -27,9 +33,11 @@ class UpdateViewController: UIViewController {
     private let collarView = CollarModelView()
     private let closeButton = UIButton(type: .system)
 
-    init(deviceId: Int, deviceName: String) {
+    init(deviceId: Int, uniqueId: String, deviceName: String, includeLTE: Bool) {
         self.deviceId = deviceId
+        self.uniqueId = uniqueId
         self.deviceName = deviceName
+        self.includeLTE = includeLTE
         super.init(nibName: nil, bundle: nil)
         isModalInPresentation = true
     }
@@ -68,8 +76,7 @@ class UpdateViewController: UIViewController {
             collarView.heightAnchor.constraint(equalTo: collarView.widthAnchor)
         ])
 
-        show(step: "Sending…", detail: "Asking the cloud to send the update command.", progress: 0)
-        sendCommand()
+        updateBluetoothChip()
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -78,6 +85,10 @@ class UpdateViewController: UIViewController {
     }
 
     private func sendCommand() {
+        startedAt = Date()
+        lastChangeAt = Date()
+        collarView.setLED(.off)
+        show(step: "LTE chip: sending…", detail: "Asking the cloud to send the update command.", progress: 0)
         DeviceCommandsAPIManager.shared.send("update", toDeviceId: deviceId) { [weak self] result in
             guard let self else { return }
             switch result {
@@ -151,8 +162,96 @@ class UpdateViewController: UIViewController {
 
     private func finish(step: String, detail: String, progress: Float? = nil) {
         pollTimer?.invalidate()
+        BLEDataCommunicationChannel.shared.resumeScanning()
         show(step: step, detail: detail, progress: progress ?? collarView.progress)
         closeButton.isHidden = false
         isModalInPresentation = false
+    }
+
+    private func updateBluetoothChip() {
+        let channel = BLEDataCommunicationChannel.shared
+        guard let device = channel.getDeviceFromDeviceId(uniqueId)
+                ?? Int(uniqueId).flatMap({ channel.getDeviceFromUniqueID($0) }) else {
+            if includeLTE {
+                sendCommand()
+            } else {
+                finish(step: "Collar not in Bluetooth range", detail: "Bring the phone next to the collar and try again.")
+            }
+            return
+        }
+
+        show(step: "Bluetooth chip: downloading…", detail: "Getting the latest Bluetooth firmware from the cloud.", progress: 0)
+        DeviceCommandsAPIManager.shared.downloadFirmware("indoor_update.zip") { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success(let url):
+                self.startDFU(zip: url, device: device)
+            case .failure(let error):
+                self.finish(step: "Could not download the Bluetooth update", detail: error.localizedDescription)
+            }
+        }
+    }
+
+    private func startDFU(zip: URL, device: PreciseFindableDevice) {
+        let firmware: DFUFirmware
+        do {
+            firmware = try DFUFirmware(urlToZipFile: zip)
+        } catch {
+            finish(step: "Bluetooth update file is invalid", detail: error.localizedDescription)
+            return
+        }
+
+        // The app's own connection and scanning would fight the DFU library for the collar.
+        BLEDataCommunicationChannel.shared.pauseScanning()
+        try? BLEDataCommunicationChannel.shared.disconnectPeripheral(device.bleUniqueID)
+
+        let initiator = DFUServiceInitiator().with(firmware: firmware)
+        initiator.delegate = self
+        initiator.progressDelegate = self
+        dfuController = initiator.start(targetWithIdentifier: device.blePeripheral.identifier)
+        if dfuController == nil {
+            finish(step: "Could not start the Bluetooth update", detail: "The collar isn't reachable over Bluetooth.")
+        }
+    }
+}
+
+extension UpdateViewController: DFUServiceDelegate {
+    func dfuStateDidChange(to state: DFUState) {
+        switch state {
+        case .connecting:
+            collarView.setLED(.pulse(.systemBlue))
+            show(step: "Bluetooth chip: connecting…", detail: "Keep the phone next to the collar.", progress: 0)
+        case .enablingDfuMode:
+            show(step: "Bluetooth chip: restarting into the bootloader…", detail: "The collar reappears as DfuTarg.", progress: 0)
+        case .starting, .validating:
+            show(step: "Bluetooth chip: checking…", detail: "The collar verifies the signature.", progress: collarView.progress)
+        case .completed:
+            BLEDataCommunicationChannel.shared.resumeScanning()
+            if includeLTE {
+                sendCommand()
+            } else {
+                collarView.setLED(.blinkTwice(.systemBlue))
+                finish(step: "✓ Bluetooth chip updated", detail: "The collar restarted into the new firmware.", progress: 1)
+            }
+        case .aborted:
+            collarView.setLED(.steady(.systemRed))
+            finish(step: "Bluetooth update stopped",
+                   detail: "If the collar shows up as DfuTarg, run the update again to recover it.")
+        default:
+            break
+        }
+    }
+
+    func dfuError(_ error: DFUError, didOccurWithMessage message: String) {
+        collarView.setLED(.steady(.systemRed))
+        finish(step: "Bluetooth update failed",
+               detail: "\(message)\nIf the collar shows up as DfuTarg, run the update again to recover it.")
+    }
+}
+
+extension UpdateViewController: DFUProgressDelegate {
+    func dfuProgressDidChange(for part: Int, outOf totalParts: Int, to progress: Int,
+                              currentSpeedBytesPerSecond: Double, avgSpeedBytesPerSecond: Double) {
+        show(step: "Bluetooth chip: sending", detail: "\(progress)% sent.", progress: Float(progress) / 100)
     }
 }
