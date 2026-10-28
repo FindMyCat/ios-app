@@ -559,7 +559,25 @@ class DeviceBottomDrawerController:
         statusAction.image = UIImage(systemName: "waveform.path.ecg")
         statusAction.backgroundColor = .systemIndigo
 
-        let configuration = UISwipeActionsConfiguration(actions: [deleteAction, editAction, statusAction])
+        // The collar downloads the image last uploaded with `make fw-upload`
+        // and reboots into it; progress shows in the Status screen.
+        let updateAction = UIContextualAction(style: .normal, title: "Update") { _, _, completionHandler in
+            let alertController = UIAlertController(
+                title: "Update firmware?",
+                message: "\(device.name) downloads the latest firmware over LTE and restarts. It needs LTE as its link right now.",
+                preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+            alertController.addAction(UIAlertAction(title: "Update", style: .default) { _ in
+                let vc = UpdateViewController(deviceId: device.id, deviceName: device.name)
+                self.parentVc.present(vc, animated: true)
+            })
+            self.parentVc.present(alertController, animated: true)
+            completionHandler(true)
+        }
+        updateAction.image = UIImage(systemName: "arrow.down.circle")
+        updateAction.backgroundColor = .systemTeal
+
+        let configuration = UISwipeActionsConfiguration(actions: [deleteAction, editAction, statusAction, updateAction])
 
         configuration.performsFirstActionWithFullSwipe = false
         return configuration

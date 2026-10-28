@@ -13,6 +13,7 @@ struct DeviceState: Decodable {
     let command: CommandResult?
     let network: NetworkState?
     let radio: RadioState?
+    let firmware: FirmwareState?
 
     static let decoder: JSONDecoder = {
         let decoder = JSONDecoder()
@@ -52,4 +53,12 @@ struct RadioState: Decodable {
     let id: Int
     let receivedAt: Date
     let active: String
+}
+
+/// Version of the running firmware, reported once per boot when LTE comes up.
+/// After an update, a new version here means the new image is running.
+struct FirmwareState: Decodable {
+    let id: Int
+    let receivedAt: Date
+    let version: String
 }
