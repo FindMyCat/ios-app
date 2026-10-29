@@ -57,7 +57,7 @@ class TraccarAPIManager {
     }
 
     func getSession(completion: @escaping (Result<Data?, Error>) -> Void) {
-        let url = "https://\(host)/api/session"
+        let url = "https://\(host)/auth/session"
         let method = HTTPMethod.get
 
         session
@@ -154,11 +154,10 @@ class TraccarAPIManager {
     }
 
     func createSession(username: String, password: String, completion: @escaping (Result<Data?, Error>) -> Void) {
-        let url = "https://\(host)/api/session"
+        let url = "https://\(host)/auth/login"
 
         let headers: HTTPHeaders = [
-            .accept("application/json"),
-            .contentType("application/x-www-form-urlencoded")
+            .accept("application/json")
         ]
 
         struct Login: Encodable {
@@ -170,7 +169,7 @@ class TraccarAPIManager {
 
         // create a session
         session
-            .request(url, method: .post, parameters: login, headers: headers)
+            .request(url, method: .post, parameters: login, encoder: JSONParameterEncoder.default, headers: headers)
             .validate(statusCode: 200..<300)
             .response { response in
                 CookieHandlerUtil.shared.backupCookies(forURL: url)
