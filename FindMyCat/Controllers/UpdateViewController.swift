@@ -6,11 +6,6 @@
 import NordicDFU
 import UIKit
 
-/// Updates both chips to the latest firmware. First the nRF52 over Bluetooth
-/// (skipped when the collar isn't in range), then the nRF91 over LTE: sends the
-/// update command and follows download progress, the reboot and the new
-/// version checking in. It can't be swiped away; Close appears once the update
-/// finishes, fails or stalls.
 class UpdateViewController: UIViewController {
 
     // MARK: - Constants
@@ -212,8 +207,6 @@ class UpdateViewController: UIViewController {
         }
     }
 
-    /// The bootloader accepted the image; success only once the collar's own
-    /// advert (not DfuTarg) shows up again, i.e. the new app is running.
     private func waitForCollarToRestartAfterBluetoothInstall() {
         showUpdateStatus(title: Self.RESTARTING_STATUS_TITLE, detail: "Waiting for the collar to come back.", progress: 1)
         BLEDataCommunicationChannel.shared.resumeScanning()
@@ -232,13 +225,13 @@ class UpdateViewController: UIViewController {
                 if self.shouldUpdateLteChip {
                     self.sendLteUpdateCommand()
                 } else {
-                    self.finishUpdate(title: Self.UPDATE_COMPLETE_STATUS_TITLE, detail: "\(self.deviceName) is back on the new firmware.",
+                    self.finishUpdate(title: Self.UPDATE_COMPLETE_STATUS_TITLE,
                                       progress: 1, succeeded: true)
                 }
             } else if Date() > restartDeadline {
                 timer.invalidate()
                 self.finishUpdate(title: "Collar didn't come back",
-                                  detail: "The update installed, but the collar hasn't reappeared. Check it's powered on and nearby.")
+                                  detail: "The update installed, but the collar hasn't reappeared.")
             }
         }
     }
