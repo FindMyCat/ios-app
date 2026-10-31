@@ -6,21 +6,10 @@
 import SceneKit
 import UIKit
 
-/// The collar's 3D model (collar-main.usdz) turning inside a progress ring,
-/// with its LED drivable from code.
 final class CollarModelView: UIView {
-    enum LED {
-        case off
-        case steady(UIColor)
-        case pulse(UIColor)
-        /// Two blinks, like the collar's boot blink.
-        case blinkTwice(UIColor)
-    }
-
     private let sceneView = SCNView()
     private let track = CAShapeLayer()
     private let ring = CAShapeLayer()
-    private var ledMaterials: [SCNMaterial] = []
     private static let ringWidth: CGFloat = 6
 
     private(set) var progress: Float = 0
@@ -88,13 +77,6 @@ final class CollarModelView: UIView {
         camera.look(at: SCNVector3Zero)
         scene.rootNode.addChildNode(camera)
 
-        // The LED keeps its Fusion material name (LEDSMD5630…).
-        var materials: [SCNMaterial] = []
-        scene.rootNode.enumerateChildNodes { node, _ in
-            materials += node.geometry?.materials.filter { $0.name?.contains("LED") == true } ?? []
-        }
-        ledMaterials = materials
-
         sceneView.scene = scene
         sceneView.pointOfView = camera
     }
@@ -105,36 +87,5 @@ final class CollarModelView: UIView {
         CATransaction.setDisableActions(!animated)
         ring.strokeEnd = CGFloat(value)
         CATransaction.commit()
-    }
-
-    func setLED(_ state: LED) {
-        for material in ledMaterials {
-            material.removeAllAnimations()
-            material.emission.intensity = 1
-
-            switch state {
-            case .off:
-                material.emission.contents = UIColor.black
-            case .steady(let color):
-                material.emission.contents = color
-            case .pulse(let color):
-                material.emission.contents = color
-                let pulse = CABasicAnimation(keyPath: "emission.intensity")
-                pulse.fromValue = 0.1
-                pulse.toValue = 1
-                pulse.duration = 0.9
-                pulse.autoreverses = true
-                pulse.repeatCount = .infinity
-                material.addAnimation(pulse, forKey: "led")
-            case .blinkTwice(let color):
-                material.emission.contents = color
-                let blink = CAKeyframeAnimation(keyPath: "emission.intensity")
-                blink.values = [1, 0, 1, 0, 1]
-                blink.keyTimes = [0, 0.25, 0.5, 0.75, 1]
-                blink.calculationMode = .discrete
-                blink.duration = 1.2
-                material.addAnimation(blink, forKey: "led")
-            }
-        }
     }
 }

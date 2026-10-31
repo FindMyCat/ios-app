@@ -559,17 +559,16 @@ class DeviceBottomDrawerController:
         statusAction.image = UIImage(systemName: "waveform.path.ecg")
         statusAction.backgroundColor = .systemIndigo
 
-        // Both chips get the images last uploaded with `make fw-upload`.
         let updateAction = UIContextualAction(style: .normal, title: "Update") { _, _, completionHandler in
             let alertController = UIAlertController(
                 title: "Update firmware?",
-                message: "Keep the phone next to \(device.name). Its Bluetooth chip updates first. The LTE chip then downloads its update and restarts, which needs LTE as its link right now.",
+                message: "Please have the Collar nearby.",
                 preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             for (title, includeLTE) in [("Bluetooth only", false), ("Bluetooth + LTE", true)] {
                 alertController.addAction(UIAlertAction(title: title, style: .default) { _ in
-                    let vc = UpdateViewController(deviceId: device.id, uniqueId: device.uniqueId,
-                                                  deviceName: device.name, includeLTE: includeLTE)
+                    let vc = UpdateViewController(deviceId: device.id, deviceUniqueId: device.uniqueId,
+                                                  deviceName: device.name, shouldUpdateLteChip: includeLTE)
                     self.parentVc.present(vc, animated: true)
                 })
             }
