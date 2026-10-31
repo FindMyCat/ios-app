@@ -25,10 +25,6 @@ class DeviceCommandsAPIManager {
         return host
     }
 
-    private var baseUrl: String {
-        return "https://\(host)/api/device-commands"
-    }
-
     private init() {}
 
     func send(_ command: String, toDeviceId deviceId: Int, completion: @escaping (Result<Void, Error>) -> Void) {
@@ -50,7 +46,7 @@ class DeviceCommandsAPIManager {
             let url = FileManager.default.temporaryDirectory.appendingPathComponent(file)
             return (url, [.removePreviousFile])
         }
-        session.download("\(baseUrl)/firmware/\(file)", to: destination)
+        session.download("https://\(host)/api/firmware/\(file)", to: destination)
             .validate()
             .response { response in
                 switch response.result {
