@@ -32,7 +32,14 @@ class DeviceStatusViewController: UITableViewController {
         load()
     }
 
+    // SIM first so the state includes a fresh "sim"; a failed refresh keeps the last one.
     private func load() {
+        DeviceStatusAPIManager.shared.refreshSim(deviceId: deviceId) { [weak self] in
+            self?.fetchState()
+        }
+    }
+
+    private func fetchState() {
         DeviceStatusAPIManager.shared.fetchDeviceState(deviceId: deviceId) { [weak self] result in
             guard let self else { return }
             self.refreshControl?.endRefreshing()

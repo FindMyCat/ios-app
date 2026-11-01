@@ -27,6 +27,18 @@ class DeviceStatusAPIManager {
 
     private init() {}
 
+    /// Asks the server to fetch the SIM status from Hologram; it lands in /state as "sim".
+    func refreshSim(deviceId: Int, completion: @escaping () -> Void) {
+        session.request("\(baseUrl)/devices/\(deviceId)/sim")
+            .validate()
+            .response { [logger] response in
+                if let error = response.error {
+                    logger.error("SIM refresh failed: \(error.localizedDescription)")
+                }
+                completion()
+            }
+    }
+
     /// Latest event of each kind for one device.
     func fetchDeviceState(deviceId: Int, completion: @escaping (Result<DeviceState, Error>) -> Void) {
         session.request("\(baseUrl)/devices/\(deviceId)/state")

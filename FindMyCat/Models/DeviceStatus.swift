@@ -14,6 +14,7 @@ struct DeviceState: Decodable {
     let network: NetworkState?
     let radio: RadioState?
     let firmware: FirmwareState?
+    let sim: SimState?
 
     static let decoder: JSONDecoder = {
         let decoder = JSONDecoder()
@@ -61,4 +62,28 @@ struct FirmwareState: Decodable {
     let id: Int
     let receivedAt: Date
     let version: String
+}
+
+/// Hologram's view of the SIM, stored by the server each time /sim is fetched.
+/// An active session means LTE is attached and a command can reach the collar.
+struct SimState: Decodable {
+    let id: Int
+    let receivedAt: Date
+    /// Hologram link state, e.g. "LIVE" or "PAUSED-USER".
+    let state: String?
+    let lastConnectTime: String?
+    let sessionActive: Bool?
+
+    private struct Session: Decodable { let active: Bool }
+    private enum CodingKeys: String, CodingKey { case id, receivedAt, state, lastConnectTime, lastSession }
+
+    // Flattens lastSession so the status screen lists it as a plain row.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(Int.self, forKey: .id)
+        receivedAt = try c.decode(Date.self, forKey: .receivedAt)
+        state = try c.decodeIfPresent(String.self, forKey: .state)
+        lastConnectTime = try c.decodeIfPresent(String.self, forKey: .lastConnectTime)
+        sessionActive = try c.decodeIfPresent(Session.self, forKey: .lastSession)?.active
+    }
 }
