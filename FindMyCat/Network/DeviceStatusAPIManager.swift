@@ -29,11 +29,17 @@ class DeviceStatusAPIManager {
 
     /// Asks the server to fetch the SIM status from Hologram; it lands in /state as "sim".
     func refreshSim(deviceId: Int, completion: @escaping () -> Void) {
-        session.request("\(baseUrl)/devices/\(deviceId)/sim")
+        let url = "\(baseUrl)/devices/\(deviceId)/sim"
+        logger.info("SIM refresh start: \(url, privacy: .public)")
+        // Never from cache: each call must reach the server so it asks Hologram again.
+        session.request(url, requestModifier: { $0.cachePolicy = .reloadIgnoringLocalCacheData })
             .validate()
             .response { [logger] response in
+                let status = response.response?.statusCode ?? -1
                 if let error = response.error {
-                    logger.error("SIM refresh failed: \(error.localizedDescription)")
+                    logger.error("SIM refresh failed (\(status)): \(error.localizedDescription, privacy: .public)")
+                } else {
+                    logger.info("SIM refresh ok (\(status))")
                 }
                 completion()
             }

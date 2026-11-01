@@ -82,6 +82,8 @@ class DeviceStatusViewController: UITableViewController {
         if let date = value as? Date {
             return date.formatted(date: .abbreviated, time: .standard) + " (" + date.formatted(.relative(presentation: .named)) + ")"
         }
+        // Exact type check: `as? Bool` would also match a number 0 or 1.
+        if type(of: value) == Bool.self, let flag = value as? Bool { return flag ? "Yes" : "No" }
         guard let number = (value as? NSNumber)?.doubleValue else { return "\(value)" }
 
         if key.hasSuffix("_ms") { return format(Date(timeIntervalSince1970: number / 1000), key: "") }

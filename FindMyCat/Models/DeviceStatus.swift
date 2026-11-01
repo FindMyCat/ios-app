@@ -69,9 +69,9 @@ struct FirmwareState: Decodable {
 struct SimState: Decodable {
     let id: Int
     let receivedAt: Date
-    /// Hologram link state, e.g. "LIVE" or "PAUSED-USER".
+    /// Hologram link state as a label, e.g. "LIVE" reads "Active".
     let state: String?
-    let lastConnectTime: String?
+    let lastConnectTime: Date?
     let sessionActive: Bool?
 
     private struct Session: Decodable { let active: Bool }
@@ -82,8 +82,32 @@ struct SimState: Decodable {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         id = try c.decode(Int.self, forKey: .id)
         receivedAt = try c.decode(Date.self, forKey: .receivedAt)
-        state = try c.decodeIfPresent(String.self, forKey: .state)
-        lastConnectTime = try c.decodeIfPresent(String.self, forKey: .lastConnectTime)
+        state = try c.decodeIfPresent(String.self, forKey: .state).map(Self.label)
+        lastConnectTime = try c.decodeIfPresent(String.self, forKey: .lastConnectTime).flatMap(Self.hologramTime.date)
         sessionActive = try c.decodeIfPresent(Session.self, forKey: .lastSession)?.active
     }
+
+    /// Hologram NetworkState values, as the app names them.
+    private static func label(_ state: String) -> String {
+        if state.hasSuffix("-PENDING") { return "Changing…" }
+        switch state {
+        case "LIVE": return "Active"
+        case "PAUSED-USER": return "Paused"
+        case "PAUSED-SYS": return "Paused by Hologram"
+        case "INACTIVE", "INACTIVE-TESTED", "FACTORY": return "Not activated"
+        case "TEST-ACTIVATE", "TEST-AUTOACTIVATE", "TEST-HIBERNATE": return "Test mode"
+        case "FROZEN": return "Frozen"
+        case "DEAD": return "Deactivated"
+        default: return state
+        }
+    }
+
+    /// Hologram timestamps are UTC "yyyy-MM-dd HH:mm:ss".
+    private static let hologramTime: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        return formatter
+    }()
 }
