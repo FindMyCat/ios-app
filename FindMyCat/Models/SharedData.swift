@@ -103,6 +103,20 @@ class SharedData {
         }
     }
 
+    // Light color is kept on this phone only, keyed by the device uniqueId.
+    private static let lightColorsKey = "LightColorByUniqueId"
+
+    public static func lightColor(forUniqueId uniqueId: String) -> LightColor {
+        let stored = UserDefaults.standard.dictionary(forKey: lightColorsKey)?[uniqueId] as? Int
+        return stored.flatMap { LightColor(rawValue: UInt8($0)) } ?? .white
+    }
+
+    public static func setLightColor(_ color: LightColor, forUniqueId uniqueId: String) {
+        var colors = UserDefaults.standard.dictionary(forKey: lightColorsKey) ?? [:]
+        colors[uniqueId] = Int(color.rawValue)
+        UserDefaults.standard.set(colors, forKey: lightColorsKey)
+    }
+
     public static func getDevicesCount() -> Int {
         return self.devices.count
     }

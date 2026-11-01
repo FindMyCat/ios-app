@@ -153,6 +153,10 @@ class BLEDataCommunicationChannel: NSObject {
         return preciseFindableDevices.first(where: { $0?.configuredDeviceId == deviceId }) ?? nil
     }
 
+    func getDevice(forUniqueId uniqueId: String) -> PreciseFindableDevice? {
+        return getDeviceFromDeviceId(uniqueId) ?? Int(uniqueId).flatMap { getDeviceFromUniqueID($0) }
+    }
+
     func identifyCollars() {
         for device in preciseFindableDevices where device?.configuredDeviceId == nil {
             guard let uniqueID = device?.bleUniqueID else { continue }

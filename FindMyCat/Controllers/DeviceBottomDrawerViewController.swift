@@ -35,12 +35,24 @@ class DeviceBottomDrawerController:
         }
     }
 
+    var currentAlertMode: AlertMode = .sound {
+        didSet {
+            reloadTableDataCellByCell()
+        }
+    }
+
     var cachedAddressesByDeviceId: [Int: (latitude: Double, longitude: Double, address: String?)] = [:]
 
     private let failedPingFeedbackGenerator = UINotificationFeedbackGenerator()
 
     private static let acknowledgedFailedPingIdsKey = "AcknowledgedFailedCommandEventIds"
-    private static let playSoundHoldSeconds: TimeInterval = 5.0
+    private static let bleCommandHoldSeconds: TimeInterval = 5.0
+    // Connect plus service discovery can take several advert intervals.
+    private static let bleCommandAttempts = 20
+
+    // One pending release per collar, reset by each command, so an older timer
+    // can't drop the link under a newer write.
+    private var pendingBleDisconnects: [Int: DispatchWorkItem] = [:]
 
     var alreadyAcknowledgedFailedPingIds: Set<Int> {
         get {
@@ -82,17 +94,6 @@ class DeviceBottomDrawerController:
 
         if !anyDeviceHasPingInFlight {
             stopSelectedDevicePingElapsedRedrawTimer()
-        }
-    }
-
-    @objc func longPressButtonAction(_ sender: UILongPressGestureRecognizer) {
-        if sender.state == .began {
-            // Long press has started
-            print("Long press started")
-            currentMode = currentMode == "ping" ? "lost" : "ping"
-        } else if sender.state == .ended {
-            // Long press has ended
-            print("Long press ended")
         }
     }
 
@@ -407,10 +408,9 @@ class DeviceBottomDrawerController:
         cell.pingOrlostModeButton.setPingInFlight(since: SharedData.pingSentAt(forDeviceId: cellDevice.id), idleTitle: currentMode.capitalized,
                                                   edrxSeconds: SharedData.edrxSeconds(forDeviceId: cellDevice.id))
 
-        let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(longPressButtonAction(_:)))
-        cell.pingOrlostModeButton.addGestureRecognizer(longPressRecognizer)
-
         cell.currentMode = currentMode
+        cell.alertMode = currentAlertMode
+        cell.lightColor = SharedData.lightColor(forUniqueId: cellDevice.uniqueId)
 
         if let targetPosition = positions.first(where: { $0.deviceId == cellDevice.id }) {
 
@@ -657,10 +657,8 @@ class DeviceBottomDrawerController:
 
 extension DeviceBottomDrawerController: DeviceCellDelegate {
     private func resolveBLEId(for device: Device) -> Int? {
-        if let identified = BLEDataCommunicationChannel.shared.getDeviceFromDeviceId(device.uniqueId) {
-            return identified.bleUniqueID
-        }
-        return Int(device.uniqueId)
+        return BLEDataCommunicationChannel.shared.getDevice(forUniqueId: device.uniqueId)?.bleUniqueID
+            ?? Int(device.uniqueId)
     }
 
     func launchPreciseFindScreen() {
@@ -683,42 +681,69 @@ extension DeviceBottomDrawerController: DeviceCellDelegate {
         let selectedDevice = SharedData.getDevices()[selectedDeviceIndex!]
         guard let selectedDeviceUniqueBLEId = resolveBLEId(for: selectedDevice) else { return }
 
-        BLEDataCommunicationChannel.shared.ensureConnected(selectedDeviceUniqueBLEId)
-        setSoundButtonBusy(true)
-        sendPlaySound(to: selectedDeviceUniqueBLEId, attemptsLeft: 8)
+        sendWhenConnected(Data([MessageId.playSound.rawValue]), to: selectedDeviceUniqueBLEId, busyButton: \.alertButton)
     }
 
-    private func setSoundButtonBusy(_ busy: Bool) {
+    func togglePingOrLostMode() {
+        currentMode = currentMode == "ping" ? "lost" : "ping"
+    }
+
+    func toggleAlertMode() {
+        currentAlertMode = currentAlertMode == .sound ? .light : .sound
+    }
+
+    func light() {
+        guard selectedDeviceIndex != nil else { return }
+        let selectedDevice = SharedData.getDevices()[selectedDeviceIndex!]
+        guard let selectedDeviceUniqueBLEId = resolveBLEId(for: selectedDevice) else { return }
+
+        let color = SharedData.lightColor(forUniqueId: selectedDevice.uniqueId)
+        sendWhenConnected(Data([MessageId.light.rawValue, color.rawValue]), to: selectedDeviceUniqueBLEId, busyButton: \.alertButton)
+    }
+
+    private func setButtonBusy(_ button: KeyPath<DeviceTableViewCell, Button>, _ busy: Bool) {
         guard let row = selectedDeviceIndex,
               let cell = tableView.cellForRow(at: IndexPath(row: row, section: 0)) as? DeviceTableViewCell
         else { return }
 
-        cell.soundButton.configuration?.showsActivityIndicator = busy
+        cell[keyPath: button].configuration?.showsActivityIndicator = busy
     }
 
-    private func sendPlaySound(to bleId: Int, attemptsLeft: Int) {
+    private func sendWhenConnected(_ data: Data, to bleId: Int, busyButton: KeyPath<DeviceTableViewCell, Button>) {
+        pendingBleDisconnects.removeValue(forKey: bleId)?.cancel()
+        BLEDataCommunicationChannel.shared.ensureConnected(bleId)
+        setButtonBusy(busyButton, true)
+        sendWhenConnected(data, to: bleId, busyButton: busyButton, attemptsLeft: Self.bleCommandAttempts)
+    }
+
+    private func sendWhenConnected(_ data: Data, to bleId: Int, busyButton: KeyPath<DeviceTableViewCell, Button>, attemptsLeft: Int) {
         guard attemptsLeft > 0 else {
-            logger.error("playSound gave up, \(bleId) never became ready")
-            setSoundButtonBusy(false)
+            logger.error("BLE command gave up, \(bleId) never became ready")
+            setButtonBusy(busyButton, false)
+            // Drop the pending connect too, or the collar stays marked connected.
+            try? BLEDataCommunicationChannel.shared.disconnectPeripheral(bleId)
             return
         }
 
         if let device = BLEDataCommunicationChannel.shared.getDeviceFromUniqueID(bleId),
            device.blePeripheral.state == .connected,
            device.rxCharacteristic != nil {
-            try? BLEDataCommunicationChannel.shared.sendData(Data([MessageId.playSound.rawValue]), bleId)
-            setSoundButtonBusy(false)
+            try? BLEDataCommunicationChannel.shared.sendData(data, bleId)
+            setButtonBusy(busyButton, false)
 
             // Release it, or Precise Find's connectPeripheral rejects a device that is
             // no longer statusDiscovered.
-            DispatchQueue.main.asyncAfter(deadline: .now() + Self.playSoundHoldSeconds) {
+            let release = DispatchWorkItem { [weak self] in
+                self?.pendingBleDisconnects[bleId] = nil
                 try? BLEDataCommunicationChannel.shared.disconnectPeripheral(bleId)
             }
+            pendingBleDisconnects[bleId] = release
+            DispatchQueue.main.asyncAfter(deadline: .now() + Self.bleCommandHoldSeconds, execute: release)
             return
         }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            self?.sendPlaySound(to: bleId, attemptsLeft: attemptsLeft - 1)
+            self?.sendWhenConnected(data, to: bleId, busyButton: busyButton, attemptsLeft: attemptsLeft - 1)
         }
     }
 

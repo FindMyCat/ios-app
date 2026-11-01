@@ -19,6 +19,8 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
     var hostTextField = CocoaTextField()
     var portTextField = CocoaTextField()
     let connectionStatusLabel = UILabel()
+    let lightColorStack = UIStackView()
+    private var lightColor = LightColor.white
     private var statusTimer: Timer?
 
     private var isInEditingMode = false
@@ -39,7 +41,7 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
         navigationItem.setHidesBackButton(true, animated: false)
         view.addSubview(sheetView)
 
-        sheetView.showInView(view, height: 620)
+        sheetView.showInView(view, height: 680)
 
         sheetView.translatesAutoresizingMaskIntoConstraints = false
 
@@ -54,6 +56,8 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
         addHostTextField()
 
         addPortTextField()
+
+        addLightColorPicker()
 
         addSubmitButton()
 
@@ -300,6 +304,48 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
         ])
     }
 
+    private func addLightColorPicker() {
+        lightColor = SharedData.lightColor(forUniqueId: uniqueIdReadOnlyTextField.text ?? "")
+
+        lightColorStack.axis = .horizontal
+        lightColorStack.spacing = 12
+        lightColorStack.translatesAutoresizingMaskIntoConstraints = false
+        sheetView.addSubview(lightColorStack)
+
+        for color in LightColor.allCases {
+            let swatch = UIButton()
+            swatch.tag = Int(color.rawValue)
+            swatch.backgroundColor = color.uiColor
+            swatch.layer.cornerRadius = 16
+            swatch.layer.borderColor = UIColor.label.cgColor
+            swatch.accessibilityLabel = "\(color.name) light"
+            swatch.addTarget(self, action: #selector(lightColorTapped(_:)), for: .touchUpInside)
+            swatch.widthAnchor.constraint(equalToConstant: 32).isActive = true
+            swatch.heightAnchor.constraint(equalToConstant: 32).isActive = true
+            lightColorStack.addArrangedSubview(swatch)
+        }
+        showSelectedLightColor()
+
+        NSLayoutConstraint.activate([
+            lightColorStack.centerXAnchor.constraint(equalTo: sheetView.centerXAnchor),
+            lightColorStack.topAnchor.constraint(equalTo: portTextField.bottomAnchor, constant: 24)
+        ])
+    }
+
+    @objc private func lightColorTapped(_ sender: UIButton) {
+        guard let color = LightColor(rawValue: UInt8(sender.tag)) else { return }
+        lightColor = color
+        showSelectedLightColor()
+    }
+
+    private func showSelectedLightColor() {
+        for swatch in lightColorStack.arrangedSubviews {
+            let selected = swatch.tag == Int(lightColor.rawValue)
+            swatch.layer.borderWidth = selected ? 3 : 1
+            swatch.accessibilityTraits = selected ? [.button, .selected] : .button
+        }
+    }
+
     private func addSubmitButton() {
 
         sheetView.addSubview(submitButton)
@@ -317,7 +363,7 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
         submitButton.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            submitButton.topAnchor.constraint(equalTo: portTextField.bottomAnchor, constant: 50),
+            submitButton.topAnchor.constraint(equalTo: lightColorStack.bottomAnchor, constant: 40),
             submitButton.centerXAnchor.constraint(equalTo: sheetView.centerXAnchor),
             submitButton.widthAnchor.constraint(equalToConstant: 100)
         ])
@@ -333,6 +379,8 @@ class AddEditDeviceViewController: UIViewController, UITextFieldDelegate {
         else {
             return
         }
+
+        SharedData.setLightColor(lightColor, forUniqueId: deviceUniqueId)
 
         // Push host/port to the tag over BLE. The device's uniqueId string is its
         // BLE uniqueID; no-op (throws) if the tag isn't currently connected.

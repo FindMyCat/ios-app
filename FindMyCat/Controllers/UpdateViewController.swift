@@ -77,9 +77,17 @@ class UpdateViewController: UIViewController {
         searchForCollarOverBluetooth()
     }
 
+    // Auto-lock suspends the app mid-transfer, and a stalled DFU leaves
+    // the collar with no app. Keep the screen on while updating.
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        UIApplication.shared.isIdleTimerDisabled = true
+    }
+
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         activeStepTimer?.invalidate()
+        UIApplication.shared.isIdleTimerDisabled = false
     }
 
     // MARK: - Layout
@@ -162,8 +170,12 @@ class UpdateViewController: UIViewController {
         showBottomButton(title: "Cancel", isProminent: false)
 
         activeStepTimer = Timer.scheduledTimer(withTimeInterval: Self.COLLAR_SEARCH_RETRY_INTERVAL_SECONDS, repeats: true) { [weak self] timer in
-            guard let self, let collarBluetoothUniqueId = Int(self.deviceUniqueId),
-                  let collar = BLEDataCommunicationChannel.shared.getDeviceFromUniqueID(collarBluetoothUniqueId) else { return }
+            guard let self else { return }
+            guard let collar = BLEDataCommunicationChannel.shared.getDevice(forUniqueId: self.deviceUniqueId) else {
+                // A collar found after the drawer opened has not had its device_id read yet.
+                BLEDataCommunicationChannel.shared.identifyCollars()
+                return
+            }
             timer.invalidate()
             self.bottomButton.isHidden = true
             self.downloadBluetoothChipFirmware(for: collar)

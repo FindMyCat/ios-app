@@ -197,13 +197,14 @@ class MapboxView: UIView, CLLocationManagerDelegate {
 
         for position in positions {
             let newCoordinate = CLLocationCoordinate2D(latitude: position.latitude, longitude: position.longitude)
-            let options = ViewAnnotationOptions(
+            var options = ViewAnnotationOptions(
                 geometry: Point(newCoordinate),
                 width: 60,
                 height: 60,
                 allowOverlap: false,
                 anchor: ViewAnnotationAnchor.bottom
             )
+            options.allowOverlapWithPuck = true
 
             if let device = SharedData.getDevices().first(where: { $0.id == position.deviceId }) {
                 let frame = CGRect(x: 0, y: 0, width: 60, height: 60)

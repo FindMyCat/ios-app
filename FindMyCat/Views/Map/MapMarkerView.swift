@@ -11,21 +11,34 @@ import Foundation
 class CustomAnnotationView: UIView {
 
     private let avatarEmojiLabel = UILabel()
+    private var markerSize: CGSize = .zero
 
     // MARK: - View Lifecycles
 
     override init(frame: CGRect) {
         super.init(frame: frame)
+        markerSize = frame.size
         backgroundColor = .clear
+        // Redraw the bubble whenever Mapbox resizes the view.
+        contentMode = .redraw
         setupShadow()
         setupSubviews()
     }
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
+        markerSize = frame.size
         backgroundColor = .clear
+        contentMode = .redraw
         setupShadow()
         setupSubviews()
+    }
+
+    // Mapbox 11 sizes view annotations with systemLayoutSizeFitting, not the options'
+    // width/height. Auto Layout alone measures only the emoji, which shrinks the bubble
+    // drawn in draw(_:) to sit hidden behind it.
+    override func systemLayoutSizeFitting(_ targetSize: CGSize) -> CGSize {
+        return markerSize
     }
 
     override func draw(_ rect: CGRect) {

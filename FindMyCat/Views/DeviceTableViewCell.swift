@@ -27,6 +27,15 @@ protocol DeviceCellDelegate: AnyObject {
     func launchPreciseFindScreen()
     func activateLostMode(currentMode: String)
     func playSound()
+    func light()
+    func togglePingOrLostMode()
+    func toggleAlertMode()
+}
+
+// What the alert button does on tap; long-press switches it, like Ping/Lost.
+enum AlertMode {
+    case sound
+    case light
 }
 
 class ButtonWithProgressBar: UIButton {
@@ -95,11 +104,21 @@ class DeviceTableViewCell: UITableViewCell {
 
     // Expanded state views
     let findButton = Button()
-    let soundButton = Button()
+    let alertButton = Button()
     let pingOrlostModeButton = ButtonWithProgressBar()
     var currentMode: String = "ping" {
         didSet {
             updateUIForCurrentMode()
+        }
+    }
+    var alertMode: AlertMode = .sound {
+        didSet {
+            updateAlertButton()
+        }
+    }
+    var lightColor: LightColor = .white {
+        didSet {
+            updateAlertButton()
         }
     }
 
@@ -139,7 +158,7 @@ class DeviceTableViewCell: UITableViewCell {
         configureDeviceAddressLabel()
         configureBatteryIcon()
         configureFindButton()
-        configurePlaySoundButton()
+        configureAlertButton()
         configureLostModeButton()
 
         configureLastSeenLabel()
@@ -240,28 +259,91 @@ class DeviceTableViewCell: UITableViewCell {
             batteryIcon.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 23)])
     }
 
-    private func configurePlaySoundButton() {
-        soundButton.tintColor = blueColor
-        soundButton.configuration = UIButton.Configuration.tinted()
-        soundButton.configuration?.buttonSize = buttonSize
-        soundButton.configuration?.imagePadding = 10
-        soundButton.configuration?.cornerStyle = .medium
-        soundButton.setImage(UIImage(systemName: "speaker.wave.2.fill"), for: .normal)
+    private func configureAlertButton() {
+        alertButton.configuration = UIButton.Configuration.tinted()
+        alertButton.configuration?.buttonSize = buttonSize
+        alertButton.configuration?.imagePadding = 10
+        alertButton.configuration?.cornerStyle = .medium
+        updateAlertButton()
 
-        contentView.addSubview(soundButton)
+        contentView.addSubview(alertButton)
 
-        soundButton.translatesAutoresizingMaskIntoConstraints = false
+        alertButton.translatesAutoresizingMaskIntoConstraints = false
 
-        soundButton.addTarget(self, action: #selector(self.playSoundTapped), for: .touchUpInside)
+        alertButton.addTarget(self, action: #selector(self.alertTapped), for: .touchUpInside)
+        addHoldToSwitch(to: alertButton, action: #selector(self.alertLongPressed(_:)))
 
         NSLayoutConstraint.activate([
-            soundButton.leadingAnchor.constraint(equalTo: findButton.trailingAnchor, constant: spacingBetweenExpandedStateButtons),
-            soundButton.bottomAnchor.constraint(equalTo: findButton.bottomAnchor)
+            alertButton.leadingAnchor.constraint(equalTo: findButton.trailingAnchor, constant: spacingBetweenExpandedStateButtons),
+            alertButton.bottomAnchor.constraint(equalTo: findButton.bottomAnchor)
         ])
     }
 
-    @objc private func playSoundTapped() {
-        delegate?.playSound()
+    // Image goes on the configuration: setImage(_:for:) is dropped when the busy
+    // spinner rewrites the configuration.
+    private func updateAlertButton() {
+        switch alertMode {
+        case .sound:
+            alertButton.configuration?.image = UIImage(systemName: "speaker.wave.2.fill")
+            alertButton.tintColor = blueColor
+            alertButton.accessibilityLabel = "Play sound"
+        case .light:
+            alertButton.configuration?.image = UIImage(systemName: "lightbulb.fill")
+            alertButton.tintColor = lightColor == .white ? blueColor : lightColor.uiColor
+            alertButton.accessibilityLabel = "Flash \(lightColor.name.lowercased()) light"
+        }
+    }
+
+    @objc private func alertTapped() {
+        switch alertMode {
+        case .sound: delegate?.playSound()
+        case .light: delegate?.light()
+        }
+    }
+
+    @objc private func alertLongPressed(_ sender: UILongPressGestureRecognizer) {
+        guard sender.state == .began else { return }
+        alertMode = alertMode == .sound ? .light : .sound
+        slapIn(alertButton) { [weak self] in self?.delegate?.toggleAlertMode() }
+    }
+
+    // MARK: - Hold to switch
+
+    // Holding grows the button until the switch fires, then it springs back in, so the
+    // user feels "keep holding... bam".
+    private static let holdToSwitchSeconds: TimeInterval = 0.5
+    private static let holdToSwitchScale: CGFloat = 1.25
+    private let switchFeedbackGenerator = UIImpactFeedbackGenerator(style: .heavy)
+
+    private func addHoldToSwitch(to button: UIButton, action: Selector) {
+        let press = UILongPressGestureRecognizer(target: self, action: action)
+        press.minimumPressDuration = Self.holdToSwitchSeconds
+        button.addGestureRecognizer(press)
+        button.addTarget(self, action: #selector(holdStarted(_:)), for: .touchDown)
+    }
+
+    // Letting go early is undone by Button's own isHighlighted animation.
+    @objc private func holdStarted(_ button: UIButton) {
+        switchFeedbackGenerator.prepare()
+        guard !UIAccessibility.isReduceMotionEnabled else { return }
+        UIView.animate(withDuration: Self.holdToSwitchSeconds, delay: 0,
+                       options: [.curveEaseIn, .allowUserInteraction, .beginFromCurrentState]) {
+            button.transform = CGAffineTransform(scaleX: Self.holdToSwitchScale, y: Self.holdToSwitchScale)
+        }
+    }
+
+    // The delegate reloads the row, so it runs after the spring settles.
+    private func slapIn(_ button: UIButton, then switched: @escaping () -> Void) {
+        switchFeedbackGenerator.impactOccurred()
+        guard !UIAccessibility.isReduceMotionEnabled else {
+            button.transform = .identity
+            switched()
+            return
+        }
+        UIView.animate(withDuration: 0.45, delay: 0, usingSpringWithDamping: 0.35, initialSpringVelocity: 1,
+                       options: [.beginFromCurrentState, .allowUserInteraction],
+                       animations: { button.transform = .identity },
+                       completion: { _ in switched() })
     }
 
     private func configureFindButton() {
@@ -330,15 +412,23 @@ class DeviceTableViewCell: UITableViewCell {
         pingOrlostModeButton.translatesAutoresizingMaskIntoConstraints = false
 
         pingOrlostModeButton.addTarget(self, action: #selector(self.activateLostMode), for: .touchUpInside)
+        // Added once here; adding it per cellForRowAt stacked recognizers on reused cells.
+        addHoldToSwitch(to: pingOrlostModeButton, action: #selector(self.pingLongPressed(_:)))
 
         NSLayoutConstraint.activate([
-            pingOrlostModeButton.leadingAnchor.constraint(equalTo: soundButton.trailingAnchor, constant: spacingBetweenExpandedStateButtons),
-            pingOrlostModeButton.bottomAnchor.constraint(equalTo: soundButton.bottomAnchor)
+            pingOrlostModeButton.leadingAnchor.constraint(equalTo: alertButton.trailingAnchor, constant: spacingBetweenExpandedStateButtons),
+            pingOrlostModeButton.bottomAnchor.constraint(equalTo: alertButton.bottomAnchor)
         ])
     }
 
     @objc private func activateLostMode() {
         delegate?.activateLostMode(currentMode: currentMode)
+    }
+
+    @objc private func pingLongPressed(_ sender: UILongPressGestureRecognizer) {
+        guard sender.state == .began else { return }
+        currentMode = currentMode == "ping" ? "lost" : "ping"
+        slapIn(pingOrlostModeButton) { [weak self] in self?.delegate?.togglePingOrLostMode() }
     }
     // MARK: - Public Methods
 
