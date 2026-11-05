@@ -106,7 +106,7 @@ class DeviceTableViewCell: UITableViewCell {
     let findButton = Button()
     let alertButton = Button()
     let pingOrlostModeButton = ButtonWithProgressBar()
-    var currentMode: String = "ping-wifi" {
+    var currentMode: String = "ping" {
         didSet {
             updateUIForCurrentMode()
         }
@@ -380,7 +380,7 @@ class DeviceTableViewCell: UITableViewCell {
     }
 
     /// Collar commands the hold-to-switch gesture cycles through, in order.
-    static let commandModesInSwitchOrder = ["ping-wifi", "ping-gps", "ping-cell", "lost"]
+    static let commandModesInSwitchOrder = ["ping", "ping-wifi", "ping-gps", "ping-cell", "lost"]
 
     static func commandMode(after mode: String) -> String {
         let index = commandModesInSwitchOrder.firstIndex(of: mode) ?? 0
@@ -390,7 +390,7 @@ class DeviceTableViewCell: UITableViewCell {
     /// While lost mode runs the button stops it, whatever mode is selected.
     static func buttonTitle(forCommandMode mode: String, isLostModeOn: Bool) -> String {
         if isLostModeOn { return "Stop Lost" }
-        let titles = ["ping-wifi": "WiFi Ping", "ping-gps": "GPS Ping", "ping-cell": "Cell Ping", "lost": "Lost"]
+        let titles = ["ping": "Ping", "ping-wifi": "WiFi Ping", "ping-gps": "GPS Ping", "ping-cell": "Cell Ping", "lost": "Lost"]
         return titles[mode] ?? mode.capitalized
     }
 

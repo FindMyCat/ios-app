@@ -29,7 +29,7 @@ class DeviceBottomDrawerController:
 
     private var selectedDeviceIndex: Int?
 
-    var currentMode: String = "ping-wifi" {
+    var currentMode: String = "ping" {
         didSet {
             reloadTableDataCellByCell()
         }
