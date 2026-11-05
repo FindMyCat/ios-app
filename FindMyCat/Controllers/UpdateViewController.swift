@@ -259,8 +259,8 @@ class UpdateViewController: UIViewController {
             guard let self else { return }
             switch result {
             case .success:
-                self.showUpdateStatus(title: "Waiting for the collar…",
-                                      detail: "It picks up the update at its next check-in, then starts downloading.",
+                self.showUpdateStatus(title: "Sending update command to collar…",
+                                      detail: "Collar will download the firmware, reboot and report.",
                                       progress: 0)
                 self.activeStepTimer = Timer.scheduledTimer(withTimeInterval: Self.LTE_STATUS_POLL_INTERVAL_SECONDS, repeats: true) { [weak self] _ in
                     self?.fetchCollarStateDuringLteUpdate()
