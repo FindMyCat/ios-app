@@ -29,7 +29,7 @@ class DeviceBottomDrawerController:
 
     private var selectedDeviceIndex: Int?
 
-    var currentMode: String = "ping" {
+    var currentMode: String = "ping-wifi" {
         didSet {
             reloadTableDataCellByCell()
         }
@@ -88,7 +88,7 @@ class DeviceBottomDrawerController:
 
             let indexPath = IndexPath(row: row, section: 0)
             guard let cell = tableView.cellForRow(at: indexPath) as? DeviceTableViewCell else { continue }
-            cell.pingOrlostModeButton.setPingInFlight(since: pingSentAt, idleTitle: currentMode.capitalized,
+            cell.pingOrlostModeButton.setPingInFlight(since: pingSentAt, idleTitle: idleButtonTitle(forDeviceId: device.id),
                                                       edrxSeconds: SharedData.edrxSeconds(forDeviceId: device.id))
         }
 
@@ -405,10 +405,12 @@ class DeviceBottomDrawerController:
         cell.lastSeenLabel.isHidden = true
         cell.deviceAddressLabel.isHidden = true
         cell.batteryIcon.isHidden = true
-        cell.pingOrlostModeButton.setPingInFlight(since: SharedData.pingSentAt(forDeviceId: cellDevice.id), idleTitle: currentMode.capitalized,
+        cell.pingOrlostModeButton.setPingInFlight(since: SharedData.pingSentAt(forDeviceId: cellDevice.id),
+                                                  idleTitle: idleButtonTitle(forDeviceId: cellDevice.id),
                                                   edrxSeconds: SharedData.edrxSeconds(forDeviceId: cellDevice.id))
 
         cell.currentMode = currentMode
+        cell.isLostModeOn = SharedData.isLostModeOn(forDeviceId: cellDevice.id)
         cell.alertMode = currentAlertMode
         cell.lightColor = SharedData.lightColor(forUniqueId: cellDevice.uniqueId)
 
@@ -685,7 +687,12 @@ extension DeviceBottomDrawerController: DeviceCellDelegate {
     }
 
     func togglePingOrLostMode() {
-        currentMode = currentMode == "ping" ? "lost" : "ping"
+        currentMode = DeviceTableViewCell.commandMode(after: currentMode)
+    }
+
+    private func idleButtonTitle(forDeviceId deviceId: Int) -> String {
+        DeviceTableViewCell.buttonTitle(forCommandMode: currentMode,
+                                        isLostModeOn: SharedData.isLostModeOn(forDeviceId: deviceId))
     }
 
     func toggleAlertMode() {
@@ -753,15 +760,21 @@ extension DeviceBottomDrawerController: DeviceCellDelegate {
 
         let selectedDevice = SharedData.getDevices()[selectedDeviceIndex!]
         let selectedDeviceTraccarId = selectedDevice.id
+        let command = SharedData.isLostModeOn(forDeviceId: selectedDeviceTraccarId) ? "idle" : currentMode
 
-        DeviceCommandsAPIManager.shared.send(currentMode, toDeviceId: selectedDeviceTraccarId) { result in
+        DeviceCommandsAPIManager.shared.send(command, toDeviceId: selectedDeviceTraccarId) { result in
             switch result {
-            case .success:
+            case .success where command.hasPrefix("ping"):
                 SharedData.markPingSent(forDeviceId: selectedDeviceTraccarId)
                 self.startSelectedDevicePingElapsedRedrawTimer()
                 self.reloadTableDataCellByCell()
+            case .success:
+                // The server logged the command, so the state now says whether lost mode is on.
+                SharedData.refreshState(forDeviceId: selectedDeviceTraccarId) {
+                    self.reloadTableDataCellByCell()
+                }
             case .failure(let error):
-                self.logger.error("Could not send \(currentMode) to device \(selectedDeviceTraccarId): \(error)")
+                self.logger.error("Could not send \(command) to device \(selectedDeviceTraccarId): \(error)")
             }
         }
     }

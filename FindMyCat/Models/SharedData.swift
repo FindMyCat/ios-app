@@ -138,6 +138,14 @@ class SharedData {
         return pingsInFlight[deviceId]
     }
 
+    public static func isLostModeOn(forDeviceId deviceId: Int) -> Bool {
+        return deviceStates[deviceId]?.command?.command == "lost"
+    }
+
+    public static func refreshState(forDeviceId deviceId: Int, completion: @escaping () -> Void) {
+        fetchState(forDeviceId: deviceId, completion: completion)
+    }
+
     /// Latest eDRX cycle the collar reported, nil until its first network event.
     public static func edrxSeconds(forDeviceId deviceId: Int) -> Double? {
         return deviceStates[deviceId]?.network?.edrx_s
@@ -156,10 +164,11 @@ class SharedData {
         }
     }
 
-    private static func fetchState(forDeviceId deviceId: Int) {
+    private static func fetchState(forDeviceId deviceId: Int, completion: (() -> Void)? = nil) {
         guard deviceId != 0 else { return } // local debug devices have no server state
 
         DeviceStatusAPIManager.shared.fetchDeviceState(deviceId: deviceId) { result in
+            defer { completion?() }
             switch result {
             case .success(let state):
                 deviceStates[deviceId] = state

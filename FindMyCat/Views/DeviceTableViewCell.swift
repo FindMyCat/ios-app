@@ -106,7 +106,7 @@ class DeviceTableViewCell: UITableViewCell {
     let findButton = Button()
     let alertButton = Button()
     let pingOrlostModeButton = ButtonWithProgressBar()
-    var currentMode: String = "ping" {
+    var currentMode: String = "ping-wifi" {
         didSet {
             updateUIForCurrentMode()
         }
@@ -379,26 +379,36 @@ class DeviceTableViewCell: UITableViewCell {
         delegate?.launchPreciseFindScreen()
     }
 
-    func updateUIForCurrentMode() {
-        if currentMode == "ping" {
-            pingOrlostModeButton.tintColor = UIColor.systemOrange
-        } else {
-            // Red color for Lost Mode
-            pingOrlostModeButton.tintColor = redColor
+    /// Collar commands the hold-to-switch gesture cycles through, in order.
+    static let commandModesInSwitchOrder = ["ping-wifi", "ping-gps", "ping-cell", "lost"]
+
+    static func commandMode(after mode: String) -> String {
+        let index = commandModesInSwitchOrder.firstIndex(of: mode) ?? 0
+        return commandModesInSwitchOrder[(index + 1) % commandModesInSwitchOrder.count]
+    }
+
+    /// While lost mode runs the button stops it, whatever mode is selected.
+    static func buttonTitle(forCommandMode mode: String, isLostModeOn: Bool) -> String {
+        if isLostModeOn { return "Stop Lost" }
+        let titles = ["ping-wifi": "WiFi Ping", "ping-gps": "GPS Ping", "ping-cell": "Cell Ping", "lost": "Lost"]
+        return titles[mode] ?? mode.capitalized
+    }
+
+    var isLostModeOn = false {
+        didSet {
+            updateUIForCurrentMode()
         }
+    }
+
+    func updateUIForCurrentMode() {
+        let isLostStyle = isLostModeOn || currentMode == "lost"
+        pingOrlostModeButton.tintColor = isLostStyle ? redColor : UIColor.systemOrange
         if pingOrlostModeButton.configuration?.showsActivityIndicator != true {
-            pingOrlostModeButton.configuration?.title = currentMode.capitalized
+            pingOrlostModeButton.configuration?.title = Self.buttonTitle(forCommandMode: currentMode, isLostModeOn: isLostModeOn)
         }
     }
 
     private func configureLostModeButton() {
-        if currentMode == "ping" {
-            pingOrlostModeButton.tintColor = UIColor.systemOrange
-        } else {
-            // Red color for Lost Mode
-            pingOrlostModeButton.tintColor = redColor
-        }
-
         pingOrlostModeButton.configuration = UIButton.Configuration.tinted()
         pingOrlostModeButton.configuration?.cornerStyle = .medium
 
@@ -407,7 +417,7 @@ class DeviceTableViewCell: UITableViewCell {
 
         contentView.addSubview(pingOrlostModeButton)
 
-        pingOrlostModeButton.configuration?.title = currentMode.capitalized
+        updateUIForCurrentMode()
 
         pingOrlostModeButton.translatesAutoresizingMaskIntoConstraints = false
 
@@ -427,7 +437,7 @@ class DeviceTableViewCell: UITableViewCell {
 
     @objc private func pingLongPressed(_ sender: UILongPressGestureRecognizer) {
         guard sender.state == .began else { return }
-        currentMode = currentMode == "ping" ? "lost" : "ping"
+        currentMode = Self.commandMode(after: currentMode)
         slapIn(pingOrlostModeButton) { [weak self] in self?.delegate?.togglePingOrLostMode() }
     }
     // MARK: - Public Methods
