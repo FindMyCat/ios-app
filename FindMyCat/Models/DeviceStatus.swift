@@ -37,6 +37,8 @@ struct CommandResult: Decodable {
     let satellites: Double?
     /// Set by the server when it placed the WiFi scan ("ok").
     let access_points: Int?
+    /// Set by the server when it placed the cell scan ("ok").
+    let cell_towers: Int?
     let accuracy_m: Double?
 }
 
