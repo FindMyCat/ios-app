@@ -34,8 +34,10 @@ class SharedData {
     /// Polls device-status only while a ping waits for its answer.
     private static var statePollTimer: Timer?
     private static let statePollInterval: TimeInterval = 3
-    private static var pingsInFlight: [Int: Date] = [:] {
+    private static let PINGS_IN_FLIGHT_PERSISTENCE_KEY = "PingsInFlightSentAtByDeviceId"
+    private static var pingsInFlight: [Int: Date] = loadPersistedPingsInFlight() {
         didSet {
+            persistPingsInFlight()
             let userInfo = ["pingsInFlight": pingsInFlight]
             NotificationCenter.default.post(name: Notification.Name(Constants.PingsInFlightUpdatedNotificationName), object: nil, userInfo: userInfo)
         }
@@ -57,6 +59,9 @@ class SharedData {
         fetchDevicesFromRestAPI {
             SharedData.mergeInPersistedLocalDevices()
             SharedData.devices.forEach { SharedData.fetchState(forDeviceId: $0.id) }
+            if !SharedData.pingsInFlight.isEmpty {
+                SharedData.startStatePolling()
+            }
             self.fetchPositionsFromRestAPI {
                 self.configureWebsocket {
                    // Fetched complete.
@@ -132,6 +137,17 @@ class SharedData {
     public static func markPingSent(forDeviceId deviceId: Int) {
         pingsInFlight[deviceId] = Date()
         startStatePolling()
+    }
+
+    private static func loadPersistedPingsInFlight() -> [Int: Date] {
+        guard let persistedPingsInFlightData = UserDefaults.standard.data(forKey: PINGS_IN_FLIGHT_PERSISTENCE_KEY) else { return [:] }
+        return (try? JSONDecoder().decode([Int: Date].self, from: persistedPingsInFlightData)) ?? [:]
+    }
+
+    private static func persistPingsInFlight() {
+        if let pingsInFlightData = try? JSONEncoder().encode(pingsInFlight) {
+            UserDefaults.standard.set(pingsInFlightData, forKey: PINGS_IN_FLIGHT_PERSISTENCE_KEY)
+        }
     }
 
     public static func pingSentAt(forDeviceId deviceId: Int) -> Date? {

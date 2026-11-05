@@ -64,6 +64,8 @@ class DeviceBottomDrawerController:
         }
     }
 
+    private var lostModeOnDeviceIdsLastRendered: Set<Int> = []
+
     var selectedDevicePingElapsedRedrawTimer: Timer?
 
     func startSelectedDevicePingElapsedRedrawTimer() {
@@ -160,6 +162,7 @@ class DeviceBottomDrawerController:
     // MARK: - Notification Observers
 
     @objc private func devicesUpdated(_ notification: Notification) {
+        if SharedData.getDevices().contains(where: { SharedData.pingSentAt(forDeviceId: $0.id) != nil }) { startSelectedDevicePingElapsedRedrawTimer() }
 
         let totalDevices = SharedData.getDevicesCount()
         let tableViewRows = tableView.numberOfRows(inSection: 0)
@@ -191,6 +194,12 @@ class DeviceBottomDrawerController:
 
     @objc private func deviceStatusUpdated(_ notification: Notification) {
         guard let deviceStates = notification.userInfo?["deviceStates"] as? [Int: DeviceState] else { return }
+
+        let lostModeOnDeviceIds = Set(deviceStates.keys.filter { SharedData.isLostModeOn(forDeviceId: $0) })
+        if lostModeOnDeviceIds != lostModeOnDeviceIdsLastRendered {
+            lostModeOnDeviceIdsLastRendered = lostModeOnDeviceIds
+            reloadTableDataCellByCell()
+        }
 
         for (deviceId, state) in deviceStates {
             guard let result = state.command, result.status.lowercased() == "fail",
