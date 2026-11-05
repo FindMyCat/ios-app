@@ -46,7 +46,10 @@ class DeviceCommandsAPIManager {
             let url = FileManager.default.temporaryDirectory.appendingPathComponent(file)
             return (url, [.removePreviousFile])
         }
-        session.download("https://\(host)/api/firmware/\(file)", to: destination)
+        // Never from cache: a stored copy would install an older image than the one on the server.
+        session.download("https://\(host)/api/firmware/\(file)",
+                         requestModifier: { $0.cachePolicy = .reloadIgnoringLocalCacheData },
+                         to: destination)
             .validate()
             .response { response in
                 switch response.result {
