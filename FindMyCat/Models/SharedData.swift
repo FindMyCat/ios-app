@@ -34,6 +34,7 @@ class SharedData {
     /// Polls device-status only while a ping waits for its answer.
     private static var statePollTimer: Timer?
     private static let statePollInterval: TimeInterval = 3
+    private static let STUCK_PING_TIMEOUT_EDRX_CYCLES: Double = 2
     private static let PINGS_IN_FLIGHT_PERSISTENCE_KEY = "PingsInFlightSentAtByDeviceId"
     private static var pingsInFlight: [Int: Date] = loadPersistedPingsInFlight() {
         didSet {
@@ -175,6 +176,13 @@ class SharedData {
                 timer.invalidate()
                 statePollTimer = nil
                 return
+            }
+            let stuckPingDeviceIds = pingsInFlight.filter { deviceId, sentAt in
+                guard let edrxSeconds = edrxSeconds(forDeviceId: deviceId) else { return false }
+                return Date().timeIntervalSince(sentAt) > edrxSeconds * STUCK_PING_TIMEOUT_EDRX_CYCLES
+            }.keys
+            if !stuckPingDeviceIds.isEmpty {
+                pingsInFlight = pingsInFlight.filter { !stuckPingDeviceIds.contains($0.key) }
             }
             pingsInFlight.keys.forEach { fetchState(forDeviceId: $0) }
         }
